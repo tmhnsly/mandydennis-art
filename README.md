@@ -1,54 +1,45 @@
-# React + TypeScript + Vite
+# Mandy Dennis Art
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Portfolio website for artist Mandy Dennis -- showcasing artwork, commission pricing, and upcoming events.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend:** React 19, Vite, TypeScript, Tailwind CSS v4
+- **CMS:** Sanity (content + image hosting)
+- **Hosting:** Netlify
+- **Forms:** Netlify Forms
 
-## Expanding the ESLint configuration
+## Quick Start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+yarn install
+yarn dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The site runs with dummy content when Sanity isn't configured -- no setup needed to preview the layout.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Connecting to Sanity
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. Create a project at [sanity.io](https://www.sanity.io)
+2. Copy `.env.example` to `.env` and fill in your project ID
+3. Add `http://localhost:5173` as a CORS origin in Sanity dashboard
+4. Set up Sanity Studio (see `studio/schemas/` for schema definitions)
+
+## Environment Variables
+
+| Variable                 | Required | Description          |
+|--------------------------|----------|----------------------|
+| `VITE_SANITY_PROJECT_ID` | yes*     | Sanity project ID    |
+| `VITE_SANITY_DATASET`    | no       | Default: production  |
+
+*Leave empty to use dummy fallback data.
+
+## Project Structure
+
+See [CLAUDE.md](./CLAUDE.md) for full project structure and conventions.
+
+## Docs
+
+- [CLAUDE.md](./CLAUDE.md) -- Project overview, structure, conventions
+- [docs/schema.md](./docs/schema.md) -- Content schema reference
+- [docs/superpowers/specs/](./docs/superpowers/specs/) -- Design spec
