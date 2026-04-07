@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from "react";
-import { fullUrl } from "../../lib/cloudinary";
+import { fullUrl } from "../../lib/content";
 import type { Artwork } from "../../types";
 
 interface Props {

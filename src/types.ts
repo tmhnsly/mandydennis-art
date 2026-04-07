@@ -1,7 +1,11 @@
+// Sanity image reference object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SanityImage = any;
+
 export interface Artwork {
   slug: string;
   title: string;
-  image: string;
+  image: SanityImage;
   description: string;
   medium: string[];
   subject: string[];
@@ -47,5 +51,5 @@ export interface SiteSettings {
 
 export interface AboutPage {
   bio: string;
-  photo: string;
+  photo: SanityImage;
 }

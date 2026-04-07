@@ -1,7 +1,7 @@
-import { getSettings } from "../lib/content";
+import { useSiteSettings } from "../context/SiteSettings";
 
 export default function Footer() {
-  const settings = getSettings();
+  const settings = useSiteSettings();
 
   return (
     <footer className="border-t border-warm-200 mt-16 py-8 px-6 text-center text-warm-500 text-sm">

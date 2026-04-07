@@ -1,4 +1,4 @@
-import yaml from "js-yaml";
+import { client, urlFor } from "./sanity";
 import type {
   Artwork,
   ArtEvent,
@@ -7,112 +7,87 @@ import type {
   AboutPage,
 } from "../types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseFrontmatter(raw: string): { data: Record<string, any>; content: string } {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) return { data: {}, content: raw };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data = (yaml.load(match[1]) as Record<string, any>) ?? {};
-  return { data, content: match[2] };
+export async function getArtwork(): Promise<Artwork[]> {
+  const results = await client.fetch(`
+    *[_type == "artwork"] | order(date desc) {
+      "slug": slug.current,
+      title,
+      image,
+      description,
+      medium,
+      subject,
+      featured,
+      date
+    }
+  `);
+  return results.map((item: Artwork) => ({
+    ...item,
+    description: item.description ?? "",
+    medium: item.medium ?? [],
+    subject: item.subject ?? [],
+    featured: item.featured ?? false,
+  }));
 }
 
-const artworkFiles = import.meta.glob("/content/artwork/*.md", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
-
-const eventFiles = import.meta.glob("/content/events/*.md", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
-
-const commissionFiles = import.meta.glob("/content/commissions/*.md", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
-
-const aboutFile = import.meta.glob("/content/pages/about.md", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
-
-const settingsFile = import.meta.glob("/content/settings.json", {
-  eager: true,
-  import: "default",
-}) as Record<string, SiteSettings>;
-
-function slugFromPath(path: string): string {
-  return path.split("/").pop()!.replace(/\.md$/, "");
+export async function getEvents(): Promise<ArtEvent[]> {
+  return client.fetch(`
+    *[_type == "event"] | order(date asc) {
+      "slug": slug.current,
+      title,
+      date,
+      location,
+      description,
+      link
+    }
+  `);
 }
 
-export function getArtwork(): Artwork[] {
-  return Object.entries(artworkFiles)
-    .map(([path, raw]) => {
-      const { data } = parseFrontmatter(raw);
-      return {
-        slug: slugFromPath(path),
-        title: data.title ?? "",
-        image: data.image ?? "",
-        description: data.description ?? "",
-        medium: data.medium ?? [],
-        subject: data.subject ?? [],
-        featured: data.featured ?? false,
-        date: data.date ?? "",
-      };
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+export async function getCommissions(): Promise<CommissionCategory[]> {
+  return client.fetch(`
+    *[_type == "commissionCategory"] | order(title asc) {
+      "slug": slug.current,
+      title,
+      options,
+      addons,
+      included,
+      notes
+    }
+  `);
 }
 
-export function getEvents(): ArtEvent[] {
-  return Object.entries(eventFiles)
-    .map(([path, raw]) => {
-      const { data, content } = parseFrontmatter(raw);
-      return {
-        slug: slugFromPath(path),
-        title: data.title ?? "",
-        date: data.date ?? "",
-        location: data.location ?? "",
-        description: content.trim(),
-        link: data.link ?? "",
-      };
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-}
-
-export function getCommissions(): CommissionCategory[] {
-  return Object.entries(commissionFiles).map(([path, raw]) => {
-    const { data } = parseFrontmatter(raw);
-    return {
-      slug: slugFromPath(path),
-      title: data.title ?? "",
-      options: data.options ?? [],
-      addons: data.addons ?? [],
-      included: data.included ?? "",
-      notes: data.notes ?? "",
-    };
-  });
-}
-
-export function getSettings(): SiteSettings {
-  const entries = Object.values(settingsFile);
-  return entries[0] ?? {
+export async function getSettings(): Promise<SiteSettings> {
+  const result = await client.fetch(`
+    *[_type == "siteSettings"][0] {
+      tagline,
+      contact_email,
+      facebook_url,
+      currency_symbol
+    }
+  `);
+  return result ?? {
     tagline: "",
     contact_email: "",
     facebook_url: "",
-    currency_symbol: "\u00a3",
+    currency_symbol: "£",
   };
 }
 
-export function getAbout(): AboutPage {
-  const entries = Object.entries(aboutFile);
-  if (entries.length === 0) return { bio: "", photo: "" };
-  const { data } = parseFrontmatter(entries[0][1]);
-  return {
-    bio: data.bio ?? "",
-    photo: data.photo ?? "",
-  };
+export async function getAbout(): Promise<AboutPage> {
+  const result = await client.fetch(`
+    *[_type == "about"][0] {
+      bio,
+      photo
+    }
+  `);
+  return result ?? { bio: "", photo: "" };
+}
+
+export function thumbnailUrl(image: Artwork["image"]): string {
+  if (!image) return "";
+  return urlFor(image).width(600).auto("format").quality(80).url();
+}
+
+export function fullUrl(image: Artwork["image"]): string {
+  if (!image) return "";
+  return urlFor(image).width(1600).auto("format").quality(85).url();
 }

@@ -1,15 +1,20 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getArtwork, getSettings } from "../lib/content";
+import { getArtwork } from "../lib/content";
+import { useSiteSettings } from "../context/SiteSettings";
 import FeaturedGrid from "../components/FeaturedGrid";
-
-const artwork = getArtwork();
-const settings = getSettings();
-const featured = artwork.filter((a) => a.featured);
+import type { Artwork } from "../types";
 
 export default function HomePage() {
+  const settings = useSiteSettings();
+  const [featured, setFeatured] = useState<Artwork[]>([]);
+
+  useEffect(() => {
+    getArtwork().then((all) => setFeatured(all.filter((a) => a.featured)));
+  }, []);
+
   return (
     <div>
-      {/* Hero */}
       <section className="px-6 py-16 md:px-12 md:py-24 text-center">
         <h1 className="font-display text-4xl md:text-6xl text-warm-800 mb-4">
           Mandy Dennis
@@ -33,7 +38,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured work */}
       {featured.length > 0 && (
         <section className="px-6 pb-16 md:px-12 max-w-7xl mx-auto">
           <h2 className="font-display text-2xl text-warm-800 mb-6">

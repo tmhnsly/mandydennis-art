@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Artwork } from "../types";
-import { thumbnailUrl } from "../lib/cloudinary";
+import { thumbnailUrl } from "../lib/content";
 
 interface Props {
   items: Artwork[];
