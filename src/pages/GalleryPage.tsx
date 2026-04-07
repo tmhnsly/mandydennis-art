@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { getArtwork } from "../lib/content";
 import TagFilter from "../components/gallery/TagFilter";
 import GalleryGrid from "../components/gallery/GalleryGrid";
+import Lightbox from "../components/gallery/Lightbox";
 import type { Artwork } from "../types";
 
 const allArtwork = getArtwork();
@@ -61,14 +62,13 @@ export default function GalleryPage() {
         onSelect={(i) => setLightboxIndex(i)}
       />
 
-      {/* Lightbox placeholder -- will be replaced in Task 6 */}
       {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
-          onClick={() => setLightboxIndex(null)}
-        >
-          <p className="text-white">Lightbox placeholder</p>
-        </div>
+        <Lightbox
+          items={filtered}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onChange={setLightboxIndex}
+        />
       )}
     </div>
   );
