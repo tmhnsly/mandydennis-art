@@ -1,4 +1,4 @@
-import matter from "gray-matter";
+import yaml from "js-yaml";
 import type {
   Artwork,
   ArtEvent,
@@ -6,6 +6,15 @@ import type {
   SiteSettings,
   AboutPage,
 } from "../types";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseFrontmatter(raw: string): { data: Record<string, any>; content: string } {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!match) return { data: {}, content: raw };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = (yaml.load(match[1]) as Record<string, any>) ?? {};
+  return { data, content: match[2] };
+}
 
 const artworkFiles = import.meta.glob("/content/artwork/*.md", {
   eager: true,
@@ -43,7 +52,7 @@ function slugFromPath(path: string): string {
 export function getArtwork(): Artwork[] {
   return Object.entries(artworkFiles)
     .map(([path, raw]) => {
-      const { data } = matter(raw);
+      const { data } = parseFrontmatter(raw);
       return {
         slug: slugFromPath(path),
         title: data.title ?? "",
@@ -61,7 +70,7 @@ export function getArtwork(): Artwork[] {
 export function getEvents(): ArtEvent[] {
   return Object.entries(eventFiles)
     .map(([path, raw]) => {
-      const { data, content } = matter(raw);
+      const { data, content } = parseFrontmatter(raw);
       return {
         slug: slugFromPath(path),
         title: data.title ?? "",
@@ -76,7 +85,7 @@ export function getEvents(): ArtEvent[] {
 
 export function getCommissions(): CommissionCategory[] {
   return Object.entries(commissionFiles).map(([path, raw]) => {
-    const { data } = matter(raw);
+    const { data } = parseFrontmatter(raw);
     return {
       slug: slugFromPath(path),
       title: data.title ?? "",
@@ -101,7 +110,7 @@ export function getSettings(): SiteSettings {
 export function getAbout(): AboutPage {
   const entries = Object.entries(aboutFile);
   if (entries.length === 0) return { bio: "", photo: "" };
-  const { data } = matter(entries[0][1]);
+  const { data } = parseFrontmatter(entries[0][1]);
   return {
     bio: data.bio ?? "",
     photo: data.photo ?? "",
