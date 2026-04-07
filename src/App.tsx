@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import GalleryPage from "./pages/GalleryPage";
+import HomePage from "./pages/HomePage";
 
 function Placeholder({ name }: { name: string }) {
   return (
@@ -14,7 +15,7 @@ export default function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Placeholder name="Home" />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/commissions" element={<Placeholder name="Commissions" />} />
         <Route path="/events" element={<Placeholder name="Events" />} />
