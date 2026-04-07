@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import CommissionsPage from "./pages/CommissionsPage";
 import GalleryPage from "./pages/GalleryPage";
 import HomePage from "./pages/HomePage";
 
@@ -17,7 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/gallery" element={<GalleryPage />} />
-        <Route path="/commissions" element={<Placeholder name="Commissions" />} />
+        <Route path="/commissions" element={<CommissionsPage />} />
         <Route path="/events" element={<Placeholder name="Events" />} />
         <Route path="/about" element={<Placeholder name="About" />} />
       </Routes>
