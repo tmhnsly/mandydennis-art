@@ -85,24 +85,28 @@ body {
   transform: scaleX(1);
 }
 
-/* ---- Hero — same motion as section reveals, just staggered ---- */
+/* ---- Hero — clean fade, tight stagger ---- */
 
-.hero-name-word {
-  display: inline-block;
+.hero-name-word { display: inline-block; }
+
+.hero-name-word,
+.hero-tagline,
+.hero-ctas,
+.hero-stats,
+.hero-image {
   opacity: 0;
-  transform: translateY(10px);
-  animation: revealUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: fadeIn 0.3s ease forwards;
 }
+
 .hero-name-word:nth-child(1) { animation-delay: 0.05s; }
-.hero-name-word:nth-child(2) { animation-delay: 0.12s; }
+.hero-name-word:nth-child(2) { animation-delay: 0.1s; }
+.hero-image   { animation-delay: 0.08s; }
+.hero-tagline { animation-delay: 0.15s; }
+.hero-ctas    { animation-delay: 0.2s; }
+.hero-stats   { animation-delay: 0.25s; }
 
-.hero-tagline { opacity: 0; transform: translateY(10px); animation: revealUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards; }
-.hero-ctas    { opacity: 0; transform: translateY(10px); animation: revealUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.24s forwards; }
-.hero-stats   { opacity: 0; transform: translateY(10px); animation: revealUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; }
-.hero-image   { opacity: 0; transform: translateY(10px); animation: revealUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards; }
-
-@keyframes revealUp {
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 
 /* Pulse ring for status dot */
