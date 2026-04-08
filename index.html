@@ -11,11 +11,29 @@
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      /* Hide page until fonts are loaded to prevent FOUT */
+      html { visibility: hidden; }
+      html.fonts-ready { visibility: visible; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if (document.fonts) {
+        document.fonts.ready.then(function() {
+          document.documentElement.classList.add('fonts-ready');
+        });
+        // Safety fallback — show page after 500ms even if fonts haven't loaded
+        setTimeout(function() {
+          document.documentElement.classList.add('fonts-ready');
+        }, 500);
+      } else {
+        // Browser doesn't support document.fonts — show immediately
+        document.documentElement.classList.add('fonts-ready');
+      }
+    </script>
   </body>
 </html>
