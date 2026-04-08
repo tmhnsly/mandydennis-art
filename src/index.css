@@ -15,12 +15,12 @@
   --color-text-subtle: #b0a096;
   --color-accent: #a0705a;
   --color-accent-hover: #8c6150;
-  --color-cta-bg: #3b2820;
-  --color-cta-text: #faf7f4;
-  --color-cta-muted: rgba(250,247,244,0.6);
-  --color-cta-btn-bg: #faf7f4;
-  --color-cta-btn-text: #3b2820;
-  --color-cta-btn-border: rgba(250,247,244,0.25);
+  --color-cta-bg: #f0e6de;
+  --color-cta-text: #3b2820;
+  --color-cta-muted: #7a6054;
+  --color-cta-btn-bg: #3b2820;
+  --color-cta-btn-text: #f0e6de;
+  --color-cta-btn-border: rgba(59,40,32,0.2);
 }
 
 @media (prefers-color-scheme: dark) {
