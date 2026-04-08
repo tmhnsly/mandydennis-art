@@ -82,45 +82,48 @@ body {
 }
 
 /* ---- Animations ---- */
-/* Shared easing — smooth deceleration for entrances, acceleration for exits */
-/* Duration: 0.5s entrance, 0.35s exit (exit feels snappier) */
+/* translate3d forces GPU compositing in Safari */
 
 /* Fade up — sections, content blocks */
 .anim-fade-up {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translate3d(0, 16px, 0);
+  will-change: opacity, transform;
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-fade-up.in-view {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Scale X rule — section header lines, DrawLine */
 .anim-rule {
-  transform: scaleX(0);
+  transform: scaleX(0) translate3d(0, 0, 0);
   transform-origin: left;
+  will-change: transform;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-rule.in-view {
-  transform: scaleX(1);
+  transform: scaleX(1) translate3d(0, 0, 0);
 }
 
 /* Text reveal — word slides up from overflow hidden */
 .anim-word {
   display: inline-block;
-  transform: translateY(110%);
+  transform: translate3d(0, 110%, 0);
+  will-change: transform;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-word.in-view {
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Hero stagger — on load */
 .hero-stagger > * {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translate3d(0, 16px, 0);
+  will-change: opacity, transform;
   animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .hero-stagger > *:nth-child(1) { animation-delay: 0.05s; }
@@ -131,7 +134,7 @@ body {
 .hero-stagger > *:nth-child(6) { animation-delay: 0.40s; }
 
 @keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* Page exit animations now handled by motion AnimatePresence */
@@ -147,12 +150,20 @@ body {
   animation: dropdown-out 0.1s ease;
 }
 @keyframes dropdown-in {
-  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.95) translate3d(0, -4px, 0); }
+  to { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
 }
 @keyframes dropdown-out {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  from { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+  to { opacity: 0; transform: scale(0.95) translate3d(0, -4px, 0); }
+}
+
+/* Safari GPU compositing hints for glassmorphism elements */
+.backdrop-blur-md,
+.backdrop-blur-xl,
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: var(--tw-backdrop-blur);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Pulse ring for status dot */
