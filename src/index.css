@@ -85,65 +85,25 @@ body {
   transform: scaleX(1);
 }
 
-/* ---- Hero animations ---- */
+/* ---- Hero animations — unified fade-up + blur clear ---- */
 
-/* Name: each word fades up individually */
-.hero-name-word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.15em);
-  filter: blur(2px);
-  animation: wordIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.hero-name-word:nth-child(1) { animation-delay: 0.05s; }
-.hero-name-word:nth-child(2) { animation-delay: 0.2s; }
-
-@keyframes wordIn {
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
   to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-/* Tagline: fade in with subtle blur clear */
-.hero-tagline {
+.hero-name-word {
+  display: inline-block;
   opacity: 0;
-  filter: blur(4px);
-  animation: blurIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+  animation: heroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+.hero-name-word:nth-child(1) { animation-delay: 0.05s; }
+.hero-name-word:nth-child(2) { animation-delay: 0.15s; }
 
-@keyframes blurIn {
-  to { opacity: 1; filter: blur(0); }
-}
-
-/* CTAs: slide in from left */
-.hero-ctas {
-  opacity: 0;
-  transform: translateX(-16px);
-  animation: slideRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
-}
-
-@keyframes slideRight {
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* Stats: fade in */
-.hero-stats {
-  opacity: 0;
-  animation: fadeIn 0.4s ease 0.6s forwards;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-
-/* Image: scale up from slightly smaller with fade */
-.hero-image {
-  opacity: 0;
-  transform: scale(0.95);
-  animation: scaleIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
-}
-
-@keyframes scaleIn {
-  to { opacity: 1; transform: scale(1); }
-}
+.hero-tagline { opacity: 0; animation: heroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards; }
+.hero-ctas    { opacity: 0; animation: heroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards; }
+.hero-stats   { opacity: 0; animation: heroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards; }
+.hero-image   { opacity: 0; animation: heroIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards; }
 
 /* Pulse ring for status dot */
 @keyframes pulse-ring {
