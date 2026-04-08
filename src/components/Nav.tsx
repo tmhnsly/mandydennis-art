@@ -91,7 +91,7 @@ export default function Nav() {
           to="/"
           className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center gap-1"
         >
-          Mandy <span className="font-serif italic font-normal text-text-mid text-[1.1rem] leading-none">Dennis</span>
+          Mandy <span className="font-serif italic font-normal text-text-mid text-[1.05rem] -translate-y-px">Dennis</span>
         </NavLink>
 
         <DesktopNav />
