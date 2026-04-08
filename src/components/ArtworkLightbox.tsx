@@ -93,7 +93,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {/* Close */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
             aria-label="Close"
           >
             <FaTimes size={14} className="text-white/80" />
@@ -157,7 +157,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/55 border border-white/10 bg-white/5"
+                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/60 border border-white/10 bg-white/5 backdrop-blur-sm"
                     >
                       {tag}
                     </span>

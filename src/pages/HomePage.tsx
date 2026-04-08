@@ -90,8 +90,8 @@ export default function HomePage() {
               onLoad={i === 0 ? () => setHeroLoaded(true) : undefined}
               className={`w-full h-full object-cover ${i === 0 && !heroLoaded ? "opacity-0" : ""}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/80 to-bg/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
           </div>
         ))}
 
@@ -99,13 +99,14 @@ export default function HomePage() {
         {featured.length === 0 && heroImage && (
           <div className="absolute inset-0">
             <img src={thumbnailUrl(heroImage.image)} alt="" loading="eager" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/80 to-bg/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
           </div>
         )}
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
-          <div className="hero-stagger max-w-xl">
+          {/* Glassmorphism panel behind hero text */}
+          <div className="hero-stagger max-w-xl backdrop-blur-md bg-bg/40 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             <h1 className="font-display text-[clamp(3.5rem,9vw,6rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
               <TextReveal as="span" className="block">Mandy</TextReveal>
               <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid">Dennis</TextReveal>
@@ -117,11 +118,11 @@ export default function HomePage() {
               <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
                 View Gallery
               </Link>
-              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors">
+              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase backdrop-blur-sm bg-bg/30 border border-text/20 text-text hover:bg-bg/50 transition-colors">
                 Commissions
               </Link>
             </div>
-            <div className="flex gap-[clamp(1.5rem,4vw,3rem)] pt-5 border-t border-line flex-wrap">
+            <div className="flex gap-[clamp(1.5rem,4vw,3rem)] pt-5 border-t border-text/10 flex-wrap">
               <div>
                 <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Medium</div>
                 <div className="font-display text-[0.85rem] font-semibold tracking-tight">Pastels & Watercolours</div>
