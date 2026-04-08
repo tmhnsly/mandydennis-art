@@ -1,21 +1,46 @@
+import { Star, X } from "lucide-react";
+
 interface Props {
   availableTags: string[];
   activeTags: string[];
   onToggle: (tag: string) => void;
   onClear: () => void;
+  showFeatured?: boolean;
+  featuredActive?: boolean;
+  onToggleFeatured?: () => void;
 }
 
-export default function TagFilter({ availableTags, activeTags, onToggle, onClear }: Props) {
-  if (availableTags.length === 0) return null;
-
+export default function TagFilter({
+  availableTags,
+  activeTags,
+  onToggle,
+  onClear,
+  showFeatured,
+  featuredActive,
+  onToggleFeatured,
+}: Props) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
+      {showFeatured && onToggleFeatured && (
+        <button
+          onClick={onToggleFeatured}
+          className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-[0.78rem] font-medium border transition-colors ${
+            featuredActive
+              ? "bg-text border-text text-bg"
+              : "border-line-strong text-text-muted hover:border-text hover:text-text"
+          }`}
+        >
+          <Star size={14} className={featuredActive ? "fill-current" : ""} />
+          Featured
+        </button>
+      )}
       {activeTags.length > 0 && (
         <button
           onClick={onClear}
-          className="px-4 py-2 rounded-full text-sm font-medium bg-warm-800 text-white hover:bg-warm-700 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[0.78rem] font-medium bg-text border border-text text-bg transition-colors"
         >
-          Clear all
+          <X size={14} />
+          Clear
         </button>
       )}
       {availableTags.map((tag) => {
@@ -24,10 +49,10 @@ export default function TagFilter({ availableTags, activeTags, onToggle, onClear
           <button
             key={tag}
             onClick={() => onToggle(tag)}
-            className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition-colors ${
+            className={`px-3.5 py-2 text-[0.78rem] font-medium border capitalize transition-colors ${
               isActive
-                ? "bg-warm-700 text-white"
-                : "bg-warm-200 text-warm-700 hover:bg-warm-300"
+                ? "bg-text border-text text-bg"
+                : "border-line-strong text-text-muted hover:border-text hover:text-text"
             }`}
           >
             {tag}

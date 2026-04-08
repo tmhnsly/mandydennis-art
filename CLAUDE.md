@@ -7,7 +7,9 @@ Portfolio website for artist Mandy Dennis. Showcases artwork, takes commission e
 ## Tech Stack
 
 - **Framework:** React 19 + Vite + TypeScript
-- **Styling:** Tailwind CSS v4 (custom warm color palette, Playfair Display + Inter fonts)
+- **Styling:** Tailwind CSS v4 + Radix UI Colors (sand scale, dark/light mode ready)
+- **Icons:** lucide-react
+- **Lightbox:** yet-another-react-lightbox
 - **CMS:** Sanity (headless CMS -- content + image hosting in one service)
 - **Hosting:** Netlify (free tier, auto-deploys from GitHub)
 - **Forms:** Netlify Forms (commission enquiry form)
@@ -79,10 +81,13 @@ VITE_SANITY_DATASET=production
 
 ## Conventions
 
-- **Styling:** Tailwind utility classes only. Custom palette: `warm-50` through `warm-900`. Fonts: `font-display` (Playfair Display), `font-body` (Inter).
+- **Styling:** Tailwind utility classes only. Radix UI Colors sand scale via CSS custom properties (bg, surface, line, text, text-mid, text-muted, text-subtle, accent). Fonts: `font-display` (Space Grotesk), `font-serif` (Instrument Serif), `font-body` (IBM Plex Sans).
 - **Components:** Function components, default exports. No class components.
 - **Data flow:** Pages fetch their own data via `useEffect`. Settings come from `useSiteSettings()` context hook.
 - **Images:** Sanity image objects passed through `thumbnailUrl()` / `fullUrl()` from `content.ts`. Falls back to placehold.co when no image.
 - **Tags:** Combined medium + subject in one unified filter bar. AND logic for multi-select. Cascading (hide zero-match tags).
 - **Currency:** Never hardcode £. Always use `settings.currency_symbol`.
 - **Responsive:** Mobile-first. Breakpoints: sm (640px), md (768px), lg (1024px). Gallery: 1/2/3 columns.
+- **Animations:** Scroll-triggered via IntersectionObserver (useAnimateIn hook). Section headers slide up, rules animate from left. Hero has staggered entrance.
+- **Section design:** Full-bleed border lines, section icons (Lucide) in bordered boxes, animated rule extending from title.
+- **Dark/light mode:** Radix UI Colors provides both scales. `prefers-color-scheme` toggles via CSS imports.

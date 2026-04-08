@@ -1,69 +1,47 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Home, Image, Palette, Calendar, User } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/gallery", label: "Gallery" },
-  { to: "/commissions", label: "Commissions" },
-  { to: "/events", label: "Events" },
-  { to: "/about", label: "About" },
+const links: { to: string; label: string; icon: LucideIcon }[] = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/gallery", label: "Gallery", icon: Image },
+  { to: "/commissions", label: "Commissions", icon: Palette },
+  { to: "/events", label: "Events", icon: Calendar },
+  { to: "/about", label: "About", icon: User },
 ];
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <nav className="relative">
-      {/* Desktop nav */}
-      <ul className="hidden md:flex gap-8">
-        {links.map(({ to, label }) => (
-          <li key={to}>
-            <NavLink
-              to={to}
-              className={({ isActive }) =>
-                `font-body text-sm tracking-wide uppercase transition-colors hover:text-warm-700 ${
-                  isActive ? "text-warm-800 font-semibold" : "text-warm-500"
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+    <nav className="sticky top-0 z-50 border-b border-line bg-bg/90 backdrop-blur-xl">
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-[clamp(1.5rem,5vw,4rem)] py-3">
+        <NavLink
+          to="/"
+          className="font-display font-bold text-[1.05rem] tracking-tight text-text"
+        >
+          Mandy Dennis
+        </NavLink>
 
-      {/* Mobile hamburger */}
-      <button
-        className="md:hidden flex flex-col gap-1.5 p-2 -mr-2"
-        onClick={() => setOpen(!open)}
-        aria-label="Toggle menu"
-        aria-expanded={open}
-      >
-        <span className={`block w-6 h-0.5 bg-warm-800 transition-transform ${open ? "rotate-45 translate-y-2" : ""}`} />
-        <span className={`block w-6 h-0.5 bg-warm-800 transition-opacity ${open ? "opacity-0" : ""}`} />
-        <span className={`block w-6 h-0.5 bg-warm-800 transition-transform ${open ? "-rotate-45 -translate-y-2" : ""}`} />
-      </button>
-
-      {/* Mobile dropdown */}
-      {open && (
-        <ul className="md:hidden absolute right-0 top-full mt-2 bg-white shadow-lg rounded-lg py-2 min-w-48 z-50">
-          {links.map(({ to, label }) => (
+        <ul className="flex gap-0.5">
+          {links.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
-                onClick={() => setOpen(false)}
+                end={to === "/"}
                 className={({ isActive }) =>
-                  `block px-6 py-3 text-sm tracking-wide uppercase transition-colors hover:bg-warm-100 ${
-                    isActive ? "text-warm-800 font-semibold" : "text-warm-500"
+                  `flex items-center gap-1.5 px-3 py-2 rounded text-xs font-medium tracking-wide uppercase transition-colors ${
+                    isActive
+                      ? "text-text bg-text/[0.06]"
+                      : "text-text-muted hover:text-text hover:bg-text/[0.04]"
                   }`
                 }
               >
-                {label}
+                <Icon size={15} className="opacity-60" />
+                <span className="hidden md:inline">{label}</span>
               </NavLink>
             </li>
           ))}
         </ul>
-      )}
+      </div>
     </nav>
   );
 }

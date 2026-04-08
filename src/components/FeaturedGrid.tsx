@@ -10,22 +10,37 @@ export default function FeaturedGrid({ items }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[3px]">
       {items.map((item) => (
         <Link
           key={item.slug}
           to="/gallery"
-          className="block rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group bg-white"
+          className="relative block aspect-[4/5] overflow-hidden cursor-pointer group"
         >
           <img
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-64 object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-[1.03]"
             loading="lazy"
           />
-          <div className="p-3">
-            <h3 className="font-display text-sm text-warm-800">{item.title}</h3>
+          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
+            <h3 className="font-display text-[0.95rem] font-semibold text-white mb-1">
+              {item.title}
+            </h3>
+            <div className="flex gap-1.5 flex-wrap">
+              {[...item.medium, ...item.subject].map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[0.6rem] tracking-wide uppercase text-white/65 px-1.5 py-0.5 border border-white/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
+          <span className="absolute top-3 right-3 text-white text-sm opacity-0 group-hover:opacity-60 transition-opacity font-display">
+            ↗
+          </span>
         </Link>
       ))}
     </div>

@@ -1,9 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
-import { getArtwork } from "../lib/content";
+import { Image as ImageIcon } from "lucide-react";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import { getArtwork, fullUrl } from "../lib/content";
+import { useAnimateIn } from "../hooks/useAnimateIn";
+import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
 import GalleryGrid from "../components/gallery/GalleryGrid";
-import Lightbox from "../components/gallery/Lightbox";
 import type { Artwork } from "../types";
+
+const PAGE_SIZE = 12;
 
 function getAllTags(items: Artwork[]): string[] {
   const tags = new Set<string>();
@@ -22,7 +28,10 @@ export default function GalleryPage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [featuredOnly, setFeaturedOnly] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [showCount, setShowCount] = useState(PAGE_SIZE);
+  const bodyRef = useAnimateIn();
 
   useEffect(() => {
     getArtwork().then((data) => {
@@ -32,58 +41,90 @@ export default function GalleryPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (activeTags.length === 0) return allArtwork;
-    return allArtwork.filter((item) => {
-      const tags = artworkTags(item);
-      return activeTags.every((t) => tags.includes(t));
-    });
-  }, [activeTags, allArtwork]);
+    let items = allArtwork;
+    if (featuredOnly) items = items.filter((a) => a.featured);
+    if (activeTags.length > 0) {
+      items = items.filter((item) => {
+        const tags = artworkTags(item);
+        return activeTags.every((t) => tags.includes(t));
+      });
+    }
+    return items;
+  }, [activeTags, featuredOnly, allArtwork]);
 
+  const visible = filtered.slice(0, showCount);
+  const hasMore = showCount < filtered.length;
   const availableTags = useMemo(() => getAllTags(filtered), [filtered]);
 
   const toggleTag = (tag: string) => {
     setActiveTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+    setShowCount(PAGE_SIZE);
   };
+
+  const lightboxSlides = filtered.map((item) => ({
+    src: fullUrl(item.image),
+    alt: item.title,
+    title: item.title,
+  }));
 
   if (loading) {
     return (
-      <div className="px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto">
-        <h1 className="font-display text-3xl md:text-4xl text-warm-800 mb-8">Gallery</h1>
-        <p className="text-warm-500">Loading artwork...</p>
+      <div className="border-b border-line">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+          <SectionHeader icon={ImageIcon} title="Gallery" />
+          <p className="text-text-muted">Loading artwork...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto">
-      <h1 className="font-display text-3xl md:text-4xl text-warm-800 mb-8">
-        Gallery
-      </h1>
+    <div className="border-b border-line">
+      <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <SectionHeader icon={ImageIcon} title="Gallery" />
 
-      <div className="mb-8">
-        <TagFilter
-          availableTags={availableTags}
-          activeTags={activeTags}
-          onToggle={toggleTag}
-          onClear={() => setActiveTags([])}
-        />
+        <div ref={bodyRef} className="animate-in">
+          <TagFilter
+            availableTags={availableTags}
+            activeTags={activeTags}
+            onToggle={toggleTag}
+            onClear={() => { setActiveTags([]); setShowCount(PAGE_SIZE); }}
+            showFeatured
+            featuredActive={featuredOnly}
+            onToggleFeatured={() => { setFeaturedOnly((p) => !p); setShowCount(PAGE_SIZE); }}
+          />
+
+          <GalleryGrid
+            items={visible}
+            onSelect={(i) => setLightboxIndex(i)}
+          />
+
+          {hasMore && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => setShowCount((c) => c + PAGE_SIZE)}
+                className="px-6 py-3 text-[0.78rem] font-medium tracking-wide uppercase border border-line-strong text-text-muted hover:border-text hover:text-text transition-colors"
+              >
+                Show more
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <GalleryGrid
-        items={filtered}
-        onSelect={(i) => setLightboxIndex(i)}
+      <Lightbox
+        open={lightboxIndex >= 0}
+        index={lightboxIndex}
+        close={() => setLightboxIndex(-1)}
+        slides={lightboxSlides}
+        styles={{
+          container: { backgroundColor: "rgba(0,0,0,0.92)" },
+        }}
+        carousel={{ finite: false }}
+        animation={{ swipe: 250 }}
       />
-
-      {lightboxIndex !== null && (
-        <Lightbox
-          items={filtered}
-          index={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-          onChange={setLightboxIndex}
-        />
-      )}
     </div>
   );
 }

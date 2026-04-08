@@ -1,17 +1,76 @@
 @import "tailwindcss";
+@import "@radix-ui/colors/sand.css";
+@import "@radix-ui/colors/sand-dark.css";
+@import "@radix-ui/colors/sand-alpha.css";
+@import "@radix-ui/colors/sand-dark-alpha.css";
+@import "@radix-ui/colors/bronze.css";
+@import "@radix-ui/colors/bronze-dark.css";
 
 @theme {
-  --color-warm-50: #fdf8f6;
-  --color-warm-100: #f2e8e5;
-  --color-warm-200: #eaddd7;
-  --color-warm-300: #e0cec7;
-  --color-warm-400: #d2bab0;
-  --color-warm-500: #bfa094;
-  --color-warm-600: #a18072;
-  --color-warm-700: #977669;
-  --color-warm-800: #846358;
-  --color-warm-900: #43302b;
+  /* Semantic tokens mapped to Radix sand scale */
+  --color-bg: var(--sand-1);
+  --color-surface: var(--sand-2);
+  --color-line: var(--sand-a4);
+  --color-line-strong: var(--sand-a5);
+  --color-line-faint: var(--sand-a3);
+  --color-text: var(--sand-12);
+  --color-text-mid: var(--sand-11);
+  --color-text-muted: var(--sand-10);
+  --color-text-subtle: var(--sand-8);
+  --color-accent: var(--bronze-9);
+  --color-accent-hover: var(--bronze-10);
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scroll-triggered animation utility */
+.animate-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.animate-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-rule {
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+.animate-rule.visible {
+  transform: scaleX(1);
+}
+
+/* Hero stagger */
+.hero-stagger-1 { opacity: 0; animation: slideUp 0.6s ease 0.1s forwards; }
+.hero-stagger-2 { opacity: 0; animation: slideUp 0.6s ease 0.25s forwards; }
+.hero-stagger-3 { opacity: 0; animation: slideUp 0.6s ease 0.4s forwards; }
+.hero-stagger-4 { opacity: 0; animation: slideUp 0.6s ease 0.55s forwards; }
+.hero-stagger-5 { opacity: 0; animation: slideUp 0.6s ease 0.7s forwards; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Lightbox overrides */
+.yarl__slide_image {
+  border-radius: 2px;
 }

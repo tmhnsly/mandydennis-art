@@ -9,29 +9,44 @@ interface Props {
 export default function GalleryGrid({ items, onSelect }: Props) {
   if (items.length === 0) {
     return (
-      <p className="text-warm-500 text-center py-12">
+      <p className="text-text-muted text-center py-16">
         No artwork matches the selected filters.
       </p>
     );
   }
 
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[3px]">
       {items.map((item, i) => (
         <button
           key={item.slug}
           onClick={() => onSelect(i)}
-          className="block w-full break-inside-avoid rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer bg-white"
+          className="block w-full break-inside-avoid mb-[3px] relative overflow-hidden cursor-pointer group text-left"
         >
           <img
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-auto block group-hover:scale-[1.02] transition-transform duration-300"
+            className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             loading="lazy"
           />
-          <div className="p-3">
-            <h3 className="font-display text-sm text-warm-800">{item.title}</h3>
+          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.78)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-4">
+            <h3 className="font-display text-[0.95rem] font-semibold text-white tracking-tight mb-1">
+              {item.title}
+            </h3>
+            <div className="flex gap-1.5 flex-wrap">
+              {[...item.medium, ...item.subject].map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[0.65rem] tracking-wide uppercase text-white/70 px-1.5 py-0.5 border border-white/25"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
+          <span className="absolute top-3 right-3 text-white text-sm opacity-0 group-hover:opacity-60 transition-opacity font-display">
+            ↗
+          </span>
         </button>
       ))}
     </div>

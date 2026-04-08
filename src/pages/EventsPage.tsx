@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
+import { Calendar } from "lucide-react";
 import { getEvents } from "../lib/content";
+import { useAnimateIn } from "../hooks/useAnimateIn";
+import SectionHeader from "../components/SectionHeader";
 import EventCard from "../components/EventCard";
 import type { ArtEvent } from "../types";
 
 export default function EventsPage() {
   const [allEvents, setAllEvents] = useState<ArtEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const bodyRef = useAnimateIn();
 
   useEffect(() => {
     getEvents().then((data) => {
@@ -22,40 +26,44 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto">
-        <h1 className="font-display text-3xl md:text-4xl text-warm-800 mb-8">Events</h1>
-        <p className="text-warm-500">Loading events...</p>
+      <div className="border-b border-line">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+          <SectionHeader icon={Calendar} title="Events" />
+          <p className="text-text-muted">Loading events...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto">
-      <h1 className="font-display text-3xl md:text-4xl text-warm-800 mb-8">
-        Events
-      </h1>
+    <div className="border-b border-line">
+      <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <SectionHeader icon={Calendar} title="Events" />
 
-      {upcoming.length > 0 ? (
-        <section className="space-y-4 mb-12">
-          <h2 className="font-display text-xl text-warm-700">Upcoming</h2>
-          {upcoming.map((event) => (
-            <EventCard key={event.slug} event={event} isPast={false} />
-          ))}
-        </section>
-      ) : (
-        <p className="text-warm-500 mb-12">
-          No upcoming events at the moment. Check back soon!
-        </p>
-      )}
+        <div ref={bodyRef} className="animate-in max-w-[700px]">
+          {upcoming.length > 0 ? (
+            <div className="space-y-3 mb-10">
+              <h2 className="font-display text-lg font-semibold text-text-mid mb-3">Upcoming</h2>
+              {upcoming.map((event) => (
+                <EventCard key={event.slug} event={event} isPast={false} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-text-muted mb-10">
+              No upcoming events at the moment. Check back soon!
+            </p>
+          )}
 
-      {past.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="font-display text-xl text-warm-400">Past Events</h2>
-          {past.map((event) => (
-            <EventCard key={event.slug} event={event} isPast={true} />
-          ))}
-        </section>
-      )}
+          {past.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="font-display text-lg font-semibold text-text-subtle mb-3">Past Events</h2>
+              {past.map((event) => (
+                <EventCard key={event.slug} event={event} isPast={true} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

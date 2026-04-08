@@ -7,38 +7,49 @@ interface Props {
 
 export default function EventCard({ event, isPast }: Props) {
   const date = new Date(event.date);
-  const formattedDate = date.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-GB", { month: "short" });
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-6 ${isPast ? "opacity-60" : ""}`}>
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-        <h3 className="font-display text-lg text-warm-800">{event.title}</h3>
-        {isPast && (
-          <span className="text-xs font-medium px-2 py-1 rounded-full bg-warm-200 text-warm-500 self-start">
-            Past
-          </span>
+    <div
+      className={`border border-line p-5 grid grid-cols-[3.5rem_1fr_auto] gap-4 items-start transition-colors hover:border-line-strong ${
+        isPast ? "opacity-50" : ""
+      }`}
+    >
+      <div className="text-center">
+        <div className="font-display font-bold text-2xl tracking-tight leading-none">
+          {day}
+        </div>
+        <div className="text-[0.58rem] tracking-widest uppercase text-text-subtle font-medium mt-0.5">
+          {month}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-display font-semibold text-[0.95rem] tracking-tight mb-0.5">
+          {event.title}
+        </h3>
+        <p className="text-[0.8rem] text-text-muted">{event.location}</p>
+        {event.description && (
+          <p className="text-[0.85rem] text-text-mid leading-relaxed mt-1.5">
+            {event.description}
+          </p>
+        )}
+        {event.link && (
+          <a
+            href={event.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 text-[0.8rem] text-text-mid underline hover:text-text transition-colors"
+          >
+            More info
+          </a>
         )}
       </div>
-      <p className="text-sm text-warm-600 mb-1">{formattedDate}</p>
-      <p className="text-sm text-warm-500 mb-3">{event.location}</p>
-      {event.description && (
-        <p className="text-sm text-warm-700">{event.description}</p>
-      )}
-      {event.link && (
-        <a
-          href={event.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-3 text-sm text-warm-600 underline hover:text-warm-800 transition-colors"
-        >
-          More info
-        </a>
-      )}
+
+      <span className="text-[0.58rem] tracking-widest uppercase text-text-subtle font-medium px-2 py-1 border border-line self-center whitespace-nowrap">
+        {isPast ? "Past" : "Upcoming"}
+      </span>
     </div>
   );
 }

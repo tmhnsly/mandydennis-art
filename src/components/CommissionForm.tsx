@@ -1,3 +1,5 @@
+import { MessageCircle } from "lucide-react";
+
 export default function CommissionForm() {
   return (
     <form
@@ -5,21 +7,22 @@ export default function CommissionForm() {
       method="POST"
       data-netlify="true"
       netlify-honeypot="bot-field"
-      className="bg-white rounded-lg shadow-sm p-6 space-y-4"
+      className="space-y-5"
     >
       <input type="hidden" name="form-name" value="commission-enquiry" />
       <p className="hidden">
-        <label>
-          Don't fill this out: <input name="bot-field" />
-        </label>
+        <label>Don't fill this out: <input name="bot-field" /></label>
       </p>
 
-      <h3 className="font-display text-xl text-warm-800">
-        Commission Enquiry
-      </h3>
+      <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">
+        Get a quote
+      </div>
+      <p className="text-[0.95rem] text-text-mid leading-relaxed">
+        Send an enquiry to discuss your commission with Mandy.
+      </p>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-warm-700 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-text-mid mb-1">
           Name
         </label>
         <input
@@ -27,12 +30,12 @@ export default function CommissionForm() {
           id="name"
           name="name"
           required
-          className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-400"
+          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-warm-700 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-text-mid mb-1">
           Email
         </label>
         <input
@@ -40,18 +43,18 @@ export default function CommissionForm() {
           id="email"
           name="email"
           required
-          className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-400"
+          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         />
       </div>
 
       <div>
-        <label htmlFor="medium" className="block text-sm font-medium text-warm-700 mb-1">
+        <label htmlFor="medium" className="block text-sm font-medium text-text-mid mb-1">
           Preferred Medium
         </label>
         <select
           id="medium"
           name="medium"
-          className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-400 bg-white"
+          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         >
           <option value="">No preference</option>
           <option value="pastel">Pastel</option>
@@ -63,7 +66,7 @@ export default function CommissionForm() {
       </div>
 
       <div>
-        <label htmlFor="details" className="block text-sm font-medium text-warm-700 mb-1">
+        <label htmlFor="details" className="block text-sm font-medium text-text-mid mb-1">
           What would you like commissioned?
         </label>
         <textarea
@@ -71,13 +74,13 @@ export default function CommissionForm() {
           name="details"
           rows={4}
           required
-          className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-400 resize-y"
+          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm resize-y"
           placeholder="e.g. A pastel portrait of my dog, A4 size..."
         />
       </div>
 
       <div>
-        <label htmlFor="reference" className="block text-sm font-medium text-warm-700 mb-1">
+        <label htmlFor="reference" className="block text-sm font-medium text-text-mid mb-1">
           Reference image (optional)
         </label>
         <input
@@ -85,14 +88,15 @@ export default function CommissionForm() {
           id="reference"
           name="reference"
           accept="image/*"
-          className="w-full text-sm text-warm-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-warm-200 file:text-warm-700 file:font-medium hover:file:bg-warm-300"
+          className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:border file:border-line-strong file:bg-transparent file:text-text-mid file:font-medium file:rounded-none hover:file:bg-text/[0.04]"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full py-3 bg-warm-800 text-white rounded-lg font-medium hover:bg-warm-700 transition-colors"
+        className="w-full py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity"
       >
+        <MessageCircle size={16} />
         Send Enquiry
       </button>
     </form>
