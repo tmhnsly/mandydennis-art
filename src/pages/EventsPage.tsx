@@ -45,26 +45,34 @@ export default function EventsPage() {
           <SectionHeader title="Events" />
 
           <div ref={bodyRef} className="animate-in max-w-[700px]">
-            {upcoming.length > 0 ? (
-              <div className="space-y-3 mb-10">
-                <h2 className="font-display text-lg font-semibold text-text-mid mb-3">Upcoming</h2>
-                {upcoming.map((event) => (
-                  <EventCard key={event.slug} event={event} isPast={false} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-text-muted mb-10">
-                No upcoming events at the moment. Check back soon!
+            {allEvents.length === 0 ? (
+              <p className="text-text-muted py-8">
+                No events scheduled at the moment. Follow Mandy on Facebook for the latest updates.
               </p>
-            )}
+            ) : (
+              <>
+                {upcoming.length > 0 ? (
+                  <div className="space-y-3 mb-10">
+                    <h2 className="font-display text-lg font-semibold text-text-mid mb-3">Upcoming</h2>
+                    {upcoming.map((event) => (
+                      <EventCard key={event.slug} event={event} isPast={false} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-text-muted mb-10">
+                    No upcoming events at the moment. Check back soon!
+                  </p>
+                )}
 
-            {past.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="font-display text-lg font-semibold text-text-subtle mb-3">Past Events</h2>
-                {past.map((event) => (
-                  <EventCard key={event.slug} event={event} isPast={true} />
-                ))}
-              </div>
+                {past.length > 0 && (
+                  <div className="space-y-3">
+                    <h2 className="font-display text-lg font-semibold text-text-subtle mb-3">Past Events</h2>
+                    {past.map((event) => (
+                      <EventCard key={event.slug} event={event} isPast={true} />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

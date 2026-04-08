@@ -90,20 +90,26 @@ export default function GalleryPage() {
         <SectionHeader title="Gallery" />
 
         <div ref={bodyRef} className="animate-in">
-          <TagFilter
-            availableTags={availableTags}
-            activeTags={activeTags}
-            onToggle={toggleTag}
-            onClear={() => { setActiveTags([]); setShowCount(PAGE_SIZE); }}
-            showFeatured
-            featuredActive={featuredOnly}
-            onToggleFeatured={() => { setFeaturedOnly((p) => !p); setShowCount(PAGE_SIZE); }}
-          />
+          {allArtwork.length === 0 ? (
+            <p className="text-text-muted py-8">
+              Gallery coming soon. Check back for Mandy's latest work.
+            </p>
+          ) : (
+            <>
+              <TagFilter
+                availableTags={availableTags}
+                activeTags={activeTags}
+                onToggle={toggleTag}
+                onClear={() => { setActiveTags([]); setShowCount(PAGE_SIZE); }}
+                showFeatured
+                featuredActive={featuredOnly}
+                onToggleFeatured={() => { setFeaturedOnly((p) => !p); setShowCount(PAGE_SIZE); }}
+              />
 
-          <GalleryGrid
-            items={visible}
-            onSelect={(i) => setLightboxIndex(i)}
-          />
+              <GalleryGrid
+                items={visible}
+                onSelect={(i) => setLightboxIndex(i)}
+              />
 
           {hasMore && (
             <div className="mt-8 text-center">
@@ -114,6 +120,8 @@ export default function GalleryPage() {
                 Show more
               </button>
             </div>
+          )}
+            </>
           )}
         </div>
       </div>

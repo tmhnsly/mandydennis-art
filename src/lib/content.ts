@@ -54,19 +54,19 @@ const DUMMY_ARTWORK: Artwork[] = [
 
 const DUMMY_EVENTS: ArtEvent[] = [
   {
-    slug: "spring-art-fair-2026",
-    title: "Spring Art Fair 2026",
-    date: "2026-05-10",
-    location: "Village Hall, Oakham",
-    description: "Join me at the Spring Art Fair where I'll be exhibiting a selection of pet portraits and landscapes. Come say hello!",
-    link: "",
-  },
-  {
     slug: "summer-exhibition",
     title: "Summer Exhibition",
     date: "2026-07-20",
     location: "The Gallery, Stamford",
-    description: "A group exhibition featuring local artists. I'll have several new watercolour landscapes on display.",
+    description: "A group exhibition featuring local artists. New watercolour seascapes on display.",
+    link: "",
+  },
+  {
+    slug: "spring-art-fair-2026",
+    title: "Spring Art Fair 2026",
+    date: "2026-03-15",
+    location: "Village Hall, Oakham",
+    description: "Exhibiting a selection of pet portraits and landscapes.",
     link: "",
   },
 ];
