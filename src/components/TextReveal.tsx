@@ -6,8 +6,6 @@ interface Props {
   className?: string;
   as?: "h1" | "h2" | "h3" | "p" | "span";
   delay?: number;
-  /** Split by "word" or "char" */
-  by?: "word" | "char";
 }
 
 export default function TextReveal({
@@ -15,30 +13,29 @@ export default function TextReveal({
   className = "",
   as: Tag = "span",
   delay = 0,
-  by = "word",
 }: Props) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
-  const units = by === "word" ? children.split(" ") : children.split("");
+  const words = children.split(" ");
 
   return (
     <Tag ref={ref} className={className}>
-      {units.map((unit, i) => (
-        <span key={i} className="inline-block overflow-hidden">
+      {words.map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden pb-[0.1em]">
           <motion.span
             className="inline-block"
-            initial={{ y: "100%" }}
-            animate={isInView ? { y: 0 } : {}}
+            initial={{ y: "110%" }}
+            animate={isInView ? { y: 0 } : { y: "110%" }}
             transition={{
-              duration: 0.35,
-              ease: [0.22, 1, 0.36, 1],
-              delay: delay + i * 0.03,
+              duration: 0.4,
+              ease: [0.25, 1, 0.5, 1],
+              delay: delay + i * 0.04,
             }}
           >
-            {unit}
-            {by === "word" && i < units.length - 1 ? "\u00A0" : ""}
+            {word}
           </motion.span>
+          {i < words.length - 1 && <span>&nbsp;</span>}
         </span>
       ))}
     </Tag>
