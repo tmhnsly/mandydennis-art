@@ -32,10 +32,8 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax scroll — desktop only (768px+), mobile skips it
+  // Parallax scroll — runs on all devices, subtle movement
   useEffect(() => {
-    if (window.innerWidth < 768) return;
-
     let ticking = false;
     const handleScroll = () => {
       if (ticking) return;
@@ -44,7 +42,7 @@ export default function HomePage() {
         const el = heroRef.current;
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.bottom > 0) setParallaxY(-rect.top * 0.25);
+          if (rect.bottom > 0) setParallaxY(-rect.top * 0.15);
         }
         ticking = false;
       });
@@ -105,8 +103,8 @@ export default function HomePage() {
                 alt=""
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
-                className="w-full h-full object-cover object-center md:will-change-transform"
-                style={parallaxY !== 0 ? { transform: `scale(1.15) translateY(${parallaxY}px)` } as CSSProperties : undefined}
+                className="w-full h-full object-cover object-center will-change-transform transition-transform duration-100 ease-out"
+                style={{ transform: `scale(1.1) translateY(${parallaxY}px)` } as CSSProperties}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
@@ -129,7 +127,7 @@ export default function HomePage() {
               <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
                 View Gallery
               </Link>
-              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase backdrop-blur-sm bg-bg/30 border border-text/20 text-text hover:bg-bg/50 transition-colors">
+              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
                 Commissions
               </Link>
             </div>
