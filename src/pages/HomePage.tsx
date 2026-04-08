@@ -22,25 +22,24 @@ export default function HomePage() {
     });
   }, []);
 
-  // Pick a hero image from featured work (first one)
   const heroImage = featured.length > 0 ? featured[0] : allArtwork[0];
 
   return (
     <>
-      {/* Hero — two column: text left, image right */}
+      {/* Hero */}
       <div>
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(3rem,6vw,5rem)]">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-[clamp(2rem,5vw,4rem)] items-center">
             {/* Left: text */}
             <div>
-              <h1 className="hero-stagger-1 font-display text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
+              <h1 className="hero-name font-display text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
                 Mandy<br />
                 <em className="font-serif italic font-normal text-text-mid">Dennis</em>
               </h1>
-              <p className="hero-stagger-2 text-[1.05rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
+              <p className="hero-tagline text-[1.05rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
                 {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
               </p>
-              <div className="hero-stagger-3 flex gap-2.5 flex-wrap">
+              <div className="hero-ctas flex gap-2.5 flex-wrap">
                 <Link
                   to="/gallery"
                   className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity"
@@ -56,7 +55,7 @@ export default function HomePage() {
               </div>
 
               {/* Stats row */}
-              <div className="hero-stagger-4 flex gap-[clamp(1.5rem,4vw,3rem)] mt-10 pt-5 border-t border-line flex-wrap">
+              <div className="hero-stats flex gap-[clamp(1.5rem,4vw,3rem)] mt-10 pt-5 border-t border-line flex-wrap">
                 <div>
                   <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Medium</div>
                   <div className="font-display text-[0.85rem] font-semibold tracking-tight">Pastels & Watercolours</div>
@@ -72,7 +71,7 @@ export default function HomePage() {
             {heroImage && (
               <Link
                 to="/gallery"
-                className="hero-stagger-2 block relative overflow-hidden aspect-[4/5] group"
+                className="hero-image block relative overflow-hidden aspect-[4/5] group"
               >
                 <img
                   src={thumbnailUrl(heroImage.image)}
