@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useAnimateIn } from "../hooks/useAnimateIn";
@@ -27,10 +27,11 @@ function artworkTags(item: Artwork): string[] {
 export default function GalleryPage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
   const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [featuredOnly, setFeaturedOnly] = useState(true);
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const { ref: bodyRef, isInView } = useAnimateIn();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { document.title = "Gallery — Mandy Dennis Art"; }, []);
   useEffect(() => { getArtwork().then(setAllArtwork); }, []);
@@ -57,6 +58,22 @@ export default function GalleryPage() {
     );
     setShowCount(PAGE_SIZE);
   };
+
+  // Infinite scroll — load more when sentinel enters viewport
+  const loadMore = useCallback(() => {
+    if (hasMore) setShowCount((c) => c + PAGE_SIZE);
+  }, [hasMore]);
+
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   return (
     <>
@@ -86,16 +103,8 @@ export default function GalleryPage() {
                   onSelect={(i) => setLightboxIndex(i)}
                 />
 
-                {hasMore && (
-                  <div className="mt-8 text-center">
-                    <button
-                      onClick={() => setShowCount((c) => c + PAGE_SIZE)}
-                      className="min-h-11 px-6 py-3 text-[0.8rem] font-medium tracking-wide uppercase border border-line-strong text-text-muted hover:border-text hover:text-text transition-colors"
-                    >
-                      Show more
-                    </button>
-                  </div>
-                )}
+                {/* Infinite scroll sentinel */}
+                {hasMore && <div ref={loadMoreRef} className="h-1" />}
               </>
             )}
           </div>
