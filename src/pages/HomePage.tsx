@@ -120,10 +120,9 @@ export default function HomePage() {
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
           <div className="hero-stagger max-w-xl backdrop-blur-md bg-bg/40 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            {/* Name — tight stacked with contrasting sizes */}
             <h1 className="mb-5">
-              <TextReveal as="span" className="block font-display text-[clamp(4rem,10vw,7rem)] font-bold tracking-[-0.05em] leading-[0.8]">Mandy</TextReveal>
-              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(2.5rem,7vw,4.5rem)] leading-[1] -mt-1">Dennis</TextReveal>
+              <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
+              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
             </h1>
 
             <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
@@ -151,17 +150,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Image indicators — frosted glass dots */}
           {featured.length > 1 && (
-            <div className="inline-flex gap-2 mt-6 backdrop-blur-md bg-bg/30 border border-white/15 rounded-full px-3 py-2">
+            <div className="flex gap-2.5 mt-6">
               {featured.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setHeroIndex(i)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
+                  className={`rounded-full backdrop-blur-md transition-all duration-300 ${
                     i === safeIndex
-                      ? "w-8 bg-text/50"
-                      : "w-2 bg-text/15 hover:bg-text/25"
+                      ? "w-8 h-2.5 bg-text/50 shadow-sm"
+                      : "w-2.5 h-2.5 bg-text/15 hover:bg-text/25"
                   }`}
                   aria-label={`Show artwork ${i + 1}`}
                 />
