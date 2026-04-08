@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaMapMarkerAlt, FaFacebookF, FaInstagram, FaEnvelope } from "react-icons/fa";
+import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
