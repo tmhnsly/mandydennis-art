@@ -33,18 +33,19 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax scroll — only activates after first scroll to prevent jump on load
+  // Parallax scroll — desktop only (768px+), mobile skips it
   useEffect(() => {
+    if (window.innerWidth < 768) return;
+
     let ticking = false;
     const handleScroll = () => {
-      parallaxActive.current = true;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         const el = heroRef.current;
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.bottom > 0) setParallaxY(-rect.top * 0.3);
+          if (rect.bottom > 0) setParallaxY(-rect.top * 0.25);
         }
         ticking = false;
       });
@@ -105,8 +106,8 @@ export default function HomePage() {
                 alt=""
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
-                className="w-full h-full object-cover object-center will-change-transform"
-                style={{ transform: `scale(1.15) translateY(${parallaxY}px)` } as CSSProperties}
+                className="w-full h-full object-cover object-center md:will-change-transform"
+                style={parallaxY !== 0 ? { transform: `scale(1.15) translateY(${parallaxY}px)` } as CSSProperties : undefined}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
