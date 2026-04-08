@@ -12,12 +12,12 @@ export default function Footer() {
           <span>&copy; {new Date().getFullYear()} Mandy Dennis Art</span>
           <span className="text-line">·</span>
           <a
-            href="https://tomhennessy.dev"
+            href="https://tomhinsley.com"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-text transition-colors"
           >
-            Site by Tom Hennessy
+            Site by Tom Hinsley
           </a>
         </div>
 
