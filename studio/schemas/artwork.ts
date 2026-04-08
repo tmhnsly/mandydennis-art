@@ -2,27 +2,31 @@ import { defineType, defineField } from "sanity";
 
 export default defineType({
   name: "artwork",
-  title: "Artwork",
+  title: "Gallery",
   type: "document",
+  icon: () => "🎨",
   fields: [
     defineField({
       name: "title",
       title: "Title",
       type: "string",
+      description: "Name of the piece, e.g. 'Bella — Pastel Portrait'",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "slug",
-      title: "Slug",
+      title: "URL Slug",
       type: "slug",
       options: { source: "title", maxLength: 96 },
+      description: "Click Generate to create automatically from the title",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "image",
-      title: "Image",
+      title: "Photo",
       type: "image",
       options: { hotspot: true },
+      description: "Upload a photo of the artwork",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -30,12 +34,14 @@ export default defineType({
       title: "Description",
       type: "text",
       rows: 3,
+      description: "Optional — a short note about this piece",
     }),
     defineField({
       name: "medium",
       title: "Medium",
       type: "array",
       of: [{ type: "string" }],
+      description: "What was this made with?",
       options: {
         list: [
           { title: "Pastel", value: "pastel" },
@@ -55,6 +61,7 @@ export default defineType({
       title: "Subject",
       type: "array",
       of: [{ type: "string" }],
+      description: "What is this a picture of?",
       options: {
         list: [
           { title: "Pets", value: "pets" },
@@ -63,6 +70,7 @@ export default defineType({
           { title: "Horses", value: "horses" },
           { title: "People", value: "people" },
           { title: "Landscape", value: "landscape" },
+          { title: "Seascapes", value: "seascapes" },
           { title: "Still Life", value: "still life" },
           { title: "Wildlife", value: "wildlife" },
           { title: "Flowers", value: "flowers" },
@@ -73,19 +81,24 @@ export default defineType({
     }),
     defineField({
       name: "featured",
-      title: "Featured on Homepage",
+      title: "Show on Homepage",
       type: "boolean",
+      description: "Turn this on to feature this piece on the homepage",
       initialValue: false,
     }),
     defineField({
       name: "date",
-      title: "Date",
+      title: "Date Added",
       type: "date",
       initialValue: () => new Date().toISOString().split("T")[0],
       validation: (rule) => rule.required(),
     }),
   ],
+  orderings: [
+    { title: "Newest First", name: "dateDesc", by: [{ field: "date", direction: "desc" }] },
+    { title: "Title A-Z", name: "titleAsc", by: [{ field: "title", direction: "asc" }] },
+  ],
   preview: {
-    select: { title: "title", media: "image" },
+    select: { title: "title", media: "image", subtitle: "date" },
   },
 });
