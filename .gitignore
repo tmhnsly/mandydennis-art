@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+studio/node_modules
+studio/dist
+studio/.yarn
 dist
 dist-ssr
 *.local
@@ -24,3 +27,4 @@ dist-ssr
 *.sln
 *.sw?
 .superpowers/
+studio/.yarn/
