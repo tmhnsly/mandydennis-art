@@ -87,14 +87,19 @@ body {
 
 /* ---- Hero animations ---- */
 
-/* Name: clip reveal from bottom */
-.hero-name {
-  clip-path: inset(100% 0 0 0);
-  animation: clipReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+/* Name: each word fades up individually */
+.hero-name-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.15em);
+  filter: blur(2px);
+  animation: wordIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+.hero-name-word:nth-child(1) { animation-delay: 0.05s; }
+.hero-name-word:nth-child(2) { animation-delay: 0.2s; }
 
-@keyframes clipReveal {
-  to { clip-path: inset(0 0 0 0); }
+@keyframes wordIn {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
 /* Tagline: fade in with subtle blur clear */

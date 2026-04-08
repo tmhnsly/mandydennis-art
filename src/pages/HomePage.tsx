@@ -32,9 +32,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-[clamp(2rem,5vw,4rem)] items-center">
             {/* Left: text */}
             <div>
-              <h1 className="hero-name font-display text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
-                Mandy<br />
-                <em className="font-serif italic font-normal text-text-mid">Dennis</em>
+              <h1 className="font-display text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
+                <span className="hero-name-word">Mandy</span>
+                <br />
+                <em className="hero-name-word font-serif italic font-normal text-text-mid">Dennis</em>
               </h1>
               <p className="hero-tagline text-[1.05rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
                 {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
