@@ -15,6 +15,12 @@
   --color-text-subtle: #b0a096;
   --color-accent: #a0705a;
   --color-accent-hover: #8c6150;
+  --color-cta-bg: #3b2820;
+  --color-cta-text: #faf7f4;
+  --color-cta-muted: rgba(250,247,244,0.6);
+  --color-cta-btn-bg: #faf7f4;
+  --color-cta-btn-text: #3b2820;
+  --color-cta-btn-border: rgba(250,247,244,0.25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +36,12 @@
     --color-text-subtle: #6e5e55;
     --color-accent: #c48a6e;
     --color-accent-hover: #d49a7e;
+    --color-cta-bg: #33261f;
+    --color-cta-text: #e8ddd5;
+    --color-cta-muted: rgba(232,221,213,0.55);
+    --color-cta-btn-bg: #c48a6e;
+    --color-cta-btn-text: #1c1513;
+    --color-cta-btn-border: rgba(196,138,110,0.35);
   }
 }
 
@@ -45,6 +57,12 @@
   --color-text-subtle: var(--color-text-subtle);
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
+  --color-cta-bg: var(--color-cta-bg);
+  --color-cta-text: var(--color-cta-text);
+  --color-cta-muted: var(--color-cta-muted);
+  --color-cta-btn-bg: var(--color-cta-btn-bg);
+  --color-cta-btn-text: var(--color-cta-btn-text);
+  --color-cta-btn-border: var(--color-cta-btn-border);
 
   --font-display: "Outfit", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
