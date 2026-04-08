@@ -10,10 +10,15 @@ const EventsPage = lazy(() => import("./pages/EventsPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
+// Stable empty shell — same height as a page so no layout shift during lazy load
+function PageShell() {
+  return <div className="min-h-[50vh]" />;
+}
+
 export default function App() {
   return (
     <Layout>
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageShell />}>
         <PageTransition>
           <Routes>
             <Route path="/" element={<HomePage />} />

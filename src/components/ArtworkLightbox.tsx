@@ -1,7 +1,7 @@
-import { useEffect, useCallback, useState } from "react";
-import { motion, AnimatePresence, type PanInfo } from "motion/react";
+import { useEffect, useCallback, useState, useRef } from "react";
+import { motion, type PanInfo } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
-import { fullUrl, thumbnailUrl } from "../lib/content";
+import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
 
 interface Props {
@@ -15,29 +15,31 @@ function wrap(i: number, len: number) {
   return ((i % len) + len) % len;
 }
 
-const SWIPE_THRESHOLD = 50;
-
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
-  const [direction, setDirection] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const dragX = useRef(0);
 
   const canNav = items.length > 1;
-  const prevItem = canNav ? items[wrap(index - 1, items.length)] : null;
-  const nextItem = canNav ? items[wrap(index + 1, items.length)] : null;
 
   const goPrev = useCallback(() => {
     if (!canNav) return;
-    setDirection(-1);
+    setImgLoaded(false);
     onChange(wrap(index - 1, items.length));
   }, [index, items.length, canNav, onChange]);
 
   const goNext = useCallback(() => {
     if (!canNav) return;
-    setDirection(1);
+    setImgLoaded(false);
     onChange(wrap(index + 1, items.length));
   }, [index, items.length, canNav, onChange]);
+
+  // Reset loaded state when opening
+  useEffect(() => {
+    if (isOpen) setImgLoaded(false);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -55,130 +57,80 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   }, [isOpen, onClose, goPrev, goNext]);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (info.offset.x > SWIPE_THRESHOLD) goPrev();
-    else if (info.offset.x < -SWIPE_THRESHOLD) goNext();
+    if (Math.abs(info.offset.x) > 60) {
+      info.offset.x > 0 ? goPrev() : goNext();
+    }
   };
 
-  const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -300 : 300, opacity: 0 }),
-  };
+  if (!isOpen || !current) return null;
 
-  const btnClass = "w-10 h-10 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
+  const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/8 hover:bg-white/15 border border-white/8 flex items-center justify-center transition-colors";
 
   return (
-    <AnimatePresence>
-      {isOpen && current && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15 }}
+      className="fixed inset-0 z-[9999] bg-black/95"
+      onClick={onClose}
+    >
+      {/* Close */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        className={`absolute top-3 right-3 z-20 ${btnClass}`}
+        aria-label="Close"
+      >
+        <FaTimes size={13} className="text-white/70" />
+      </button>
+
+      {/* Full canvas image area */}
+      <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-6" onClick={(e) => e.stopPropagation()}>
         <motion.div
-          key="lightbox"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
-          onClick={onClose}
+          key={current.slug}
+          drag={canNav ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={handleDragEnd}
+          onDrag={(_, info) => { dragX.current = info.offset.x; }}
+          className="relative max-w-full max-h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
         >
-          {/* Close */}
-          <div className="absolute top-4 right-4 z-20">
-            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={btnClass} aria-label="Close">
-              <FaTimes size={13} className="text-white/80" />
-            </button>
-          </div>
-
-          {/* Image area */}
-          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            {/* Peek prev */}
-            {prevItem && (
-              <button
-                onClick={(e) => { e.stopPropagation(); goPrev(); }}
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 cursor-pointer group"
-                aria-label="Previous"
-              >
-                <img src={thumbnailUrl(prevItem.image)} alt="" className="h-full w-full object-cover rounded-sm opacity-20 group-hover:opacity-35 transition-opacity" />
-              </button>
-            )}
-
-            {/* Main image — draggable for swipe */}
-            <div className="relative z-10 px-[10%] sm:px-[14%] max-w-full" onClick={(e) => e.stopPropagation()}>
-              <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-                <motion.div
-                  key={current.slug}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                  drag={canNav ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.15}
-                  onDragEnd={handleDragEnd}
-                  className="cursor-grab active:cursor-grabbing"
-                >
-                  <motion.img
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    src={fullUrl(current.image)}
-                    alt={current.title}
-                    className="max-h-[70vh] max-w-full object-contain rounded-sm select-none pointer-events-none"
-                    draggable={false}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Peek next */}
-            {nextItem && (
-              <button
-                onClick={(e) => { e.stopPropagation(); goNext(); }}
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 cursor-pointer group"
-                aria-label="Next"
-              >
-                <img src={thumbnailUrl(nextItem.image)} alt="" className="h-full w-full object-cover rounded-sm opacity-20 group-hover:opacity-35 transition-opacity" />
-              </button>
-            )}
-          </div>
-
-          {/* Bottom bar */}
-          <div className="flex-shrink-0 px-4 pb-5 pt-3" onClick={(e) => e.stopPropagation()}>
-            <div className="max-w-[1400px] mx-auto flex items-center gap-4">
-              {canNav && (
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={goPrev} className={btnClass} aria-label="Previous">
-                    <FaChevronLeft size={12} className="text-white/80" />
-                  </button>
-                  <span className="text-white/40 text-xs tabular-nums font-medium min-w-[3rem] text-center">
-                    {index + 1} / {items.length}
-                  </span>
-                  <button onClick={goNext} className={btnClass} aria-label="Next">
-                    <FaChevronRight size={12} className="text-white/80" />
-                  </button>
-                </div>
-              )}
-              <AnimatePresence mode="wait">
-                {tags.length > 0 && (
-                  <motion.div
-                    key={current.slug + "-tags"}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex gap-1.5 flex-wrap flex-1"
-                  >
-                    {tags.map((tag) => (
-                      <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/55 border border-white/10 bg-white/5 backdrop-blur-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
+          <img
+            src={fullUrl(current.image)}
+            alt={current.title}
+            onLoad={() => setImgLoaded(true)}
+            className={`max-w-full max-h-[calc(100vh-6rem)] object-contain select-none transition-opacity duration-200 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+            draggable={false}
+          />
         </motion.div>
-      )}
-    </AnimatePresence>
+      </div>
+
+      {/* Bottom bar — nav + tags */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 pt-2" onClick={(e) => e.stopPropagation()}>
+        <div className="max-w-[1400px] mx-auto flex items-center gap-4">
+          {canNav && (
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button onClick={goPrev} className={btnClass} aria-label="Previous">
+                <FaChevronLeft size={12} className="text-white/70" />
+              </button>
+              <span className="text-white/35 text-xs tabular-nums font-medium min-w-[3rem] text-center">
+                {index + 1} / {items.length}
+              </span>
+              <button onClick={goNext} className={btnClass} aria-label="Next">
+                <FaChevronRight size={12} className="text-white/70" />
+              </button>
+            </div>
+          )}
+          {tags.length > 0 && (
+            <div className="flex gap-1.5 flex-wrap flex-1">
+              {tags.map((tag) => (
+                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/45 border border-white/8 bg-white/4">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 }
