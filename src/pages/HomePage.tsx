@@ -132,8 +132,9 @@ export default function HomePage() {
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)] relative">
-            {/* Top-right info block */}
-            <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-3">
+            {/* Top rule + status — line runs from left, ends at the label */}
+            <div className="hidden sm:flex items-center gap-3 mb-6">
+              <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
                 <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Open for commissions</span>
                 <span className="relative flex h-3 w-3">
@@ -141,23 +142,6 @@ export default function HomePage() {
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
               </span>
-              <div className="flex gap-1">
-                {settings.contact_email && (
-                  <a href={`mailto:${settings.contact_email}`} className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Email">
-                    <FaEnvelope size={14} />
-                  </a>
-                )}
-                {settings.facebook_url && (
-                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Facebook">
-                    <FaFacebookF size={14} />
-                  </a>
-                )}
-                {settings.instagram_url && (
-                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
-                    <FaInstagram size={15} />
-                  </a>
-                )}
-              </div>
             </div>
 
             <h1 className="mb-5">
