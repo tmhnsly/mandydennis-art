@@ -109,12 +109,14 @@ body {
 }
 
 /* Scale X rule — section header lines, DrawLine */
-/* Animation temporarily disabled for testing */
 .anim-rule {
-  transform: scaleX(1);
+  transform: scaleX(0) translate3d(0, 0, 0);
+  transform-origin: left;
+  will-change: transform;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-rule.in-view {
-  transform: scaleX(1);
+  transform: scaleX(1) translate3d(0, 0, 0);
 }
 
 /* Text reveal — word slides up from overflow hidden */
