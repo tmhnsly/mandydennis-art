@@ -1,21 +1,21 @@
-import { Link } from "react-router-dom";
 import type { Artwork } from "../types";
 import { thumbnailUrl } from "../lib/content";
 
 interface Props {
   items: Artwork[];
+  onSelect: (index: number) => void;
 }
 
-export default function FeaturedGrid({ items }: Props) {
+export default function FeaturedGrid({ items, onSelect }: Props) {
   if (items.length === 0) return null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[3px]">
-      {items.map((item) => (
-        <Link
+      {items.map((item, i) => (
+        <button
           key={item.slug}
-          to="/gallery"
-          className="relative block aspect-[4/5] overflow-hidden cursor-pointer group"
+          onClick={() => onSelect(i)}
+          className="relative block aspect-[4/5] overflow-hidden cursor-pointer group text-left"
         >
           <img
             src={thumbnailUrl(item.image)}
@@ -28,7 +28,7 @@ export default function FeaturedGrid({ items }: Props) {
               {item.title}
             </h3>
             <div className="flex gap-1.5 flex-wrap">
-              {[...item.medium, ...item.subject].map((tag) => (
+              {[...(item.medium ?? []), ...(item.subject ?? [])].map((tag) => (
                 <span
                   key={tag}
                   className="text-[0.6rem] tracking-wide uppercase text-white/65 px-1.5 py-0.5 border border-white/20"
@@ -41,7 +41,7 @@ export default function FeaturedGrid({ items }: Props) {
           <span className="absolute top-3 right-3 text-white text-sm opacity-0 group-hover:opacity-60 transition-opacity font-display">
             ↗
           </span>
-        </Link>
+        </button>
       ))}
     </div>
   );

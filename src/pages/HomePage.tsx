@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, thumbnailUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
+import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -16,6 +17,7 @@ export default function HomePage() {
   const initial = getInitialArtwork();
   const [featured, setFeatured] = useState<Artwork[]>(() => initial.filter((a) => a.featured));
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
@@ -89,7 +91,7 @@ export default function HomePage() {
             <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
-                <FeaturedGrid items={featured} />
+                <FeaturedGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
                 <div className="mt-8 text-center">
                   <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors">
                     <FaArrowRight size={14} />
@@ -100,6 +102,13 @@ export default function HomePage() {
             </div>
           </div>
           <DrawLine />
+
+          <ArtworkLightbox
+            items={featured}
+            index={lightboxIndex}
+            onClose={() => setLightboxIndex(-1)}
+            onChange={setLightboxIndex}
+          />
         </>
       )}
 

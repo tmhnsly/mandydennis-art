@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import { getArtwork, getInitialArtwork, fullUrl } from "../lib/content";
+import { getArtwork, getInitialArtwork } from "../lib/content";
+import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import CtaBanner from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
@@ -59,12 +58,6 @@ export default function GalleryPage() {
     setShowCount(PAGE_SIZE);
   };
 
-  const lightboxSlides = visible.map((item) => ({
-    src: fullUrl(item.image),
-    alt: item.title,
-    title: item.title,
-  }));
-
   return (
     <>
       <div>
@@ -108,14 +101,11 @@ export default function GalleryPage() {
           </div>
         </div>
 
-        <Lightbox
-          open={lightboxIndex >= 0}
+        <ArtworkLightbox
+          items={visible}
           index={lightboxIndex}
-          close={() => setLightboxIndex(-1)}
-          slides={lightboxSlides}
-          styles={{ container: { backgroundColor: "rgba(0,0,0,0.92)" } }}
-          carousel={{ finite: false }}
-          animation={{ swipe: 250 }}
+          onClose={() => setLightboxIndex(-1)}
+          onChange={setLightboxIndex}
         />
       </div>
       <DrawLine />
