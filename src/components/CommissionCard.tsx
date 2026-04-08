@@ -1,6 +1,24 @@
 import { FaPaw, FaCheck, FaTruck } from "react-icons/fa";
 import type { CommissionCategory } from "../types";
 
+const MEDIUMS = ["pastels", "pastel", "watercolours", "watercolour", "pencil", "oil", "charcoal", "acrylic", "ink", "mixed media"];
+
+function StylisedTitle({ text }: { text: string }) {
+  // Find the last medium word in the title and italicise it in serif
+  const words = text.split(" ");
+  const lastMediumIdx = words.reduce((acc, w, i) =>
+    MEDIUMS.includes(w.toLowerCase()) ? i : acc, -1);
+  if (lastMediumIdx === -1) return <>{text}</>;
+  return (
+    <>
+      {words.slice(0, lastMediumIdx).join(" ")}{" "}
+      <span className="font-serif italic font-normal text-text-mid">
+        {words.slice(lastMediumIdx).join(" ")}
+      </span>
+    </>
+  );
+}
+
 interface Props {
   category: CommissionCategory;
   currency: string;
@@ -15,7 +33,7 @@ export default function CommissionCard({ category, currency }: Props) {
           <FaPaw size={14} className="text-accent" />
         </div>
         <h3 className="font-display text-xl font-bold tracking-tight">
-          {category.title}
+          <StylisedTitle text={category.title} />
         </h3>
       </div>
 

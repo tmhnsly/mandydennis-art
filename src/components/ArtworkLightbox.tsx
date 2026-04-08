@@ -127,7 +127,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
               }
             }}
           >
-            <div className="h-full overflow-hidden" ref={emblaRef} style={{ touchAction: isDraggingDown ? "none" : "pan-y" }}>
+            <div className="h-full overflow-hidden" ref={emblaRef} style={{ touchAction: "none" }}>
               <div className="flex h-full">
                 {items.map((item) => (
                   <div
@@ -147,13 +147,11 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
             </div>
           </motion.div>
 
-          {/* Click-to-close zones */}
-          <div className="absolute inset-y-0 left-0 w-12 z-10 cursor-pointer" onClick={onClose} />
-          <div className="absolute inset-y-0 right-0 w-12 z-10 cursor-pointer" onClick={onClose} />
+          {/* Click backdrop (above/below image) to close */}
 
           {/* Bottom bar — tags left, controls right */}
           <div className="absolute bottom-0 left-0 right-0 z-20">
-            <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3 px-4 py-4">
+            <div className="max-w-[var(--width-content)] mx-auto flex items-center justify-between gap-3 px-4 py-4">
               {tags.length > 0 ? (
                 <div className="flex gap-1.5 flex-wrap flex-1">
                   {tags.map((tag) => (

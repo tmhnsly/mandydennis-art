@@ -55,7 +55,7 @@ function MobileNav() {
           <DropdownMenu.Content
             align="end"
             sideOffset={8}
-            className="z-[100] min-w-[200px] rounded-lg border border-line bg-bg/95 backdrop-blur-xl p-1.5 shadow-lg animate-in"
+            className="z-[100] min-w-[var(--width-menu)] rounded-lg border border-line bg-bg/95 backdrop-blur-xl p-1.5 shadow-lg animate-in"
           >
             {links.map(({ to, label, icon: Icon }) => {
               const isActive = location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
@@ -86,12 +86,12 @@ function MobileNav() {
 export default function Nav() {
   return (
     <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur-xl">
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between px-[clamp(1.5rem,5vw,4rem)] py-2">
+      <div className="max-w-[var(--width-content)] mx-auto flex items-center justify-between px-[var(--pad-page)] py-2">
         <NavLink
           to="/"
-          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center"
+          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center gap-1.5"
         >
-          Mandy Dennis
+          Mandy <span className="font-serif italic font-normal text-text-mid">Dennis</span>
         </NavLink>
 
         <DesktopNav />

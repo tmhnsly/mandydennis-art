@@ -28,7 +28,7 @@ export default function AboutPage() {
     <>
       {/* Bio section */}
       <div>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="About" />
 
           <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start`}>
@@ -95,7 +95,7 @@ export default function AboutPage() {
       {testimonials.length > 0 && (
         <>
           <div ref={testimonialsRef}>
-            <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+            <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Kind Words" />
 
               <div className={`anim-fade-up ${testimonialsInView ? "in-view" : ""} grid grid-cols-1 md:grid-cols-2 gap-6`}>
@@ -122,7 +122,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <div ref={ctaRef}>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(3rem,6vw,5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(3rem,6vw,5rem)]">
           <div className={`anim-fade-up ${ctaInView ? "in-view" : ""} text-center max-w-lg mx-auto`}>
             <h2 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-3">
               Want your own?

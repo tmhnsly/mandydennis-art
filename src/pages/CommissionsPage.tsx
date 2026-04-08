@@ -19,7 +19,7 @@ export default function CommissionsPage() {
   return (
     <>
       <div>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Commissions" />
 
           <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} grid gap-[clamp(2rem,5vw,3.5rem)] lg:grid-cols-[1fr_minmax(0,420px)]`}>

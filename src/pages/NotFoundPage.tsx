@@ -10,7 +10,7 @@ export default function NotFoundPage() {
   return (
     <>
       <div>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <h1 className="font-display text-3xl font-bold tracking-tight mb-4">
             Page not found
           </h1>

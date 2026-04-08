@@ -161,7 +161,7 @@ export default function GalleryPage() {
   return (
     <>
       <div>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Gallery" />
 
           <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""}`}>

@@ -16,12 +16,12 @@ export default function GalleryGrid({ items, onSelect }: Props) {
   }
 
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[3px]">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)]">
       {items.map((item, i) => (
         <button
           key={item.slug}
           onClick={() => onSelect(i)}
-          className="block w-full break-inside-avoid mb-[3px] relative overflow-hidden cursor-pointer group text-left"
+          className="block w-full break-inside-avoid mb-[var(--gap-masonry)] relative overflow-hidden cursor-pointer group text-left"
         >
           <img
             src={thumbnailUrl(item.image)}

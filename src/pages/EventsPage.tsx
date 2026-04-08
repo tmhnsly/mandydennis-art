@@ -31,10 +31,10 @@ export default function EventsPage() {
   return (
     <>
       <div>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Events" />
 
-          <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[700px]`}>
+          <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[var(--width-narrow)]`}>
             {allEvents.length === 0 ? (
               <p className="text-text-muted py-8">
                 No events scheduled at the moment. Follow Mandy on Facebook for the latest updates.

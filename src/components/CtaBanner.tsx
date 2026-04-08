@@ -16,7 +16,7 @@ export default function CtaBanner({ heading, text, buttonLabel, buttonTo, second
 
   return (
     <div ref={ref} className="bg-cta-bg">
-      <div className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(3rem,6vw,4.5rem)] text-center`}>
+      <div className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(3rem,6vw,4.5rem)] text-center`}>
         <h2 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2 text-cta-text">
           {heading}
         </h2>

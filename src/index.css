@@ -67,6 +67,17 @@
   --font-display: "Outfit", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
+
+  /* Layout tokens */
+  --width-content: 1400px;
+  --width-narrow: 700px;
+  --width-text: 440px;
+  --width-menu: 200px;
+  --gap-masonry: 3px;
+  --pad-page: clamp(1.5rem, 5vw, 4rem);
+  --pad-section: clamp(2.5rem, 6vw, 4.5rem);
+  --pad-hero: clamp(4rem, 8vw, 7rem);
+  --blur-glass: 8px;
 }
 
 html {

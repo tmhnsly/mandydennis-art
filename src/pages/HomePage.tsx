@@ -138,14 +138,14 @@ export default function HomePage() {
           );
         })}
 
-        <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-[8px] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+        <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
+          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             <h1 className="mb-5">
               <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
               <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
             </h1>
 
-            <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
+            <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[var(--width-text)] mb-8">
               {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
             </p>
 
@@ -192,7 +192,7 @@ export default function HomePage() {
 
       {/* Intro strip */}
       <div ref={introRef}>
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2rem,4vw,3rem)]">
+        <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(2rem,4vw,3rem)]">
           <div className={`anim-fade-up ${introInView ? "in-view" : ""} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
             <p className="text-text-mid text-[1rem] leading-relaxed max-w-lg">
               Self-taught artist creating bespoke artwork for over 30 years. Born in Germany, raised across the world, now based in the UK.
@@ -209,7 +209,7 @@ export default function HomePage() {
       {featured.length > 0 && (
         <>
           <div ref={featuredRef}>
-            <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+            <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
                 <FeaturedGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
@@ -237,9 +237,9 @@ export default function HomePage() {
       {upcomingEvents.length > 0 && (
         <>
           <div ref={eventsRef}>
-            <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+            <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Upcoming Events" />
-              <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[700px]`}>
+              <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[var(--width-narrow)]`}>
                 {upcomingEvents.map((event) => {
                   const [, m, d] = event.startDate.split("-").map(Number);
                   const date = new Date(Date.UTC(2026, m - 1, d));

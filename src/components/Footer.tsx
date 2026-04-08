@@ -7,7 +7,7 @@ export default function Footer() {
 
   return (
     <footer>
-      <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-xs text-text-subtle tracking-wide">
           <span>&copy; {new Date().getFullYear()} Mandy Dennis Art</span>
           <span className="text-line">·</span>
