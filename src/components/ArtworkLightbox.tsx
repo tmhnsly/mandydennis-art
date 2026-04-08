@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
@@ -16,18 +16,32 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const touchStart = useRef<number | null>(null);
+  const [direction, setDirection] = useState(0); // -1 = left, 1 = right
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Once lightbox is open and the initial layoutId animation has settled,
+  // switch to slide mode for prev/next
+  useEffect(() => {
+    if (isOpen) {
+      const timer = window.setTimeout(() => setIsNavigating(true), 500);
+      return () => clearTimeout(timer);
+    }
+    setIsNavigating(false);
+    setDirection(0);
+  }, [isOpen]);
 
   const goPrev = useCallback(() => {
     if (items.length <= 1) return;
+    setDirection(-1);
     onChange(index === 0 ? items.length - 1 : index - 1);
   }, [index, items.length, onChange]);
 
   const goNext = useCallback(() => {
     if (items.length <= 1) return;
+    setDirection(1);
     onChange(index === items.length - 1 ? 0 : index + 1);
   }, [index, items.length, onChange]);
 
-  // Keyboard nav
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -43,7 +57,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStart.current = e.touches[0].clientX;
   };
@@ -56,6 +69,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     touchStart.current = null;
   };
 
+  // Slide variants for navigating between images
+  const slideVariants = {
+    enter: (d: number) => ({ x: d > 0 ? 200 : -200, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -200 : 200, opacity: 0 }),
+  };
+
   return (
     <AnimatePresence>
       {isOpen && current && (
@@ -64,13 +84,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
           onClick={onClose}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Close button */}
+          {/* Close */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -90,39 +110,62 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
             </button>
           )}
 
-          {/* Image with layoutId for shared element transition */}
-          <motion.div
+          {/* Image */}
+          <div
             className="relative max-w-[90vw] max-h-[85vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <motion.img
-              key={current.slug}
-              layoutId={`artwork-${current.slug}`}
-              src={fullUrl(current.image)}
-              alt={current.title}
-              className="max-h-[78vh] max-w-[90vw] object-contain rounded-sm"
-              transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
-            />
+            <AnimatePresence mode="popLayout" custom={direction}>
+              {isNavigating ? (
+                /* Slide transition for prev/next navigation */
+                <motion.img
+                  key={current.slug}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+                  src={fullUrl(current.image)}
+                  alt={current.title}
+                  className="max-h-[78vh] max-w-[90vw] object-contain rounded-sm"
+                />
+              ) : (
+                /* layoutId spring for open/close from grid */
+                <motion.img
+                  key={current.slug}
+                  layoutId={`artwork-${current.slug}`}
+                  src={fullUrl(current.image)}
+                  alt={current.title}
+                  className="max-h-[78vh] max-w-[90vw] object-contain rounded-sm"
+                  transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
+                />
+              )}
+            </AnimatePresence>
 
-            {/* Tags below image */}
-            {tags.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.3 }}
-                className="flex justify-center gap-1.5 mt-4 flex-wrap px-4"
-              >
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/55 border border-white/10 bg-white/5"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </motion.div>
-            )}
-          </motion.div>
+            {/* Tags */}
+            <AnimatePresence mode="wait">
+              {tags.length > 0 && (
+                <motion.div
+                  key={current.slug + "-tags"}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex justify-center gap-1.5 mt-4 flex-wrap px-4"
+                >
+                  {tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/55 border border-white/10 bg-white/5"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Next */}
           {items.length > 1 && (
