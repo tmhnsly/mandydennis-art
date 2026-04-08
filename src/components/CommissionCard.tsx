@@ -25,10 +25,12 @@ export default function CommissionCard({ category, currency }: Props) {
             <span className="font-display font-semibold text-[0.95rem] whitespace-nowrap min-w-[6rem]">
               {opt.size}
             </span>
-            <span className="text-text-mid text-[0.9rem] flex-1">
-              {opt.description}
-            </span>
-            <span className="font-display font-semibold text-[0.95rem] whitespace-nowrap text-right">
+            {opt.description && (
+              <span className="text-text-mid text-[0.9rem] flex-1">
+                {opt.description}
+              </span>
+            )}
+            <span className={`font-display font-semibold text-[0.95rem] whitespace-nowrap text-right ${!opt.description ? "ml-auto" : ""}`}>
               {opt.description === "Starting from" ? "from " : ""}
               {currency}{opt.price}
             </span>
