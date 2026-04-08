@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getEvents } from "../lib/content";
+import { getEvents, getInitialEvents } from "../lib/content";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import EventCard from "../components/EventCard";
@@ -7,7 +7,7 @@ import type { ArtEvent } from "../types";
 import DrawLine from "../components/DrawLine";
 
 export default function EventsPage() {
-  const [allEvents, setAllEvents] = useState<ArtEvent[]>([]);
+  const [allEvents, setAllEvents] = useState<ArtEvent[]>(getInitialEvents);
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => { document.title = "Events — Mandy Dennis Art"; }, []);

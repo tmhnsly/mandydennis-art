@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCommissions } from "../lib/content";
+import { getCommissions, getInitialCommissions } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -10,7 +10,7 @@ import DrawLine from "../components/DrawLine";
 
 export default function CommissionsPage() {
   const settings = useSiteSettings();
-  const [commissions, setCommissions] = useState<CommissionCategory[]>([]);
+  const [commissions, setCommissions] = useState<CommissionCategory[]>(getInitialCommissions);
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {

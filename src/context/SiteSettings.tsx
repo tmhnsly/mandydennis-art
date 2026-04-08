@@ -3,7 +3,7 @@ import { getSettings } from "../lib/content";
 import type { SiteSettings } from "../types";
 
 const defaults: SiteSettings = {
-  tagline: "",
+  tagline: "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours.",
   contact_email: "",
   facebook_url: "",
   instagram_url: "",

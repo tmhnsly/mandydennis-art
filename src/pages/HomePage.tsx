@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
-import { getArtwork, thumbnailUrl } from "../lib/content";
+import { getArtwork, getInitialArtwork, thumbnailUrl } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -12,8 +12,9 @@ import type { Artwork } from "../types";
 
 export default function HomePage() {
   const settings = useSiteSettings();
-  const [featured, setFeatured] = useState<Artwork[]>([]);
-  const [allArtwork, setAllArtwork] = useState<Artwork[]>([]);
+  const initial = getInitialArtwork();
+  const [featured, setFeatured] = useState<Artwork[]>(() => initial.filter((a) => a.featured));
+  const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);

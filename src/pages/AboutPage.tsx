@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaQuoteLeft, FaArrowRight } from "react-icons/fa";
-import { getAbout, getTestimonials } from "../lib/content";
+import { getAbout, getTestimonials, getInitialTestimonials } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { urlFor } from "../lib/sanity";
 import { useAnimateIn, useInView } from "../hooks/useAnimateIn";
@@ -12,7 +12,7 @@ import type { AboutPage as AboutData, Testimonial } from "../types";
 export default function AboutPage() {
   const settings = useSiteSettings();
   const [about, setAbout] = useState<AboutData>({ bio: "", photo: null });
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(getInitialTestimonials);
   const { ref: bodyRef, isInView } = useAnimateIn();
   const { ref: testimonialsRef, isInView: testimonialsInView } = useInView(0.1);
   const { ref: ctaRef, isInView: ctaInView } = useInView(0.1);

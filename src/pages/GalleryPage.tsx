@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
-import { getArtwork, fullUrl } from "../lib/content";
+import { getArtwork, getInitialArtwork, fullUrl } from "../lib/content";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
@@ -25,7 +25,7 @@ function artworkTags(item: Artwork): string[] {
 }
 
 export default function GalleryPage() {
-  const [allArtwork, setAllArtwork] = useState<Artwork[]>([]);
+  const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [featuredOnly, setFeaturedOnly] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState(-1);

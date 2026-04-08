@@ -146,6 +146,18 @@ function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   });
 }
 
+// Sync access to cached data — returns fallback if not yet cached
+function getCached<T>(key: string, fallback: T): T {
+  const entry = cache.get(key);
+  return entry ? (entry.data as T) : fallback;
+}
+
+// Export initial data getters so pages can render immediately
+export function getInitialArtwork(): Artwork[] { return getCached("artwork", DUMMY_ARTWORK); }
+export function getInitialEvents(): ArtEvent[] { return getCached("events", DUMMY_EVENTS); }
+export function getInitialCommissions(): CommissionCategory[] { return getCached("commissions", DUMMY_COMMISSIONS); }
+export function getInitialTestimonials(): Testimonial[] { return getCached("testimonials", DUMMY_TESTIMONIALS); }
+
 export function getArtwork(): Promise<Artwork[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_ARTWORK);
   const c = client;
