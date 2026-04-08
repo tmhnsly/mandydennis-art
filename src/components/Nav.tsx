@@ -89,9 +89,9 @@ export default function Nav() {
       <div className="max-w-[var(--width-content)] mx-auto flex items-center justify-between px-[var(--pad-page)] py-2">
         <NavLink
           to="/"
-          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center gap-1"
+          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center"
         >
-          Mandy <span className="font-serif italic font-normal text-text-mid text-[1.05rem] -translate-y-px">Dennis</span>
+          Mandy Dennis
         </NavLink>
 
         <DesktopNav />

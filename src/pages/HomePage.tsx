@@ -195,7 +195,7 @@ export default function HomePage() {
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(2rem,4vw,3rem)]">
           <div className={`anim-fade-up ${introInView ? "in-view" : ""} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
             <p className="text-text-mid text-[1rem] leading-relaxed max-w-lg">
-              Self-taught artist creating <span className="font-serif italic text-text">bespoke artwork</span> for over 30 years. Born in Germany, raised across the world, now based in the UK.
+              Self-taught artist creating bespoke artwork for over 30 years. Born in Germany, raised across the world, now based in the UK.
             </p>
             <Link to="/about" className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors whitespace-nowrap min-h-11">
               About Mandy <FaArrowRight size={12} />
