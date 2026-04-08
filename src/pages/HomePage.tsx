@@ -141,8 +141,8 @@ export default function HomePage() {
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             <h1 className="mb-5">
-              <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
-              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
+              <TextReveal as="span" className="block font-display text-[clamp(3.2rem,8vw,5.5rem)] font-bold tracking-[-0.04em] leading-[0.9]">Mandy</TextReveal>
+              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.2rem,8vw,5.5rem)] leading-[0.9] -mt-1">Dennis</TextReveal>
             </h1>
 
             <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[var(--width-text)] mb-8">
