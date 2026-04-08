@@ -2,15 +2,15 @@ import { defineType, defineField } from "sanity";
 
 export default defineType({
   name: "commissionCategory",
-  title: "Pricing",
+  title: "Commission Prices",
   type: "document",
-  icon: () => "💰",
+  icon: () => "🏷️",
   fields: [
     defineField({
       name: "title",
-      title: "Name",
+      title: "What type of commission is this?",
       type: "string",
-      description: "e.g. 'Pet Portraits in Pastels'",
+      description: "e.g. 'Pet Portraits in Pastels', 'Watercolour Landscapes'",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -18,50 +18,82 @@ export default defineType({
       title: "URL Slug",
       type: "slug",
       options: { source: "title", maxLength: 96 },
-      description: "Click Generate to create automatically",
+      description: "Click Generate — this is created automatically from the name above",
+      hidden: false,
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "options",
       title: "Sizes & Prices",
       type: "array",
-      description: "Add each size option with its price",
+      description: "Add a row for each size you offer. Click the + button to add more.",
       of: [
         {
           type: "object",
+          title: "Size option",
           fields: [
-            defineField({ name: "size", title: "Size", type: "string", description: "e.g. A5, A4, A3", validation: (rule) => rule.required() }),
-            defineField({ name: "description", title: "Description", type: "string", description: "e.g. 'Head portrait', 'Full body'" }),
-            defineField({ name: "price", title: "Price (£)", type: "number", validation: (rule) => rule.required().min(0) }),
+            defineField({
+              name: "size",
+              title: "Size",
+              type: "string",
+              description: "e.g. A5, A4, A3, 12×12, Larger than A3",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "description",
+              title: "What's included at this size?",
+              type: "string",
+              description: "e.g. 'Head portrait', 'Head and shoulder', 'Full body'. Leave blank if not needed.",
+            }),
+            defineField({
+              name: "price",
+              title: "Price (£)",
+              type: "number",
+              description: "Just the number, e.g. 80",
+              validation: (rule) => rule.required().min(0),
+            }),
           ],
           preview: {
-            select: { title: "size", subtitle: "price", desc: "description" },
-            prepare: ({ title, subtitle, desc }) => ({
-              title: `${title ?? "Size"}${desc ? ` — ${desc}` : ""}`,
-              subtitle: subtitle ? `£${subtitle}` : "",
+            select: { size: "size", price: "price", desc: "description" },
+            prepare: ({ size, price, desc }) => ({
+              title: `${size ?? "?"}${desc ? ` — ${desc}` : ""}`,
+              subtitle: price != null ? `£${price}` : "",
             }),
           },
         },
       ],
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "addons",
-      title: "Add-ons",
+      title: "Extras / Add-ons",
       type: "array",
-      description: "Optional extras the customer can add",
+      description: "Things the customer can add on top, like extra pets or a specific background.",
       of: [
         {
           type: "object",
+          title: "Add-on",
           fields: [
-            defineField({ name: "description", title: "What is it?", type: "string", description: "e.g. 'Extra pet', 'Specific background'", validation: (rule) => rule.required() }),
-            defineField({ name: "price", title: "Price (£)", type: "number", validation: (rule) => rule.required().min(0) }),
+            defineField({
+              name: "description",
+              title: "What is it?",
+              type: "string",
+              description: "e.g. 'Each extra pet', 'Specific background'",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "price",
+              title: "Extra cost (£)",
+              type: "number",
+              description: "Just the number, e.g. 50",
+              validation: (rule) => rule.required().min(0),
+            }),
           ],
           preview: {
             select: { title: "description", subtitle: "price" },
             prepare: ({ title, subtitle }) => ({
               title: title ?? "Add-on",
-              subtitle: subtitle ? `+£${subtitle}` : "",
+              subtitle: subtitle != null ? `+£${subtitle}` : "",
             }),
           },
         },
@@ -69,14 +101,14 @@ export default defineType({
     }),
     defineField({
       name: "included",
-      title: "What's Included",
+      title: "What's included in the price?",
       type: "text",
       rows: 2,
-      description: "e.g. 'A5–A3 includes a basic frame and mount'",
+      description: "e.g. 'A5–A3 includes a basic frame and mount. Add extra for a specific frame.'",
     }),
     defineField({
       name: "notes",
-      title: "Additional Notes",
+      title: "Anything else to mention?",
       type: "text",
       rows: 2,
       description: "e.g. 'Postage & packaging available if required'",
