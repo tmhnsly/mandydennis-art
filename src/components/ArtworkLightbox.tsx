@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
@@ -16,6 +17,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
+  const navigate = useNavigate();
   const canNav = items.length > 1;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -123,9 +125,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
               {tags.length > 0 ? (
                 <div className="flex gap-1.5 flex-wrap flex-1">
                   {tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
+                    <button
+                      key={tag}
+                      onClick={() => { onClose(); navigate(`/gallery?tag=${encodeURIComponent(tag)}`); }}
+                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+                    >
                       {tag}
-                    </span>
+                    </button>
                   ))}
                 </div>
               ) : <div />}

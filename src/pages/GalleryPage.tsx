@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useAnimateIn } from "../hooks/useAnimateIn";
@@ -25,16 +26,44 @@ function artworkTags(item: Artwork): string[] {
 }
 
 export default function GalleryPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
-  const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const { ref: bodyRef, isInView } = useAnimateIn();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  // Read tag + image from URL params
+  const urlTag = searchParams.get("tag");
+  const urlImage = searchParams.get("image");
+
+  const [activeTags, setActiveTags] = useState<string[]>(() =>
+    urlTag ? [urlTag] : []
+  );
+  const [featuredOnly, setFeaturedOnly] = useState(false);
+
   useEffect(() => { document.title = "Gallery — Mandy Dennis Art"; }, []);
   useEffect(() => { getArtwork().then(setAllArtwork); }, []);
+
+  // Apply tag from URL when it changes (e.g. from lightbox tag click)
+  useEffect(() => {
+    if (urlTag) {
+      setActiveTags([urlTag]);
+      setFeaturedOnly(false);
+      setShowCount(PAGE_SIZE);
+    }
+  }, [urlTag]);
+
+  // Open lightbox from URL param (e.g. shared link)
+  useEffect(() => {
+    if (urlImage && allArtwork.length > 0) {
+      const idx = allArtwork.findIndex((a) => a.slug === urlImage);
+      if (idx >= 0) {
+        setShowCount(Math.max(PAGE_SIZE, idx + 1));
+        setLightboxIndex(idx);
+      }
+    }
+  }, [urlImage, allArtwork]);
 
   const filtered = useMemo(() => {
     let items = allArtwork;
@@ -53,13 +82,60 @@ export default function GalleryPage() {
   const availableTags = useMemo(() => getAllTags(filtered), [filtered]);
 
   const toggleTag = (tag: string) => {
-    setActiveTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    setActiveTags((prev) => {
+      const next = prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag];
+      // Update URL to reflect tag state
+      if (next.length === 1) {
+        setSearchParams({ tag: next[0] }, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
+      }
+      return next;
+    });
     setShowCount(PAGE_SIZE);
   };
 
-  // Infinite scroll — load more when sentinel enters viewport
+  const clearTags = () => {
+    setActiveTags([]);
+    setSearchParams({}, { replace: true });
+    setShowCount(PAGE_SIZE);
+  };
+
+  // Update URL when lightbox opens/closes
+  const openLightbox = (i: number) => {
+    const item = visible[i];
+    if (item) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("image", item.slug);
+        return next;
+      }, { replace: true });
+    }
+    setLightboxIndex(i);
+  };
+
+  const closeLightbox = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("image");
+      return next;
+    }, { replace: true });
+    setLightboxIndex(-1);
+  };
+
+  const changeLightbox = (i: number) => {
+    const item = visible[i];
+    if (item) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("image", item.slug);
+        return next;
+      }, { replace: true });
+    }
+    setLightboxIndex(i);
+  };
+
+  // Infinite scroll
   const loadMore = useCallback(() => {
     if (hasMore) setShowCount((c) => c + PAGE_SIZE);
   }, [hasMore]);
@@ -92,7 +168,7 @@ export default function GalleryPage() {
                   availableTags={availableTags}
                   activeTags={activeTags}
                   onToggle={toggleTag}
-                  onClear={() => { setActiveTags([]); setShowCount(PAGE_SIZE); }}
+                  onClear={clearTags}
                   showFeatured
                   featuredActive={featuredOnly}
                   onToggleFeatured={() => { setFeaturedOnly((p) => !p); setShowCount(PAGE_SIZE); }}
@@ -100,10 +176,9 @@ export default function GalleryPage() {
 
                 <GalleryGrid
                   items={visible}
-                  onSelect={(i) => setLightboxIndex(i)}
+                  onSelect={openLightbox}
                 />
 
-                {/* Infinite scroll sentinel */}
                 {hasMore && <div ref={loadMoreRef} className="h-1" />}
               </>
             )}
@@ -113,8 +188,8 @@ export default function GalleryPage() {
         <ArtworkLightbox
           items={visible}
           index={lightboxIndex}
-          onClose={() => setLightboxIndex(-1)}
-          onChange={setLightboxIndex}
+          onClose={closeLightbox}
+          onChange={changeLightbox}
         />
       </div>
       <DrawLine />
