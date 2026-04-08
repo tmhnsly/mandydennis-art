@@ -27,44 +27,26 @@
         opacity: 0;
         pointer-events: none;
       }
-      #loader span {
-        font-family: system-ui, sans-serif;
-        font-size: 0.85rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        color: #b0a096;
-        animation: pulse 1.5s ease-in-out infinite;
+      #loader .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #e0cec7;
+        border-top-color: #a0705a;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
       }
-      @keyframes pulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 1; }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
       }
       @media (prefers-color-scheme: dark) {
         #loader { background: #1c1513; }
-        #loader span { color: #6e5e55; }
+        #loader .spinner { border-color: #3d302a; border-top-color: #c48a6e; }
       }
     </style>
   </head>
   <body>
-    <div id="loader"><span>M</span></div>
+    <div id="loader"><div class="spinner"></div></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      (function() {
-        var loader = document.getElementById('loader');
-        if (!loader) return;
-
-        function hideLoader() {
-          loader.classList.add('fade-out');
-          loader.addEventListener('transitionend', function() {
-            loader.remove();
-          }, { once: true });
-        }
-
-        // document.fonts.ready is supported in all modern browsers
-        // and resolves when all render-blocking fonts have loaded
-        document.fonts.ready.then(hideLoader);
-      })();
-    </script>
   </body>
 </html>
