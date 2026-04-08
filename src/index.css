@@ -63,51 +63,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---- Scroll-triggered content reveal ---- */
-.animate-in {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.animate-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Lines — draw from left on scroll */
-.animate-rule {
-  transform-origin: left;
-  transform: scaleX(0);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.animate-rule.visible {
-  transform: scaleX(1);
-}
-
-/* ---- Hero — clean fade, tight stagger ---- */
-
-.hero-name-word { display: inline-block; }
-
-.hero-name-word,
-.hero-tagline,
-.hero-ctas,
-.hero-stats,
-.hero-image {
-  opacity: 0;
-  animation: fadeIn 0.3s ease forwards;
-}
-
-.hero-name-word:nth-child(1) { animation-delay: 0.05s; }
-.hero-name-word:nth-child(2) { animation-delay: 0.1s; }
-.hero-image   { animation-delay: 0.08s; }
-.hero-tagline { animation-delay: 0.15s; }
-.hero-ctas    { animation-delay: 0.2s; }
-.hero-stats   { animation-delay: 0.25s; }
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
+/* All animations now handled by motion/react */
 
 /* Pulse ring for status dot */
 @keyframes pulse-ring {

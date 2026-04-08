@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { getArtwork, fullUrl } from "../lib/content";
+import { motion } from "motion/react";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
@@ -31,7 +32,7 @@ export default function GalleryPage() {
   const [featuredOnly, setFeaturedOnly] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
-  const bodyRef = useAnimateIn();
+  const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
     getArtwork().then((data) => {
@@ -89,7 +90,7 @@ export default function GalleryPage() {
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
         <SectionHeader title="Gallery" />
 
-        <div ref={bodyRef} className="animate-in">
+        <motion.div ref={bodyRef} initial={{ opacity: 0, y: 8 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.3 }}>
           {allArtwork.length === 0 ? (
             <p className="text-text-muted py-8">
               Gallery coming soon. Check back for Mandy's latest work.
@@ -123,7 +124,7 @@ export default function GalleryPage() {
           )}
             </>
           )}
-        </div>
+        </motion.div>
       </div>
 
       <Lightbox

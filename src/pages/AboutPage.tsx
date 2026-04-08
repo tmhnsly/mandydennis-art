@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getAbout } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { urlFor } from "../lib/sanity";
+import { motion } from "motion/react";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import type { AboutPage as AboutData } from "../types";
@@ -10,7 +11,7 @@ import DrawLine from "../components/DrawLine";
 export default function AboutPage() {
   const settings = useSiteSettings();
   const [about, setAbout] = useState<AboutData>({ bio: "", photo: null });
-  const bodyRef = useAnimateIn();
+  const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
     getAbout().then(setAbout);
@@ -22,7 +23,7 @@ export default function AboutPage() {
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
         <SectionHeader title="About" />
 
-        <div ref={bodyRef} className="animate-in grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start">
+        <motion.div ref={bodyRef} initial={{ opacity: 0, y: 8 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.3 }} className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start">
           {about.photo ? (
             <img
               src={urlFor(about.photo).width(400).auto("format").url()}
@@ -82,7 +83,7 @@ export default function AboutPage() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
     <DrawLine />
