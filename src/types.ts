@@ -17,10 +17,13 @@ export interface Artwork {
 export interface ArtEvent {
   slug: string;
   title: string;
-  date: string;
+  startDate: string;
+  endDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
   location: string;
   description: string;
-  link: string;
+  link: string | null;
 }
 
 export interface CommissionOption {

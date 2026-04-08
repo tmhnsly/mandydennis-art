@@ -22,10 +22,29 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "date",
-      title: "Date",
+      name: "startDate",
+      title: "Start Date",
       type: "date",
+      description: "When does it start?",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "endDate",
+      title: "End Date (optional)",
+      type: "date",
+      description: "Leave blank if it's a single day event",
+    }),
+    defineField({
+      name: "startTime",
+      title: "Start Time (optional)",
+      type: "string",
+      description: "e.g. '10:00am', '2pm'",
+    }),
+    defineField({
+      name: "endTime",
+      title: "End Time (optional)",
+      type: "string",
+      description: "e.g. '4:00pm', '8pm'",
     }),
     defineField({
       name: "location",
@@ -50,10 +69,14 @@ export default defineType({
     }),
   ],
   orderings: [
-    { title: "Date (Newest)", name: "dateDesc", by: [{ field: "date", direction: "desc" }] },
-    { title: "Date (Oldest)", name: "dateAsc", by: [{ field: "date", direction: "asc" }] },
+    { title: "Date (Newest)", name: "dateDesc", by: [{ field: "startDate", direction: "desc" }] },
+    { title: "Date (Oldest)", name: "dateAsc", by: [{ field: "startDate", direction: "asc" }] },
   ],
   preview: {
-    select: { title: "title", subtitle: "date" },
+    select: { title: "title", start: "startDate", end: "endDate" },
+    prepare: ({ title, start, end }) => ({
+      title: title ?? "Event",
+      subtitle: end ? `${start} → ${end}` : start ?? "",
+    }),
   },
 });

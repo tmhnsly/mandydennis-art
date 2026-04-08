@@ -57,18 +57,24 @@ const DUMMY_EVENTS: ArtEvent[] = [
   {
     slug: "summer-exhibition",
     title: "Summer Exhibition",
-    date: "2026-07-20",
+    startDate: "2026-07-20",
+    endDate: "2026-07-22",
+    startTime: "10:00am",
+    endTime: "4:00pm",
     location: "The Gallery, Stamford",
     description: "A group exhibition featuring local artists. New watercolour seascapes on display.",
-    link: "",
+    link: null,
   },
   {
     slug: "spring-art-fair-2026",
     title: "Spring Art Fair 2026",
-    date: "2026-03-15",
+    startDate: "2026-03-15",
+    endDate: null,
+    startTime: "10:00am",
+    endTime: "3:00pm",
     location: "Village Hall, Oakham",
     description: "Exhibiting a selection of pet portraits and landscapes.",
-    link: "",
+    link: null,
   },
 ];
 
@@ -177,10 +183,13 @@ export function getEvents(): Promise<ArtEvent[]> {
   return cached("events", async () => {
     try {
       const results = await withTimeout(c.fetch(`
-        *[_type == "event"] | order(date asc) {
+        *[_type == "event"] | order(startDate asc) {
           "slug": slug.current,
           title,
-          date,
+          startDate,
+          endDate,
+          startTime,
+          endTime,
           location,
           description,
           link
