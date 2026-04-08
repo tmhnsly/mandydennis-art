@@ -36,7 +36,7 @@ export default function AboutPage() {
           )}
 
           <div>
-            <div className="text-base text-text-mid leading-[1.8] space-y-4">
+            <div className="text-base text-text-mid leading-[1.8] space-y-4 max-w-[65ch]">
               <p>
                 Mandy Dennis is a self-taught artist whose work is extremely varied, including
                 pet portraiture, wildlife, seascapes and still life. Her medium is predominantly
