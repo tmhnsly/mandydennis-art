@@ -35,14 +35,14 @@ export default function HomePage() {
           <div className="hero-stagger-4 flex gap-2.5 mt-8 flex-wrap">
             <Link
               to="/gallery"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity"
+              className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity"
             >
               <Image size={16} />
               View Gallery
             </Link>
             <Link
               to="/commissions"
-              className="inline-flex items-center gap-2 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
+              className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
             >
               Commissions
             </Link>
@@ -75,7 +75,7 @@ export default function HomePage() {
               <div className="mt-8 text-center">
                 <Link
                   to="/gallery"
-                  className="inline-flex items-center gap-2 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
+                  className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
                 >
                   <ArrowRight size={16} />
                   Browse all work

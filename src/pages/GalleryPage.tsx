@@ -104,7 +104,7 @@ export default function GalleryPage() {
             <div className="mt-8 text-center">
               <button
                 onClick={() => setShowCount((c) => c + PAGE_SIZE)}
-                className="px-6 py-3 text-[0.78rem] font-medium tracking-wide uppercase border border-line-strong text-text-muted hover:border-text hover:text-text transition-colors"
+                className="min-h-11 px-6 py-3 text-[0.8rem] font-medium tracking-wide uppercase border border-line-strong text-text-muted hover:border-text hover:text-text transition-colors"
               >
                 Show more
               </button>

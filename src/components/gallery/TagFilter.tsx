@@ -10,6 +10,8 @@ interface Props {
   onToggleFeatured?: () => void;
 }
 
+const TAG_BASE = "inline-flex items-center justify-center gap-1.5 min-h-11 px-4 text-[0.8rem] font-medium border transition-colors";
+
 export default function TagFilter({
   availableTags,
   activeTags,
@@ -24,22 +26,22 @@ export default function TagFilter({
       {showFeatured && onToggleFeatured && (
         <button
           onClick={onToggleFeatured}
-          className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-[0.78rem] font-medium border transition-colors ${
+          className={`${TAG_BASE} ${
             featuredActive
               ? "bg-text border-text text-bg"
               : "border-line-strong text-text-muted hover:border-text hover:text-text"
           }`}
         >
-          <Star size={14} className={featuredActive ? "fill-current" : ""} />
+          <Star size={15} className={featuredActive ? "fill-current" : ""} />
           Featured
         </button>
       )}
       {activeTags.length > 0 && (
         <button
           onClick={onClear}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[0.78rem] font-medium bg-text border border-text text-bg transition-colors"
+          className={`${TAG_BASE} bg-text border-text text-bg`}
         >
-          <X size={14} />
+          <X size={15} />
           Clear
         </button>
       )}
@@ -49,7 +51,7 @@ export default function TagFilter({
           <button
             key={tag}
             onClick={() => onToggle(tag)}
-            className={`px-3.5 py-2 text-[0.78rem] font-medium border capitalize transition-colors ${
+            className={`${TAG_BASE} capitalize ${
               isActive
                 ? "bg-text border-text text-bg"
                 : "border-line-strong text-text-muted hover:border-text hover:text-text"

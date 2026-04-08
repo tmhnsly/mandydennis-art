@@ -30,7 +30,7 @@ export default function CommissionForm() {
           id="name"
           name="name"
           required
-          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
+          className="w-full min-h-11 px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         />
       </div>
 
@@ -43,7 +43,7 @@ export default function CommissionForm() {
           id="email"
           name="email"
           required
-          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
+          className="w-full min-h-11 px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         />
       </div>
 
@@ -54,7 +54,7 @@ export default function CommissionForm() {
         <select
           id="medium"
           name="medium"
-          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
+          className="w-full min-h-11 px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm"
         >
           <option value="">No preference</option>
           <option value="pastel">Pastel</option>
@@ -74,7 +74,7 @@ export default function CommissionForm() {
           name="details"
           rows={4}
           required
-          className="w-full px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm resize-y"
+          className="w-full min-h-11 px-4 py-2.5 border border-line-strong bg-transparent rounded-none focus:outline-none focus:ring-1 focus:ring-text text-sm resize-y"
           placeholder="e.g. A pastel portrait of my dog, A4 size..."
         />
       </div>
@@ -94,7 +94,7 @@ export default function CommissionForm() {
 
       <button
         type="submit"
-        className="w-full py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity"
+        className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity"
       >
         <MessageCircle size={16} />
         Send Enquiry
