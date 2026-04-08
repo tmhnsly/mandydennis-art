@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, thumbnailUrl } from "../lib/content";
+import CtaBanner from "../components/CtaBanner";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -101,6 +102,16 @@ export default function HomePage() {
           <DrawLine />
         </>
       )}
+
+      <CtaBanner
+        heading="Ready to commission?"
+        text="Get a unique piece of art created just for you. Pastels, watercolours, pet portraits and more."
+        buttonLabel="Get in Touch"
+        buttonTo="/commissions"
+        secondaryLabel="View Prices"
+        secondaryTo="/commissions"
+      />
+      <DrawLine />
     </>
   );
 }

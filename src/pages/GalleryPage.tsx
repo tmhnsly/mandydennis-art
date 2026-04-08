@@ -3,6 +3,7 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { getArtwork, getInitialArtwork, fullUrl } from "../lib/content";
 import { useAnimateIn } from "../hooks/useAnimateIn";
+import CtaBanner from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
 import GalleryGrid from "../components/gallery/GalleryGrid";
@@ -117,6 +118,16 @@ export default function GalleryPage() {
           animation={{ swipe: 250 }}
         />
       </div>
+      <DrawLine />
+
+      <CtaBanner
+        heading="Like what you see?"
+        text="Commission your own portrait or get in touch to discuss an idea."
+        buttonLabel="Get in Touch"
+        buttonTo="/commissions"
+        secondaryLabel="View Prices"
+        secondaryTo="/commissions"
+      />
       <DrawLine />
     </>
   );
