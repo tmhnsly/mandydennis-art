@@ -2,6 +2,20 @@
   command = "yarn build"
   publish = "dist"
 
+# Redirect /studio to hosted Sanity Studio
+[[redirects]]
+  from = "/studio"
+  to = "https://mandydennis-art.sanity.studio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/studio/*"
+  to = "https://mandydennis-art.sanity.studio/:splat"
+  status = 301
+  force = true
+
+# SPA fallback — must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
