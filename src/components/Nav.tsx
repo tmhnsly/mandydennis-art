@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FaPaintBrush, FaHome, FaImage, FaPalette, FaCalendarAlt, FaUser } from "react-icons/fa";
+import { FaHome, FaImage, FaPalette, FaCalendarAlt, FaUser } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 const links: { to: string; label: string; icon: IconType }[] = [
@@ -18,7 +18,6 @@ export default function Nav() {
           to="/"
           className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center gap-2"
         >
-          <FaPaintBrush className="text-accent" size={16} />
           Mandy Dennis
         </NavLink>
 
