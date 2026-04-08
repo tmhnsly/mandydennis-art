@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
+import { FaArrowRight, FaMapMarkerAlt, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
@@ -131,7 +131,34 @@ export default function HomePage() {
         ))}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)] relative">
+            {/* Top-right info block */}
+            <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-3">
+              <span className="flex items-center gap-2 text-[0.7rem] text-text-muted tracking-wide">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute h-full w-full rounded-full bg-emerald-400/40 animate-[pulse-ring_2s_ease-out_infinite]" />
+                  <span className="relative rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                Open for commissions
+              </span>
+              <span className="text-[0.65rem] text-text-subtle tracking-wide">Based in the UK</span>
+              <span className="text-[0.65rem] text-text-subtle tracking-wide">30+ years creating</span>
+              {(settings.facebook_url || settings.instagram_url) && (
+                <div className="flex gap-2 mt-1">
+                  {settings.facebook_url && (
+                    <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-text-subtle hover:text-text transition-colors" aria-label="Facebook">
+                      <FaFacebookF size={13} />
+                    </a>
+                  )}
+                  {settings.instagram_url && (
+                    <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-text-subtle hover:text-text transition-colors" aria-label="Instagram">
+                      <FaInstagram size={14} />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+
             <h1 className="mb-5">
               <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
               <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
