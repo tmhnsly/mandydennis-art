@@ -5,6 +5,7 @@ import type {
   CommissionCategory,
   SiteSettings,
   AboutPage,
+  Testimonial,
 } from "../types";
 
 // --- Dummy data for when Sanity isn't configured ---
@@ -103,6 +104,19 @@ const DUMMY_ABOUT: AboutPage = {
   bio: "Welcome to my art page! I'm Mandy Dennis, an artist based in the UK specialising in pastel pet portraits and watercolour landscapes. I've been creating art for over 30 years and love bringing your beloved pets to life on paper.",
   photo: null,
 };
+
+const DUMMY_TESTIMONIALS: Testimonial[] = [
+  {
+    name: "Sarah T.",
+    quote: "Mandy captured our dog perfectly — the detail in the eyes is incredible. We were in tears when we saw it.",
+    commission: "Pastel portrait of their spaniel",
+  },
+  {
+    name: "James & Louise",
+    quote: "We commissioned a portrait of our cat as a gift for my mum. She absolutely loved it. Mandy was lovely to work with.",
+    commission: "Pastel portrait of a tabby cat",
+  },
+];
 
 // --- Data fetching (cached, with timeout, falls back to dummy if empty) ---
 
@@ -236,6 +250,25 @@ export function getAbout(): Promise<AboutPage> {
       return result ?? DUMMY_ABOUT;
     } catch {
       return DUMMY_ABOUT;
+    }
+  });
+}
+
+export function getTestimonials(): Promise<Testimonial[]> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_TESTIMONIALS);
+  const c = client;
+  return cached("testimonials", async () => {
+    try {
+      const results = await withTimeout(c.fetch(`
+        *[_type == "testimonial"] {
+          name,
+          quote,
+          commission
+        }
+      `), 3000);
+      return results && results.length > 0 ? results : DUMMY_TESTIMONIALS;
+    } catch {
+      return DUMMY_TESTIMONIALS;
     }
   });
 }

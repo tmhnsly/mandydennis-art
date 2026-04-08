@@ -55,3 +55,9 @@ export interface AboutPage {
   bio: string;
   photo: SanityImage;
 }
+
+export interface Testimonial {
+  name: string;
+  quote: string;
+  commission: string;
+}
