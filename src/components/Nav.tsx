@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FaHome, FaImage, FaPalette, FaCalendarAlt, FaUser } from "react-icons/fa";
+import { FaHome, FaImage, FaPalette, FaCalendarAlt, FaQuestionCircle } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 const links: { to: string; label: string; icon: IconType }[] = [
@@ -7,7 +7,7 @@ const links: { to: string; label: string; icon: IconType }[] = [
   { to: "/gallery", label: "Gallery", icon: FaImage },
   { to: "/commissions", label: "Commissions", icon: FaPalette },
   { to: "/events", label: "Events", icon: FaCalendarAlt },
-  { to: "/about", label: "About", icon: FaUser },
+  { to: "/about", label: "About", icon: FaQuestionCircle },
 ];
 
 export default function Nav() {
