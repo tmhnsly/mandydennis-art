@@ -1,7 +1,7 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
@@ -19,17 +19,26 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const navigate = useNavigate();
   const canNav = items.length > 1;
+  const [isDraggingDown, setIsDraggingDown] = useState(false);
+  const closeThreshold = 120;
+
+  // Vertical drag to dismiss
+  const dragY = useMotionValue(0);
+  const backdropOpacity = useTransform(dragY, [0, closeThreshold * 2], [0.95, 0]);
+  const dragScale = useTransform(dragY, [0, closeThreshold * 2], [1, 0.85]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: canNav,
     startIndex: index >= 0 ? index : 0,
     dragFree: false,
     containScroll: false,
-    duration: 25,
+    duration: 20,
     skipSnaps: false,
   });
 
-  // Sync embla → parent state
+  // Prevent embla from capturing vertical drags
+  const slideRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!emblaApi) return;
     const onSelect = () => {
@@ -40,7 +49,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     return () => { emblaApi.off("select", onSelect); };
   }, [emblaApi, index, onChange]);
 
-  // Sync parent state → embla (for button clicks)
   useEffect(() => {
     if (!emblaApi || !isOpen) return;
     if (emblaApi.selectedScrollSnap() !== index) {
@@ -48,7 +56,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     }
   }, [emblaApi, index, isOpen]);
 
-  // Re-init embla when opening with a new starting index
   useEffect(() => {
     if (!emblaApi || !isOpen) return;
     emblaApi.reInit({ startIndex: index >= 0 ? index : 0 });
@@ -57,7 +64,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   const goPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const goNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
-  // Keyboard
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -73,6 +79,14 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
+  // Reset drag when closing
+  useEffect(() => {
+    if (!isOpen) {
+      dragY.set(0);
+      setIsDraggingDown(false);
+    }
+  }, [isOpen, dragY]);
+
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/8 hover:bg-white/15 border border-white/8 flex items-center justify-center transition-colors";
 
   return (
@@ -84,7 +98,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+          className="fixed inset-0 z-[9999] flex flex-col"
+          style={{ backgroundColor: useTransform(backdropOpacity, (v) => `rgba(0,0,0,${v})`) }}
         >
           {/* Close */}
           <button
@@ -95,30 +110,47 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
             <FaTimes size={13} className="text-white/70" />
           </button>
 
-          {/* Carousel */}
-          <div className="flex-1 overflow-hidden" ref={emblaRef}>
-            <div className="flex h-full">
-              {items.map((item) => (
-                <div
-                  key={item.slug}
-                  className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
-                >
-                  <img
-                    src={fullUrl(item.image)}
-                    alt={item.title}
-                    className="max-w-full max-h-full object-contain select-none"
-                    draggable={false}
-                  />
-                </div>
-              ))}
+          {/* Carousel with vertical drag wrapper */}
+          <motion.div
+            className="flex-1 overflow-hidden"
+            style={{ y: dragY, scale: dragScale }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0.05, bottom: 0.4 }}
+            onDragStart={() => setIsDraggingDown(true)}
+            onDragEnd={(_, info) => {
+              setIsDraggingDown(false);
+              if (info.offset.y > closeThreshold || info.velocity.y > 500) {
+                onClose();
+              } else {
+                dragY.set(0);
+              }
+            }}
+          >
+            <div className="h-full overflow-hidden" ref={emblaRef} style={{ touchAction: isDraggingDown ? "none" : "pan-y" }}>
+              <div className="flex h-full">
+                {items.map((item) => (
+                  <div
+                    key={item.slug}
+                    ref={slideRef}
+                    className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
+                  >
+                    <img
+                      src={fullUrl(item.image)}
+                      alt={item.title}
+                      className="max-w-full max-h-full object-contain select-none"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Click-to-close zones on either side of image */}
+          {/* Click-to-close zones */}
           <div className="absolute inset-y-0 left-0 w-12 z-10 cursor-pointer" onClick={onClose} />
           <div className="absolute inset-y-0 right-0 w-12 z-10 cursor-pointer" onClick={onClose} />
 
-          {/* Bottom controls */}
           {/* Bottom bar — tags left, controls right */}
           <div className="absolute bottom-0 left-0 right-0 z-20">
             <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3 px-4 py-4">
