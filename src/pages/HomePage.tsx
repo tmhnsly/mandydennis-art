@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa";
-import { getArtwork, getInitialArtwork, thumbnailUrl } from "../lib/content";
+import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
+import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, thumbnailUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useSiteSettings } from "../context/SiteSettings";
@@ -10,7 +10,7 @@ import SectionHeader from "../components/SectionHeader";
 import FeaturedGrid from "../components/FeaturedGrid";
 import DrawLine from "../components/DrawLine";
 import TextReveal from "../components/TextReveal";
-import type { Artwork } from "../types";
+import type { Artwork, ArtEvent } from "../types";
 
 const CYCLE_MS = 5000;
 
@@ -19,10 +19,13 @@ export default function HomePage() {
   const initial = getInitialArtwork();
   const [featured, setFeatured] = useState<Artwork[]>(() => initial.filter((a) => a.featured));
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
+  const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
+  const { ref: introRef, isInView: introInView } = useInView(0.1);
+  const { ref: eventsRef, isInView: eventsInView } = useInView(0.1);
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
@@ -31,23 +34,20 @@ export default function HomePage() {
       setAllArtwork(all);
       setFeatured(all.filter((a) => a.featured));
     });
+    getEvents().then(setEvents);
   }, []);
 
-  // Cycle hero image
   const cycleHero = useCallback(() => {
     if (featured.length <= 1) return;
     setHeroFading(true);
-    const fadeTimer = requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // After fade out starts, wait for transition then swap
-        const swapTimer = window.setTimeout(() => {
+        window.setTimeout(() => {
           setHeroIndex((i) => (i + 1) % featured.length);
           setHeroFading(false);
         }, 400);
-        return () => clearTimeout(swapTimer);
       });
     });
-    return () => cancelAnimationFrame(fadeTimer);
   }, [featured.length]);
 
   useEffect(() => {
@@ -57,14 +57,24 @@ export default function HomePage() {
   }, [featured.length, cycleHero]);
 
   const heroImage = featured.length > 0 ? featured[heroIndex % featured.length] : allArtwork[0];
-  // Featured grid shows all except the current hero image
   const gridItems = featured.filter((_, i) => i !== heroIndex % featured.length);
+
+  // Upcoming events only
+  const now = new Date();
+  const toUTC = (d: string | null) => {
+    if (!d) return 0;
+    const [y, m, dd] = d.split("-").map(Number);
+    return Date.UTC(y, m - 1, dd);
+  };
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const upcomingEvents = events
+    .filter((e) => e.startDate && toUTC(e.endDate ?? e.startDate) >= todayUTC)
+    .slice(0, 2);
 
   return (
     <>
-      {/* Hero — full-width image with overlaid text */}
+      {/* Hero */}
       <div className="relative overflow-hidden">
-        {/* Background image */}
         {heroImage && (
           <div className="absolute inset-0">
             <img
@@ -79,7 +89,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Content */}
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
           <div className="hero-stagger max-w-xl">
             <h1 className="font-display text-[clamp(3.5rem,9vw,6rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
@@ -109,7 +118,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Cycle indicators */}
           {featured.length > 1 && (
             <div className="flex gap-1.5 mt-8">
               {featured.map((_, i) => (
@@ -117,9 +125,7 @@ export default function HomePage() {
                   key={i}
                   onClick={() => { setHeroIndex(i); setHeroFading(false); }}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    i === heroIndex % featured.length
-                      ? "w-6 bg-text/60"
-                      : "w-1.5 bg-text/20 hover:bg-text/30"
+                    i === heroIndex % featured.length ? "w-6 bg-text/60" : "w-1.5 bg-text/20 hover:bg-text/30"
                   }`}
                   aria-label={`Show artwork ${i + 1}`}
                 />
@@ -130,7 +136,25 @@ export default function HomePage() {
       </div>
       <DrawLine />
 
-      {/* Featured Work — excludes current hero image */}
+      {/* Intro strip */}
+      <div ref={introRef}>
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2rem,4vw,3rem)]">
+          <div className={`anim-fade-up ${introInView ? "in-view" : ""} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
+            <p className="text-text-mid text-[1rem] leading-relaxed max-w-lg">
+              Self-taught artist creating bespoke artwork for over 30 years. Born in Germany, raised across the world, now based in the UK.
+            </p>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors whitespace-nowrap min-h-11"
+            >
+              About Mandy <FaArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+      </div>
+      <DrawLine />
+
+      {/* Featured Work */}
       {gridItems.length > 0 && (
         <>
           <div ref={featuredRef}>
@@ -155,6 +179,50 @@ export default function HomePage() {
             onClose={() => setLightboxIndex(-1)}
             onChange={setLightboxIndex}
           />
+        </>
+      )}
+
+      {/* Upcoming events teaser */}
+      {upcomingEvents.length > 0 && (
+        <>
+          <div ref={eventsRef}>
+            <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+              <SectionHeader title="Upcoming Events" />
+              <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[700px]`}>
+                {upcomingEvents.map((event) => {
+                  const [, m, d] = event.startDate.split("-").map(Number);
+                  const date = new Date(Date.UTC(2026, m - 1, d));
+                  const day = date.getUTCDate();
+                  const month = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
+
+                  return (
+                    <div key={event.slug} className="border border-line p-5 flex items-center gap-5">
+                      <div className="text-center flex-shrink-0 w-12">
+                        <div className="font-display font-bold text-xl leading-none">{day}</div>
+                        <div className="text-[0.55rem] tracking-widest uppercase text-text-subtle font-medium mt-0.5">{month}</div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-display font-semibold text-[0.9rem] tracking-tight">{event.title}</div>
+                        <div className="flex items-center gap-1.5 text-[0.78rem] text-text-muted mt-0.5">
+                          <FaMapMarkerAlt size={10} className="text-text-subtle flex-shrink-0" />
+                          {event.location}
+                        </div>
+                      </div>
+                      <span className="text-[0.55rem] tracking-widest uppercase text-accent font-medium px-2.5 py-1 border border-accent/30 flex-shrink-0">
+                        Upcoming
+                      </span>
+                    </div>
+                  );
+                })}
+                <div className="pt-4">
+                  <Link to="/events" className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors min-h-11">
+                    All events <FaArrowRight size={12} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DrawLine />
         </>
       )}
 
