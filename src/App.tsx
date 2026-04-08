@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import PageTransition from "./components/PageTransition";
 import HomePage from "./pages/HomePage";
 
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
@@ -13,14 +14,16 @@ export default function App() {
   return (
     <Layout>
       <Suspense fallback={null}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/commissions" element={<CommissionsPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <PageTransition>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/commissions" element={<CommissionsPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </PageTransition>
       </Suspense>
     </Layout>
   );
