@@ -1,4 +1,4 @@
-import { FaPaw, FaBoxOpen, FaPlus } from "react-icons/fa";
+import { FaPaw, FaCheck, FaTruck } from "react-icons/fa";
 import type { CommissionCategory } from "../types";
 
 interface Props {
@@ -19,71 +19,70 @@ export default function CommissionCard({ category, currency }: Props) {
         </h3>
       </div>
 
-      {/* Price options */}
-      <div className="px-6 py-3">
+      {/* Price options — each as a clear row */}
+      <div className="divide-y divide-dotted divide-line">
         {category.options.map((opt, i) => (
-          <div
-            key={i}
-            className="flex items-center py-3.5 border-b border-dotted border-line last:border-b-0 gap-3"
-          >
-            <span className="font-display font-bold text-base whitespace-nowrap w-28 flex-shrink-0">
-              {opt.size}
-            </span>
-            {opt.description ? (
-              <span className="text-text-mid text-sm flex-1">
-                {opt.description}
-              </span>
-            ) : (
-              <span className="flex-1" />
-            )}
-            <span className="font-display font-bold text-lg whitespace-nowrap text-right tabular-nums">
+          <div key={i} className="px-6 py-4 flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="font-display font-bold text-[0.95rem]">
+                {opt.size}
+              </div>
+              {opt.description && (
+                <div className="text-text-muted text-sm mt-0.5">
+                  {opt.description}
+                </div>
+              )}
+            </div>
+            <div className="font-display font-bold text-xl tabular-nums whitespace-nowrap">
               {opt.description === "Starting from" && (
                 <span className="text-text-subtle text-xs font-medium mr-1">from</span>
               )}
               {currency}{opt.price}
-            </span>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Add-ons */}
       {category.addons.length > 0 && (
-        <div className="px-6 py-4 border-t border-line bg-text/[0.02]">
-          <div className="flex items-center gap-2 mb-3">
-            <FaPlus size={10} className="text-text-subtle" />
+        <div className="border-t border-line bg-text/[0.02]">
+          <div className="px-6 pt-4 pb-1">
             <span className="text-[0.65rem] tracking-widest uppercase text-text-subtle font-semibold">
-              Add-ons
+              Optional extras
             </span>
           </div>
-          {category.addons.map((addon, i) => (
-            <div key={i} className="flex justify-between items-center py-2 text-sm">
-              <span className="text-text-mid">{addon.description}</span>
-              <span className="font-display font-bold text-text whitespace-nowrap tabular-nums">
-                +{currency}{addon.price}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* What's included */}
-      {category.included && (
-        <div className="px-6 py-4 border-t border-line">
-          <div className="flex items-start gap-3">
-            <FaBoxOpen size={13} className="text-accent mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-text-mid leading-relaxed">
-              {category.included}
-            </p>
+          <div className="divide-y divide-dotted divide-line">
+            {category.addons.map((addon, i) => (
+              <div key={i} className="px-6 py-3 flex items-center justify-between gap-4">
+                <span className="text-text-mid text-sm">{addon.description}</span>
+                <span className="font-display font-bold text-base tabular-nums whitespace-nowrap">
+                  +{currency}{addon.price}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Postage note */}
-      {category.notes && (
-        <div className="px-6 py-3 border-t border-line-faint bg-text/[0.015]">
-          <p className="text-xs text-text-subtle">
-            {category.notes.replace("Extra for P&P if required.", "Postage & packaging available if required.")}
-          </p>
+      {/* What's included + notes */}
+      {(category.included || category.notes) && (
+        <div className="border-t border-line px-6 py-4 space-y-2.5">
+          {category.included && (
+            <div className="flex items-start gap-2.5">
+              <FaCheck size={11} className="text-accent mt-1 flex-shrink-0" />
+              <p className="text-sm text-text-mid leading-relaxed">
+                {category.included}
+              </p>
+            </div>
+          )}
+          {category.notes && (
+            <div className="flex items-start gap-2.5">
+              <FaTruck size={11} className="text-text-subtle mt-1 flex-shrink-0" />
+              <p className="text-sm text-text-muted leading-relaxed">
+                {category.notes.replace("Extra for P&P if required.", "Postage & packaging available if required.")}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
