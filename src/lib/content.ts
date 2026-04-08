@@ -104,12 +104,19 @@ const DUMMY_ABOUT: AboutPage = {
   photo: null,
 };
 
-// --- Data fetching (Sanity or dummy fallback) ---
+// --- Data fetching (Sanity with timeout, falls back to dummy if empty) ---
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
 
 export async function getArtwork(): Promise<Artwork[]> {
   if (!isConfigured || !client) return DUMMY_ARTWORK;
   try {
-    const results = await client.fetch(`
+    const results = await withTimeout(client.fetch(`
       *[_type == "artwork"] | order(date desc) {
         "slug": slug.current,
         title,
@@ -120,7 +127,8 @@ export async function getArtwork(): Promise<Artwork[]> {
         featured,
         date
       }
-    `);
+    `), 3000);
+    if (!results || results.length === 0) return DUMMY_ARTWORK;
     return results.map((item: Artwork) => ({
       ...item,
       description: item.description ?? "",
@@ -136,7 +144,7 @@ export async function getArtwork(): Promise<Artwork[]> {
 export async function getEvents(): Promise<ArtEvent[]> {
   if (!isConfigured || !client) return DUMMY_EVENTS;
   try {
-    return await client.fetch(`
+    const results = await withTimeout(client.fetch(`
       *[_type == "event"] | order(date asc) {
         "slug": slug.current,
         title,
@@ -145,7 +153,8 @@ export async function getEvents(): Promise<ArtEvent[]> {
         description,
         link
       }
-    `);
+    `), 3000);
+    return results && results.length > 0 ? results : DUMMY_EVENTS;
   } catch {
     return DUMMY_EVENTS;
   }
@@ -154,7 +163,7 @@ export async function getEvents(): Promise<ArtEvent[]> {
 export async function getCommissions(): Promise<CommissionCategory[]> {
   if (!isConfigured || !client) return DUMMY_COMMISSIONS;
   try {
-    return await client.fetch(`
+    const results = await withTimeout(client.fetch(`
       *[_type == "commissionCategory"] | order(title asc) {
         "slug": slug.current,
         title,
@@ -163,7 +172,8 @@ export async function getCommissions(): Promise<CommissionCategory[]> {
         included,
         notes
       }
-    `);
+    `), 3000);
+    return results && results.length > 0 ? results : DUMMY_COMMISSIONS;
   } catch {
     return DUMMY_COMMISSIONS;
   }
@@ -172,7 +182,7 @@ export async function getCommissions(): Promise<CommissionCategory[]> {
 export async function getSettings(): Promise<SiteSettings> {
   if (!isConfigured || !client) return DUMMY_SETTINGS;
   try {
-    const result = await client.fetch(`
+    const result = await withTimeout(client.fetch(`
       *[_type == "siteSettings"][0] {
         tagline,
         contact_email,
@@ -180,7 +190,7 @@ export async function getSettings(): Promise<SiteSettings> {
         instagram_url,
         currency_symbol
       }
-    `);
+    `), 3000);
     return result ?? DUMMY_SETTINGS;
   } catch {
     return DUMMY_SETTINGS;
@@ -190,12 +200,12 @@ export async function getSettings(): Promise<SiteSettings> {
 export async function getAbout(): Promise<AboutPage> {
   if (!isConfigured || !client) return DUMMY_ABOUT;
   try {
-    const result = await client.fetch(`
+    const result = await withTimeout(client.fetch(`
       *[_type == "about"][0] {
         bio,
         photo
       }
-    `);
+    `), 3000);
     return result ?? DUMMY_ABOUT;
   } catch {
     return DUMMY_ABOUT;
