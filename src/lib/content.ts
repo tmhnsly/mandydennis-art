@@ -104,7 +104,7 @@ const DUMMY_ABOUT: AboutPage = {
   photo: null,
 };
 
-// --- Data fetching (Sanity with timeout, falls back to dummy if empty) ---
+// --- Data fetching (cached, with timeout, falls back to dummy if empty) ---
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
@@ -113,10 +113,24 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
-export async function getArtwork(): Promise<Artwork[]> {
-  if (!isConfigured || !client) return DUMMY_ARTWORK;
-  try {
-    const results = await withTimeout(client.fetch(`
+// Simple in-memory cache — prevents re-fetching on navigation
+const cache = new Map<string, { data: unknown; ts: number }>();
+const CACHE_TTL = 60_000; // 1 minute
+
+function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const entry = cache.get(key);
+  if (entry && Date.now() - entry.ts < CACHE_TTL) return Promise.resolve(entry.data as T);
+  return fetcher().then((data) => {
+    cache.set(key, { data, ts: Date.now() });
+    return data;
+  });
+}
+
+export function getArtwork(): Promise<Artwork[]> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_ARTWORK);
+  return cached("artwork", async () => {
+    try {
+      const results = await withTimeout(client.fetch(`
       *[_type == "artwork"] | order(date desc) {
         "slug": slug.current,
         title,
@@ -136,80 +150,89 @@ export async function getArtwork(): Promise<Artwork[]> {
       subject: item.subject ?? [],
       featured: item.featured ?? false,
     }));
-  } catch {
-    return DUMMY_ARTWORK;
-  }
+    } catch {
+      return DUMMY_ARTWORK;
+    }
+  });
 }
 
-export async function getEvents(): Promise<ArtEvent[]> {
-  if (!isConfigured || !client) return DUMMY_EVENTS;
-  try {
-    const results = await withTimeout(client.fetch(`
-      *[_type == "event"] | order(date asc) {
-        "slug": slug.current,
-        title,
-        date,
-        location,
-        description,
-        link
-      }
-    `), 3000);
-    return results && results.length > 0 ? results : DUMMY_EVENTS;
-  } catch {
-    return DUMMY_EVENTS;
-  }
+export function getEvents(): Promise<ArtEvent[]> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_EVENTS);
+  return cached("events", async () => {
+    try {
+      const results = await withTimeout(client.fetch(`
+        *[_type == "event"] | order(date asc) {
+          "slug": slug.current,
+          title,
+          date,
+          location,
+          description,
+          link
+        }
+      `), 3000);
+      return results && results.length > 0 ? results : DUMMY_EVENTS;
+    } catch {
+      return DUMMY_EVENTS;
+    }
+  });
 }
 
-export async function getCommissions(): Promise<CommissionCategory[]> {
-  if (!isConfigured || !client) return DUMMY_COMMISSIONS;
-  try {
-    const results = await withTimeout(client.fetch(`
-      *[_type == "commissionCategory"] | order(title asc) {
-        "slug": slug.current,
-        title,
-        options,
-        addons,
-        included,
-        notes
-      }
-    `), 3000);
-    return results && results.length > 0 ? results : DUMMY_COMMISSIONS;
-  } catch {
-    return DUMMY_COMMISSIONS;
-  }
+export function getCommissions(): Promise<CommissionCategory[]> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_COMMISSIONS);
+  return cached("commissions", async () => {
+    try {
+      const results = await withTimeout(client.fetch(`
+        *[_type == "commissionCategory"] | order(title asc) {
+          "slug": slug.current,
+          title,
+          options,
+          addons,
+          included,
+          notes
+        }
+      `), 3000);
+      return results && results.length > 0 ? results : DUMMY_COMMISSIONS;
+    } catch {
+      return DUMMY_COMMISSIONS;
+    }
+  });
 }
 
-export async function getSettings(): Promise<SiteSettings> {
-  if (!isConfigured || !client) return DUMMY_SETTINGS;
-  try {
-    const result = await withTimeout(client.fetch(`
-      *[_type == "siteSettings"][0] {
-        tagline,
-        contact_email,
-        facebook_url,
-        instagram_url,
-        currency_symbol
-      }
-    `), 3000);
-    return result ?? DUMMY_SETTINGS;
-  } catch {
-    return DUMMY_SETTINGS;
-  }
+export function getSettings(): Promise<SiteSettings> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_SETTINGS);
+  return cached("settings", async () => {
+    try {
+      const result = await withTimeout(client.fetch(`
+        *[_type == "siteSettings"][0] {
+          tagline,
+          contact_email,
+          facebook_url,
+          instagram_url,
+          currency_symbol
+        }
+      `), 3000);
+      return result ?? DUMMY_SETTINGS;
+    } catch {
+      return DUMMY_SETTINGS;
+    }
+  });
 }
 
-export async function getAbout(): Promise<AboutPage> {
-  if (!isConfigured || !client) return DUMMY_ABOUT;
-  try {
-    const result = await withTimeout(client.fetch(`
-      *[_type == "about"][0] {
-        bio,
+export function getAbout(): Promise<AboutPage> {
+  if (!isConfigured || !client) return Promise.resolve(DUMMY_ABOUT);
+  return cached("about", async () => {
+    try {
+      const result = await withTimeout(client.fetch(`
+        *[_type == "about"][0] {
+          bio,
         photo
       }
     `), 3000);
-    return result ?? DUMMY_ABOUT;
-  } catch {
-    return DUMMY_ABOUT;
-  }
+      return result ?? DUMMY_ABOUT;
+    } catch {
+      return DUMMY_ABOUT;
+    }
+  });
 }
 
 // --- Image helpers ---
