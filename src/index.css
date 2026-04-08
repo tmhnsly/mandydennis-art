@@ -1,24 +1,52 @@
 @import "tailwindcss";
-@import "@radix-ui/colors/sand.css";
-@import "@radix-ui/colors/sand-dark.css";
-@import "@radix-ui/colors/sand-alpha.css";
-@import "@radix-ui/colors/sand-dark-alpha.css";
-@import "@radix-ui/colors/bronze.css";
-@import "@radix-ui/colors/bronze-dark.css";
+
+/*
+ * Warm muted palette — light & dark mode
+ * Inspired by the original warm-50..warm-900 tones
+ * with Radix-style semantic naming
+ */
+:root {
+  --color-bg: #faf7f4;
+  --color-surface: #f5efe9;
+  --color-line: rgba(67,48,43,0.10);
+  --color-line-strong: rgba(67,48,43,0.18);
+  --color-line-faint: rgba(67,48,43,0.06);
+  --color-text: #3b2820;
+  --color-text-mid: #6b5148;
+  --color-text-muted: #8a7568;
+  --color-text-subtle: #b0a096;
+  --color-accent: #a0705a;
+  --color-accent-hover: #8c6150;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1c1513;
+    --color-surface: #241c19;
+    --color-line: rgba(210,186,176,0.10);
+    --color-line-strong: rgba(210,186,176,0.18);
+    --color-line-faint: rgba(210,186,176,0.06);
+    --color-text: #f0e6df;
+    --color-text-mid: #c4b0a4;
+    --color-text-muted: #9a877b;
+    --color-text-subtle: #6e5e55;
+    --color-accent: #c48a6e;
+    --color-accent-hover: #d49a7e;
+  }
+}
 
 @theme {
-  /* Semantic tokens mapped to Radix sand scale */
-  --color-bg: var(--sand-1);
-  --color-surface: var(--sand-2);
-  --color-line: var(--sand-a4);
-  --color-line-strong: var(--sand-a5);
-  --color-line-faint: var(--sand-a3);
-  --color-text: var(--sand-12);
-  --color-text-mid: var(--sand-11);
-  --color-text-muted: var(--sand-10);
-  --color-text-subtle: var(--sand-8);
-  --color-accent: var(--bronze-9);
-  --color-accent-hover: var(--bronze-10);
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-line-faint: var(--color-line-faint);
+  --color-text: var(--color-text);
+  --color-text-mid: var(--color-text-mid);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-subtle: var(--color-text-subtle);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
 
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;

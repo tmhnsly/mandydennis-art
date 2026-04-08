@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Calendar } from "lucide-react";
 import { getEvents } from "../lib/content";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -28,7 +27,7 @@ export default function EventsPage() {
     return (
       <div className="border-b border-line">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-          <SectionHeader icon={Calendar} title="Events" />
+          <SectionHeader title="Events" />
           <p className="text-text-muted">Loading events...</p>
         </div>
       </div>
@@ -38,7 +37,7 @@ export default function EventsPage() {
   return (
     <div className="border-b border-line">
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-        <SectionHeader icon={Calendar} title="Events" />
+        <SectionHeader title="Events" />
 
         <div ref={bodyRef} className="animate-in max-w-[700px]">
           {upcoming.length > 0 ? (

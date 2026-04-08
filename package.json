@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@radix-ui/colors": "^3.0.0",
     "@sanity/client": "^7.20.0",
     "@sanity/image-url": "^2.1.1",
     "lucide-react": "^1.7.0",

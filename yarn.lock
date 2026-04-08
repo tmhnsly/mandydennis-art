@@ -719,13 +719,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/colors@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@radix-ui/colors@npm:3.0.0"
-  checksum: 10c0/612c6bb4efe987f2d49aaca2f785687d08150da59a248328bc2b4e187ece4ef731c1dc5c6a9430fffcac4af9e65cf2f89ceb9806f8809940c9eb238b79d2cf2f
-  languageName: node
-  linkType: hard
-
 "@rollup/rollup-android-arm-eabi@npm:4.39.0":
   version: 4.39.0
   resolution: "@rollup/rollup-android-arm-eabi@npm:4.39.0"
@@ -2608,7 +2601,6 @@ __metadata:
   resolution: "mandydennis-art@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.21.0"
-    "@radix-ui/colors": "npm:^3.0.0"
     "@sanity/client": "npm:^7.20.0"
     "@sanity/image-url": "npm:^2.1.1"
     "@tailwindcss/postcss": "npm:^4.2.2"

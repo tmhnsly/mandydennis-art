@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { User } from "lucide-react";
 import { getAbout } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { urlFor } from "../lib/sanity";
@@ -19,7 +18,7 @@ export default function AboutPage() {
   return (
     <div className="border-b border-line">
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-        <SectionHeader icon={User} title="About" />
+        <SectionHeader title="About" />
 
         <div ref={bodyRef} className="animate-in grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start">
           {about.photo ? (

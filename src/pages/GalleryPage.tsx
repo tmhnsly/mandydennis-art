@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { Image as ImageIcon } from "lucide-react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { getArtwork, fullUrl } from "../lib/content";
@@ -73,7 +72,7 @@ export default function GalleryPage() {
     return (
       <div className="border-b border-line">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-          <SectionHeader icon={ImageIcon} title="Gallery" />
+          <SectionHeader title="Gallery" />
           <p className="text-text-muted">Loading artwork...</p>
         </div>
       </div>
@@ -83,7 +82,7 @@ export default function GalleryPage() {
   return (
     <div className="border-b border-line">
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-        <SectionHeader icon={ImageIcon} title="Gallery" />
+        <SectionHeader title="Gallery" />
 
         <div ref={bodyRef} className="animate-in">
           <TagFilter

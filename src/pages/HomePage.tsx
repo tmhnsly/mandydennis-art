@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Image, ArrowRight, Star } from "lucide-react";
+import { Image, ArrowRight } from "lucide-react";
 import { getArtwork } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useAnimateIn } from "../hooks/useAnimateIn";
@@ -69,7 +69,7 @@ export default function HomePage() {
       {featured.length > 0 && (
         <div className="border-b border-line">
           <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-            <SectionHeader icon={Star} title="Featured Work" />
+            <SectionHeader title="Featured Work" />
             <div ref={bodyRef} className="animate-in">
               <FeaturedGrid items={featured} />
               <div className="mt-8 text-center">
