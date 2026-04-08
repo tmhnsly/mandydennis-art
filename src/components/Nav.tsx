@@ -12,7 +12,7 @@ const links: { to: string; label: string; icon: IconType }[] = [
 
 export default function Nav() {
   return (
-    <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur-xl" style={{ viewTransitionName: "nav-bar" }}>
+    <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur-xl">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-[clamp(1.5rem,5vw,4rem)] py-2">
         <NavLink
           to="/"

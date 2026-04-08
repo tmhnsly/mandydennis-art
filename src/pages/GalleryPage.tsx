@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { getArtwork, getInitialArtwork } from "../lib/content";
-import { withViewTransition } from "../lib/viewTransition";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import CtaBanner from "../components/CtaBanner";
@@ -84,7 +83,7 @@ export default function GalleryPage() {
 
                 <GalleryGrid
                   items={visible}
-                  onSelect={(i) => withViewTransition(() => setLightboxIndex(i))}
+                  onSelect={(i) => setLightboxIndex(i)}
                 />
 
                 {hasMore && (
@@ -105,7 +104,7 @@ export default function GalleryPage() {
         <ArtworkLightbox
           items={visible}
           index={lightboxIndex}
-          onClose={() => withViewTransition(() => setLightboxIndex(-1))}
+          onClose={() => setLightboxIndex(-1)}
           onChange={setLightboxIndex}
         />
       </div>

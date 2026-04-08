@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import type { Artwork } from "../types";
 import { thumbnailUrl } from "../lib/content";
 
@@ -17,12 +18,12 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
           onClick={() => onSelect(i)}
           className="relative block aspect-[4/5] overflow-hidden cursor-pointer group text-left"
         >
-          <img
+          <motion.img
+            layoutId={`artwork-${item.slug}`}
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover"
             loading="lazy"
-            style={{ viewTransitionName: `artwork-${item.slug}` }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
             <h3 className="font-display text-[0.95rem] font-semibold text-white mb-1">
@@ -30,10 +31,7 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
             </h3>
             <div className="flex gap-1.5 flex-wrap">
               {[...(item.medium ?? []), ...(item.subject ?? [])].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-0.5 rounded-full text-[0.6rem] tracking-wide uppercase text-white/65 border border-white/15 bg-white/5"
-                >
+                <span key={tag} className="px-2.5 py-0.5 rounded-full text-[0.6rem] tracking-wide uppercase text-white/65 border border-white/15 bg-white/5">
                   {tag}
                 </span>
               ))}
