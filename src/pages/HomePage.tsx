@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Image, ArrowRight } from "lucide-react";
+import { FaImage, FaArrowRight } from "react-icons/fa";
 import { getArtwork } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useAnimateIn } from "../hooks/useAnimateIn";
@@ -37,7 +37,7 @@ export default function HomePage() {
               to="/gallery"
               className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity"
             >
-              <Image size={16} />
+              <FaImage size={14} />
               View Gallery
             </Link>
             <Link
@@ -77,7 +77,7 @@ export default function HomePage() {
                   to="/gallery"
                   className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
                 >
-                  <ArrowRight size={16} />
+                  <FaArrowRight size={14} />
                   Browse all work
                 </Link>
               </div>

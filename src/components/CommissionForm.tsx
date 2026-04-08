@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, Check } from "lucide-react";
+import { FaCommentDots, FaCheck } from "react-icons/fa";
 import { useSiteSettings } from "../context/SiteSettings";
 
 const SIZE_OPTIONS = [
@@ -90,7 +90,7 @@ export default function CommissionForm() {
                       active ? "border-text bg-text" : "border-line-strong"
                     }`}
                   >
-                    {active && <Check size={13} className="text-bg" />}
+                    {active && <FaCheck size={10} className="text-bg" />}
                   </div>
                   <span className="font-display font-semibold text-[0.9rem]">{opt.label}</span>
                   {opt.desc && (
@@ -131,7 +131,7 @@ export default function CommissionForm() {
                       active ? "border-text bg-text" : "border-line-strong"
                     }`}
                   >
-                    {active && <Check size={13} className="text-bg" />}
+                    {active && <FaCheck size={10} className="text-bg" />}
                   </div>
                   <span className="text-[0.9rem] text-text-mid">{addon.label}</span>
                 </div>
@@ -229,7 +229,7 @@ export default function CommissionForm() {
         type="submit"
         className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity"
       >
-        <MessageCircle size={16} />
+        <FaCommentDots size={14} />
         Send Enquiry
       </button>
     </form>

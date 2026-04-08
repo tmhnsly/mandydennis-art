@@ -1,13 +1,13 @@
 import { NavLink } from "react-router-dom";
-import { Home, Image, Palette, Calendar, User } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { FaPaintBrush, FaHome, FaImage, FaPalette, FaCalendarAlt, FaUser } from "react-icons/fa";
+import type { IconType } from "react-icons";
 
-const links: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/gallery", label: "Gallery", icon: Image },
-  { to: "/commissions", label: "Commissions", icon: Palette },
-  { to: "/events", label: "Events", icon: Calendar },
-  { to: "/about", label: "About", icon: User },
+const links: { to: string; label: string; icon: IconType }[] = [
+  { to: "/", label: "Home", icon: FaHome },
+  { to: "/gallery", label: "Gallery", icon: FaImage },
+  { to: "/commissions", label: "Commissions", icon: FaPalette },
+  { to: "/events", label: "Events", icon: FaCalendarAlt },
+  { to: "/about", label: "About", icon: FaUser },
 ];
 
 export default function Nav() {
@@ -16,8 +16,9 @@ export default function Nav() {
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-[clamp(1.5rem,5vw,4rem)] py-2">
         <NavLink
           to="/"
-          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center"
+          className="font-display font-bold text-[1.05rem] tracking-tight text-text min-h-11 flex items-center gap-2"
         >
+          <FaPaintBrush className="text-accent" size={16} />
           Mandy Dennis
         </NavLink>
 
@@ -35,7 +36,7 @@ export default function Nav() {
                   }`
                 }
               >
-                <Icon size={18} strokeWidth={1.75} className="flex-shrink-0" />
+                <Icon size={16} className="flex-shrink-0" />
                 <span className="hidden lg:inline">{label}</span>
               </NavLink>
             </li>

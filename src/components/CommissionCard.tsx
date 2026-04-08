@@ -1,4 +1,4 @@
-import { PawPrint } from "lucide-react";
+import { FaPaw } from "react-icons/fa";
 import type { CommissionCategory } from "../types";
 
 interface Props {
@@ -10,7 +10,7 @@ export default function CommissionCard({ category, currency }: Props) {
   return (
     <div className="border border-line">
       <div className="px-6 py-5 border-b border-line flex items-center gap-2.5">
-        <PawPrint size={18} className="text-text-muted flex-shrink-0" />
+        <FaPaw size={16} className="text-text-muted flex-shrink-0" />
         <h3 className="font-display text-lg font-semibold tracking-tight">
           {category.title}
         </h3>

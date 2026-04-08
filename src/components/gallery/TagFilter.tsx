@@ -1,4 +1,4 @@
-import { Star, X } from "lucide-react";
+import { FaStar, FaTimes } from "react-icons/fa";
 
 interface Props {
   availableTags: string[];
@@ -32,7 +32,7 @@ export default function TagFilter({
               : "border-line-strong text-text-muted hover:border-text hover:text-text"
           }`}
         >
-          <Star size={15} className={featuredActive ? "fill-current" : ""} />
+          <FaStar size={13} />
           Featured
         </button>
       )}
@@ -41,7 +41,7 @@ export default function TagFilter({
           onClick={onClear}
           className={`${TAG_BASE} bg-text border-text text-bg`}
         >
-          <X size={15} />
+          <FaTimes size={13} />
           Clear
         </button>
       )}
