@@ -204,15 +204,21 @@ export async function getAbout(): Promise<AboutPage> {
 
 // --- Image helpers ---
 
-const PLACEHOLDER_THUMB = "https://placehold.co/600x400/eaddd7/846358?text=Artwork";
-const PLACEHOLDER_FULL = "https://placehold.co/1600x1200/eaddd7/846358?text=Artwork";
+// Inline SVG placeholder — no network request, matches the warm palette
+const placeholderSvg = (w: number, h: number) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect fill="%23f0e8e2" width="${w}" height="${h}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="14" fill="%23b0a096">Artwork</text></svg>`
+  )}`;
+
+const PLACEHOLDER_THUMB = placeholderSvg(600, 400);
+const PLACEHOLDER_FULL = placeholderSvg(1600, 1200);
 
 export function thumbnailUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_THUMB;
-  return urlFor(image).width(600).auto("format").quality(80).url() || PLACEHOLDER_THUMB;
+  return urlFor(image).width(600).auto("format").quality(75).url() || PLACEHOLDER_THUMB;
 }
 
 export function fullUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_FULL;
-  return urlFor(image).width(1600).auto("format").quality(85).url() || PLACEHOLDER_FULL;
+  return urlFor(image).width(1600).auto("format").quality(80).url() || PLACEHOLDER_FULL;
 }
