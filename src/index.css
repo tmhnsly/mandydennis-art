@@ -150,6 +150,10 @@ body {
 
 /* Page exit animations now handled by motion AnimatePresence */
 
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Radix dropdown menu animation */
 [data-radix-popper-content-wrapper] {
   z-index: 100 !important;
