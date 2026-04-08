@@ -1,5 +1,6 @@
-import { useEffect, useCallback, useState, useRef } from "react";
-import { motion, type PanInfo } from "motion/react";
+import { useEffect, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
@@ -11,36 +12,48 @@ interface Props {
   onChange: (index: number) => void;
 }
 
-function wrap(i: number, len: number) {
-  return ((i % len) + len) % len;
-}
-
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const dragX = useRef(0);
-
   const canNav = items.length > 1;
 
-  const goPrev = useCallback(() => {
-    if (!canNav) return;
-    setImgLoaded(false);
-    onChange(wrap(index - 1, items.length));
-  }, [index, items.length, canNav, onChange]);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: canNav,
+    startIndex: index >= 0 ? index : 0,
+    dragFree: false,
+    containScroll: false,
+  });
 
-  const goNext = useCallback(() => {
-    if (!canNav) return;
-    setImgLoaded(false);
-    onChange(wrap(index + 1, items.length));
-  }, [index, items.length, canNav, onChange]);
-
-  // Reset loaded state when opening
+  // Sync embla → parent state
   useEffect(() => {
-    if (isOpen) setImgLoaded(false);
-  }, [isOpen]);
+    if (!emblaApi) return;
+    const onSelect = () => {
+      const selected = emblaApi.selectedScrollSnap();
+      if (selected !== index) onChange(selected);
+    };
+    emblaApi.on("select", onSelect);
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi, index, onChange]);
 
+  // Sync parent state → embla (for button clicks)
+  useEffect(() => {
+    if (!emblaApi || !isOpen) return;
+    if (emblaApi.selectedScrollSnap() !== index) {
+      emblaApi.scrollTo(index);
+    }
+  }, [emblaApi, index, isOpen]);
+
+  // Re-init embla when opening with a new starting index
+  useEffect(() => {
+    if (!emblaApi || !isOpen) return;
+    emblaApi.reInit({ startIndex: index >= 0 ? index : 0 });
+  }, [emblaApi, isOpen]);
+
+  const goPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const goNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  // Keyboard
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -56,81 +69,80 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > 60) {
-      info.offset.x > 0 ? goPrev() : goNext();
-    }
-  };
-
-  if (!isOpen || !current) return null;
-
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/8 hover:bg-white/15 border border-white/8 flex items-center justify-center transition-colors";
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.15 }}
-      className="fixed inset-0 z-[9999] bg-black/95"
-      onClick={onClose}
-    >
-      {/* Close */}
-      <button
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
-        className={`absolute top-3 right-3 z-20 ${btnClass}`}
-        aria-label="Close"
-      >
-        <FaTimes size={13} className="text-white/70" />
-      </button>
-
-      {/* Full canvas image area — image can fill edge to edge */}
-      <div className="absolute inset-0 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+    <AnimatePresence>
+      {isOpen && current && (
         <motion.div
-          key={current.slug}
-          drag={canNav ? "x" : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          onDrag={(_, info) => { dragX.current = info.offset.x; }}
-          className="relative max-w-full max-h-full flex items-center justify-center cursor-grab active:cursor-grabbing p-2"
+          key="lightbox"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
         >
-          <img
-            src={fullUrl(current.image)}
-            alt={current.title}
-            onLoad={() => setImgLoaded(true)}
-            className={`max-w-full max-h-[100vh] object-contain select-none transition-opacity duration-200 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
-            draggable={false}
-          />
-        </motion.div>
-      </div>
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className={`absolute top-3 right-3 z-20 ${btnClass}`}
+            aria-label="Close"
+          >
+            <FaTimes size={13} className="text-white/70" />
+          </button>
 
-      {/* Bottom bar — individual items have blur, no full-width background */}
-      <div className="absolute bottom-0 left-0 right-0 z-20" onClick={(e) => e.stopPropagation()}>
-        <div className="max-w-[1400px] mx-auto flex items-center gap-3 px-4 py-4">
-          {canNav && (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <button onClick={goPrev} className={btnClass} aria-label="Previous">
-                <FaChevronLeft size={12} className="text-white/70" />
-              </button>
-              <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
-                {index + 1} / {items.length}
-              </span>
-              <button onClick={goNext} className={btnClass} aria-label="Next">
-                <FaChevronRight size={12} className="text-white/70" />
-              </button>
-            </div>
-          )}
-          {tags.length > 0 && (
-            <div className="flex gap-1.5 flex-wrap flex-1">
-              {tags.map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
-                  {tag}
-                </span>
+          {/* Carousel */}
+          <div className="flex-1 overflow-hidden" ref={emblaRef}>
+            <div className="flex h-full">
+              {items.map((item) => (
+                <div
+                  key={item.slug}
+                  className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
+                >
+                  <img
+                    src={fullUrl(item.image)}
+                    alt={item.title}
+                    className="max-w-full max-h-full object-contain select-none"
+                    draggable={false}
+                  />
+                </div>
               ))}
             </div>
-          )}
-        </div>
-      </div>
-    </motion.div>
+          </div>
+
+          {/* Click-to-close zones on either side of image */}
+          <div className="absolute inset-y-0 left-0 w-12 z-10 cursor-pointer" onClick={onClose} />
+          <div className="absolute inset-y-0 right-0 w-12 z-10 cursor-pointer" onClick={onClose} />
+
+          {/* Bottom controls */}
+          <div className="absolute bottom-0 left-0 right-0 z-20">
+            <div className="max-w-[1400px] mx-auto flex items-center gap-3 px-4 py-4">
+              {canNav && (
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button onClick={goPrev} className={btnClass} aria-label="Previous">
+                    <FaChevronLeft size={12} className="text-white/70" />
+                  </button>
+                  <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
+                    {index + 1} / {items.length}
+                  </span>
+                  <button onClick={goNext} className={btnClass} aria-label="Next">
+                    <FaChevronRight size={12} className="text-white/70" />
+                  </button>
+                </div>
+              )}
+              {tags.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap flex-1">
+                  {tags.map((tag) => (
+                    <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
