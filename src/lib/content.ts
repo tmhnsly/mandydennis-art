@@ -133,46 +133,49 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
-// Simple in-memory cache — prevents re-fetching on navigation
+// In-memory cache — sync access prevents layout shift
 const cache = new Map<string, { data: unknown; ts: number }>();
-const CACHE_TTL = 30_000; // 30 seconds
+const CACHE_TTL = 30_000;
 
-function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
-  if (entry && Date.now() - entry.ts < CACHE_TTL) return Promise.resolve(entry.data as T);
-  return fetcher().then((data) => {
-    cache.set(key, { data, ts: Date.now() });
+  if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data as T;
+  return null;
+}
+
+function setCache(key: string, data: unknown) {
+  cache.set(key, { data, ts: Date.now() });
+}
+
+// Sync initial data — returns cached if available, dummy if not. Never null.
+export function getInitialArtwork(): Artwork[] { return getCached("artwork") ?? DUMMY_ARTWORK; }
+export function getInitialEvents(): ArtEvent[] { return getCached("events") ?? DUMMY_EVENTS; }
+export function getInitialCommissions(): CommissionCategory[] { return getCached("commissions") ?? DUMMY_COMMISSIONS; }
+export function getInitialTestimonials(): Testimonial[] { return getCached("testimonials") ?? DUMMY_TESTIMONIALS; }
+
+// Async fetchers — update cache in background. Pages use getInitial* for first render.
+// Only call these in useEffect — they won't cause layout shift because pages
+// already have data from getInitial*.
+
+async function fetchAndCache<T>(key: string, fetcher: () => Promise<T>, fallback: T): Promise<T> {
+  // If cache is fresh, skip the fetch entirely
+  if (getCached<T>(key) !== null) return getCached<T>(key) as T;
+  try {
+    const data = await fetcher();
+    setCache(key, data);
     return data;
-  });
+  } catch {
+    return fallback;
+  }
 }
-
-// Sync access to cached data — returns fallback if not yet cached
-function getCached<T>(key: string, fallback: T): T {
-  const entry = cache.get(key);
-  return entry ? (entry.data as T) : fallback;
-}
-
-// Export initial data getters so pages can render immediately
-export function getInitialArtwork(): Artwork[] { return getCached("artwork", DUMMY_ARTWORK); }
-export function getInitialEvents(): ArtEvent[] { return getCached("events", DUMMY_EVENTS); }
-export function getInitialCommissions(): CommissionCategory[] { return getCached("commissions", DUMMY_COMMISSIONS); }
-export function getInitialTestimonials(): Testimonial[] { return getCached("testimonials", DUMMY_TESTIMONIALS); }
 
 export function getArtwork(): Promise<Artwork[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_ARTWORK);
   const c = client;
-  return cached("artwork", async () => {
-    try {
-      const results = await withTimeout(c.fetch(`
+  return fetchAndCache("artwork", async () => {
+    const results = await withTimeout(c.fetch(`
       *[_type == "artwork"] | order(date desc) {
-        "slug": slug.current,
-        title,
-        image,
-        description,
-        medium,
-        subject,
-        featured,
-        date
+        "slug": slug.current, title, image, description, medium, subject, featured, date
       }
     `), 3000);
     if (!results || results.length === 0) return DUMMY_ARTWORK;
@@ -183,117 +186,70 @@ export function getArtwork(): Promise<Artwork[]> {
       subject: item.subject ?? [],
       featured: item.featured ?? false,
     }));
-    } catch {
-      return DUMMY_ARTWORK;
-    }
-  });
+  }, DUMMY_ARTWORK);
 }
 
 export function getEvents(): Promise<ArtEvent[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_EVENTS);
   const c = client;
-  return cached("events", async () => {
-    try {
-      const results = await withTimeout(c.fetch(`
-        *[_type == "event"] | order(coalesce(startDate, date) asc) {
-          "slug": slug.current,
-          title,
-          "startDate": coalesce(startDate, date),
-          endDate,
-          startTime,
-          endTime,
-          location,
-          description,
-          link
-        }
-      `), 3000);
-      if (!results || results.length === 0) return DUMMY_EVENTS;
-      // Filter out any events missing a date entirely
-      return results.filter((e: ArtEvent) => e.startDate);
-    } catch {
-      return DUMMY_EVENTS;
-    }
-  });
+  return fetchAndCache("events", async () => {
+    const results = await withTimeout(c.fetch(`
+      *[_type == "event"] | order(coalesce(startDate, date) asc) {
+        "slug": slug.current, title, "startDate": coalesce(startDate, date),
+        endDate, startTime, endTime, location, description, link
+      }
+    `), 3000);
+    if (!results || results.length === 0) return DUMMY_EVENTS;
+    return results.filter((e: ArtEvent) => e.startDate);
+  }, DUMMY_EVENTS);
 }
 
 export function getCommissions(): Promise<CommissionCategory[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_COMMISSIONS);
   const c = client;
-  return cached("commissions", async () => {
-    try {
-      const results = await withTimeout(c.fetch(`
-        *[_type == "commissionCategory"] | order(title asc) {
-          "slug": slug.current,
-          title,
-          options,
-          addons,
-          included,
-          notes
-        }
-      `), 3000);
-      return results && results.length > 0 ? results : DUMMY_COMMISSIONS;
-    } catch {
-      return DUMMY_COMMISSIONS;
-    }
-  });
+  return fetchAndCache("commissions", async () => {
+    const results = await withTimeout(c.fetch(`
+      *[_type == "commissionCategory"] | order(title asc) {
+        "slug": slug.current, title, options, addons, included, notes
+      }
+    `), 3000);
+    return results && results.length > 0 ? results : DUMMY_COMMISSIONS;
+  }, DUMMY_COMMISSIONS);
 }
 
 export function getSettings(): Promise<SiteSettings> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_SETTINGS);
   const c = client;
-  return cached("settings", async () => {
-    try {
-      const result = await withTimeout(c.fetch(`
-        *[_type == "siteSettings"][0] {
-          tagline,
-          contact_email,
-          facebook_url,
-          instagram_url,
-          currency_symbol
-        }
-      `), 3000);
-      return result ?? DUMMY_SETTINGS;
-    } catch {
-      return DUMMY_SETTINGS;
-    }
-  });
+  return fetchAndCache("settings", async () => {
+    const result = await withTimeout(c.fetch(`
+      *[_type == "siteSettings"][0] {
+        tagline, contact_email, facebook_url, instagram_url, currency_symbol
+      }
+    `), 3000);
+    return result ?? DUMMY_SETTINGS;
+  }, DUMMY_SETTINGS);
 }
 
 export function getAbout(): Promise<AboutPage> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_ABOUT);
   const c = client;
-  return cached("about", async () => {
-    try {
-      const result = await withTimeout(c.fetch(`
-        *[_type == "about"][0] {
-          bio,
-        photo
-      }
+  return fetchAndCache("about", async () => {
+    const result = await withTimeout(c.fetch(`
+      *[_type == "about"][0] { bio, photo }
     `), 3000);
-      return result ?? DUMMY_ABOUT;
-    } catch {
-      return DUMMY_ABOUT;
-    }
-  });
+    return result ?? DUMMY_ABOUT;
+  }, DUMMY_ABOUT);
 }
 
 export function getTestimonials(): Promise<Testimonial[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_TESTIMONIALS);
   const c = client;
-  return cached("testimonials", async () => {
-    try {
-      const results = await withTimeout(c.fetch(`
-        *[_type == "testimonial"] {
-          name,
-          quote,
-          commission
-        }
-      `), 3000);
-      return results && results.length > 0 ? results : DUMMY_TESTIMONIALS;
-    } catch {
-      return DUMMY_TESTIMONIALS;
-    }
-  });
+  return fetchAndCache("testimonials", async () => {
+    const results = await withTimeout(c.fetch(`
+      *[_type == "testimonial"] { name, quote, commission }
+    `), 3000);
+    return results && results.length > 0 ? results : DUMMY_TESTIMONIALS;
+  }, DUMMY_TESTIMONIALS);
 }
 
 // --- Image helpers ---
