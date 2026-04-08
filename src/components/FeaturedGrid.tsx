@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import type { Artwork } from "../types";
 import { thumbnailUrl } from "../lib/content";
 
@@ -17,11 +18,13 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
           onClick={() => onSelect(i)}
           className="relative block aspect-[4/5] overflow-hidden cursor-pointer group text-left"
         >
-          <img
+          <motion.img
+            layoutId={`artwork-${item.slug}`}
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover"
             loading="lazy"
+            transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
             <h3 className="font-display text-[0.95rem] font-semibold text-white mb-1">

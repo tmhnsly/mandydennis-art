@@ -171,26 +171,3 @@ body {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
-/* Lightbox overrides */
-.yarl__slide_image {
-  border-radius: 2px;
-  max-height: calc(100vh - 7rem) !important;
-  max-width: calc(100vw - 1rem) !important;
-  object-fit: contain;
-}
-
-/* Hide prev/next on mobile — swipe handles navigation */
-@media (max-width: 640px) {
-  .yarl__navigation_prev,
-  .yarl__navigation_next {
-    display: none !important;
-  }
-  .yarl__slide {
-    padding: 3rem 0 3.5rem !important;
-  }
-}
-
-/* Toolbar positioning */
-.yarl__toolbar {
-  padding: 0.75rem !important;
-}
