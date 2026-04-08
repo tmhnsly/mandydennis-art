@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "motion/react";
@@ -19,7 +19,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const navigate = useNavigate();
   const canNav = items.length > 1;
-  const [isDraggingDown, setIsDraggingDown] = useState(false);
   const closeThreshold = 120;
 
   // Vertical drag to dismiss
@@ -117,9 +116,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0.05, bottom: 0.4 }}
-            onDragStart={() => setIsDraggingDown(true)}
             onDragEnd={(_, info) => {
-              setIsDraggingDown(false);
               if (info.offset.y > closeThreshold || info.velocity.y > 500) {
                 onClose();
               } else {
