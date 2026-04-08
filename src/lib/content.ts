@@ -191,13 +191,21 @@ export function getArtwork(): Promise<Artwork[]> {
       }
     `), 3000);
     if (!results || results.length === 0) return DUMMY_ARTWORK;
-    return results.map((item: Artwork) => ({
+    const ANIMAL_TAGS = ["animals", "dogs", "cats", "horses", "birds", "wildlife"];
+    const mapped = results.map((item: Artwork) => ({
       ...item,
       description: item.description ?? "",
       medium: item.medium ?? [],
       subject: item.subject ?? [],
       featured: item.featured ?? false,
     }));
+    // Sort: animal-tagged artwork first, then by date
+    return mapped.sort((a: Artwork, b: Artwork) => {
+      const aAnimal = a.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
+      const bAnimal = b.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
+      if (aAnimal !== bAnimal) return aAnimal - bAnimal;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   }, DUMMY_ARTWORK);
 }
 

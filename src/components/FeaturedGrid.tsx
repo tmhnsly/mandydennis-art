@@ -10,17 +10,17 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[3px]">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[3px]">
       {items.map((item, i) => (
         <button
           key={item.slug}
           onClick={() => onSelect(i)}
-          className="relative block aspect-[4/5] overflow-hidden cursor-pointer group text-left"
+          className="block w-full break-inside-avoid mb-[3px] relative overflow-hidden cursor-pointer group text-left"
         >
           <img
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">

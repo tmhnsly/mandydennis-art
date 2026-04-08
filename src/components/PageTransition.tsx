@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 interface Props {
@@ -6,15 +6,16 @@ interface Props {
 }
 
 export default function PageTransition({ children }: Props) {
-  const location = useLocation();
-  const prevPath = useRef(location.pathname);
+  const { pathname } = useLocation();
+  const prevPath = useRef(pathname);
 
-  useEffect(() => {
-    if (location.pathname !== prevPath.current) {
-      prevPath.current = location.pathname;
-      window.scrollTo(0, 0);
+  // useLayoutEffect runs before paint — prevents flash at old scroll position
+  useLayoutEffect(() => {
+    if (pathname !== prevPath.current) {
+      prevPath.current = pathname;
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
-  }, [location.pathname]);
+  }, [pathname]);
 
   return <>{children}</>;
 }

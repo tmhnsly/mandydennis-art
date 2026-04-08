@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
@@ -21,8 +21,8 @@ export default function HomePage() {
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
-  const [parallaxY, setParallaxY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const parallaxImgs = useRef<HTMLImageElement[]>([]);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
@@ -32,7 +32,7 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax scroll — runs on all devices, subtle movement
+  // Parallax — direct DOM manipulation, no React re-renders
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -40,9 +40,11 @@ export default function HomePage() {
       ticking = true;
       requestAnimationFrame(() => {
         const el = heroRef.current;
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.bottom > 0) setParallaxY(-rect.top * 0.15);
+        if (el && el.getBoundingClientRect().bottom > 0) {
+          const y = -el.getBoundingClientRect().top * 0.12;
+          for (const img of parallaxImgs.current) {
+            img.style.transform = `scale(1.08) translateY(${y}px)`;
+          }
         }
         ticking = false;
       });
@@ -103,8 +105,9 @@ export default function HomePage() {
                 alt=""
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
-                className="w-full h-full object-cover object-center will-change-transform transition-transform duration-100 ease-out"
-                style={{ transform: `scale(1.1) translateY(${parallaxY}px)` } as CSSProperties}
+                ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
+                className="w-full h-full object-cover object-center will-change-transform"
+                style={{ transform: "scale(1.08)" }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
