@@ -22,7 +22,6 @@ export default function HomePage() {
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [parallaxY, setParallaxY] = useState(0);
-  const parallaxActive = useRef(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
