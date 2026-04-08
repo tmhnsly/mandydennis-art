@@ -8,19 +8,10 @@ import DrawLine from "../components/DrawLine";
 
 export default function EventsPage() {
   const [allEvents, setAllEvents] = useState<ArtEvent[]>([]);
-  const [loading, setLoading] = useState(true);
   const { ref: bodyRef, isInView } = useAnimateIn();
 
-  useEffect(() => {
-    document.title = "Events — Mandy Dennis Art";
-  }, []);
-
-  useEffect(() => {
-    getEvents().then((data) => {
-      setAllEvents(data);
-      setLoading(false);
-    });
-  }, []);
+  useEffect(() => { document.title = "Events — Mandy Dennis Art"; }, []);
+  useEffect(() => { getEvents().then(setAllEvents); }, []);
 
   const now = new Date();
   const eventDate = (d: string) => {
@@ -32,20 +23,6 @@ export default function EventsPage() {
   const past = allEvents
     .filter((e) => eventDate(e.date) < todayUTC)
     .sort((a, b) => eventDate(b.date) - eventDate(a.date));
-
-  if (loading) {
-    return (
-      <>
-        <div>
-          <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-            <SectionHeader title="Events" />
-            <p className="text-text-muted">Loading events...</p>
-          </div>
-        </div>
-        <DrawLine />
-      </>
-    );
-  }
 
   return (
     <>
