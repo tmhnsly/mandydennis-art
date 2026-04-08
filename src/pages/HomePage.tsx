@@ -49,7 +49,10 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="hero-stagger-5 flex gap-[clamp(2rem,5vw,4rem)] mt-[clamp(3rem,6vw,5rem)] pt-5 border-t border-line flex-wrap">
+          <div className="hero-stagger-5 mt-[clamp(3rem,6vw,5rem)]">
+            <DrawLine delay={2} />
+          </div>
+          <div className="flex gap-[clamp(2rem,5vw,4rem)] pt-5 flex-wrap hero-stagger-5">
             <div>
               <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Medium</div>
               <div className="font-display text-[0.88rem] font-semibold tracking-tight">Pastels & Watercolours</div>
@@ -65,7 +68,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <DrawLine delay={2} />
+      <DrawLine delay={3} />
 
       {/* Featured Work */}
       {featured.length > 0 && (
@@ -87,7 +90,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <DrawLine delay={3} />
+          <DrawLine delay={4} />
         </>
       )}
     </>

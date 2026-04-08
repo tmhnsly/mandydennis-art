@@ -70,15 +70,16 @@ body {
   animation: drawIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 /*
- * Timing: nav(1)=0.05s, hero line(2)=0.65s (after hero text),
- * featured(3)=0.85s, footer/other(4)=1.05s, (5)=1.2s, (6)=1.35s
+ * Timing: nav draws first, then everything else waits for
+ * hero text to finish (stagger-5 ends at ~0.95s).
+ * Lines draw in strict top-to-bottom order after that.
  */
 .draw-line-1 { animation-delay: 0.05s; }
-.draw-line-2 { animation-delay: 0.65s; }
-.draw-line-3 { animation-delay: 0.85s; }
-.draw-line-4 { animation-delay: 1.05s; }
-.draw-line-5 { animation-delay: 1.2s; }
-.draw-line-6 { animation-delay: 1.35s; }
+.draw-line-2 { animation-delay: 1.0s; }
+.draw-line-3 { animation-delay: 1.2s; }
+.draw-line-4 { animation-delay: 1.4s; }
+.draw-line-5 { animation-delay: 1.6s; }
+.draw-line-6 { animation-delay: 1.8s; }
 
 @keyframes drawIn {
   from { transform: scaleX(0); }
