@@ -85,7 +85,7 @@ export default function AboutPage() {
         </div>
       </div>
     </div>
-    <DrawLine delay={2} />
+    <DrawLine />
     </>
   );
 }

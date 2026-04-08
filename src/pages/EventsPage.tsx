@@ -33,7 +33,7 @@ export default function EventsPage() {
             <p className="text-text-muted">Loading events...</p>
           </div>
         </div>
-        <DrawLine delay={2} />
+        <DrawLine />
       </>
     );
   }
@@ -77,7 +77,7 @@ export default function EventsPage() {
           </div>
         </div>
       </div>
-      <DrawLine delay={2} />
+      <DrawLine />
     </>
   );
 }

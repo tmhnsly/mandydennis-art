@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <>
-      <DrawLine delay={4} />
+      <DrawLine />
       <footer>
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-5 flex justify-between items-center">
           <span className="text-xs text-text-subtle tracking-wide">

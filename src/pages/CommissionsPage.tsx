@@ -39,7 +39,7 @@ export default function CommissionsPage() {
           </div>
         </div>
       </div>
-      <DrawLine delay={2} />
+      <DrawLine />
     </>
   );
 }

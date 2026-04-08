@@ -78,7 +78,7 @@ export default function GalleryPage() {
             <p className="text-text-muted">Loading artwork...</p>
           </div>
         </div>
-        <DrawLine delay={2} />
+        <DrawLine />
       </>
     );
   }
@@ -138,7 +138,7 @@ export default function GalleryPage() {
         animation={{ swipe: 250 }}
       />
     </div>
-    <DrawLine delay={2} />
+    <DrawLine />
     </>
   );
 }
