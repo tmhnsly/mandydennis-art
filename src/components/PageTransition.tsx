@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, flushSync } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { flushSync } from "react-dom";
 import { useLocation } from "react-router-dom";
 
 interface Props {
