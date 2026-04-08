@@ -59,5 +59,5 @@ export interface AboutPage {
 export interface Testimonial {
   name: string;
   quote: string;
-  commission: string;
+  commission: string | null;
 }

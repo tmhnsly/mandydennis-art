@@ -129,7 +129,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 // Simple in-memory cache — prevents re-fetching on navigation
 const cache = new Map<string, { data: unknown; ts: number }>();
-const CACHE_TTL = 60_000; // 1 minute
+const CACHE_TTL = 30_000; // 30 seconds
 
 function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   const entry = cache.get(key);
