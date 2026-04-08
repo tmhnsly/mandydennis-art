@@ -119,49 +119,58 @@ export default function HomePage() {
         ))}
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
-          {/* Glassmorphism panel behind hero text */}
-          <div className="hero-stagger max-w-xl backdrop-blur-md bg-bg/40 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            <h1 className="font-display text-[clamp(3.5rem,9vw,6rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-5">
-              <TextReveal as="span" className="block">Mandy</TextReveal>
-              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid">Dennis</TextReveal>
-            </h1>
-            <p className="text-[1.1rem] text-text-mid leading-relaxed max-w-[440px] mb-8">
-              {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
-            </p>
-            <div className="flex gap-2.5 flex-wrap mb-10">
-              <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
-                View Gallery
-              </Link>
-              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase backdrop-blur-sm bg-bg/30 border border-text/20 text-text hover:bg-bg/50 transition-colors">
-                Commissions
-              </Link>
-            </div>
-            <div className="flex gap-[clamp(1.5rem,4vw,3rem)] pt-5 border-t border-text/10 flex-wrap">
-              <div>
-                <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Medium</div>
-                <div className="font-display text-[0.85rem] font-semibold tracking-tight">Pastels & Watercolours</div>
-              </div>
-              <div>
-                <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Subjects</div>
-                <div className="font-display text-[0.85rem] font-semibold tracking-tight">Pets · Wildlife · Seascapes</div>
+          <div className="hero-stagger max-w-xl">
+            {/* Glass panel — name + tagline + CTAs */}
+            <div className="backdrop-blur-xl bg-bg/50 border border-white/20 rounded-2xl p-[clamp(1.5rem,4vw,2.5rem)] shadow-lg shadow-black/5 mb-6">
+              <h1 className="font-display text-[clamp(3.5rem,9vw,6rem)] font-bold tracking-[-0.04em] leading-[0.88] mb-4">
+                <TextReveal as="span" className="block">Mandy</TextReveal>
+                <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid">Dennis</TextReveal>
+              </h1>
+              <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[400px] mb-6">
+                {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
+              </p>
+              <div className="flex gap-2.5 flex-wrap">
+                <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase rounded-lg hover:opacity-85 transition-opacity">
+                  View Gallery
+                </Link>
+                <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase rounded-lg backdrop-blur-sm bg-white/20 border border-white/20 text-text hover:bg-white/30 transition-colors">
+                  Commissions
+                </Link>
               </div>
             </div>
-          </div>
 
-          {featured.length > 1 && (
-            <div className="flex gap-1.5 mt-8">
-              {featured.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroIndex(i)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    i === safeIndex ? "w-6 bg-text/60" : "w-1.5 bg-text/20 hover:bg-text/30"
-                  }`}
-                  aria-label={`Show artwork ${i + 1}`}
-                />
-              ))}
+            {/* Stats — outside the panel, frosted pills */}
+            <div className="flex gap-3 flex-wrap mb-6">
+              <div className="backdrop-blur-md bg-bg/40 border border-white/15 rounded-full px-4 py-2">
+                <span className="text-[0.58rem] tracking-widest uppercase text-text-subtle font-medium">Medium</span>
+                <span className="text-text-mid mx-1.5">·</span>
+                <span className="font-display text-[0.8rem] font-semibold tracking-tight">Pastels & Watercolours</span>
+              </div>
+              <div className="backdrop-blur-md bg-bg/40 border border-white/15 rounded-full px-4 py-2">
+                <span className="text-[0.58rem] tracking-widest uppercase text-text-subtle font-medium">Subjects</span>
+                <span className="text-text-mid mx-1.5">·</span>
+                <span className="font-display text-[0.8rem] font-semibold tracking-tight">Animals · Wildlife · Seascapes</span>
+              </div>
             </div>
-          )}
+
+            {/* Image indicators — frosted pills */}
+            {featured.length > 1 && (
+              <div className="flex gap-2">
+                {featured.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setHeroIndex(i)}
+                    className={`h-2.5 rounded-full backdrop-blur-md border transition-all duration-300 ${
+                      i === safeIndex
+                        ? "w-10 bg-white/40 border-white/30"
+                        : "w-2.5 bg-white/15 border-white/10 hover:bg-white/25"
+                    }`}
+                    aria-label={`Show artwork ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <DrawLine />
