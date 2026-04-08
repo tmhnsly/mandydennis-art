@@ -1,12 +1,6 @@
-interface Props {
-  delay?: number;
-  className?: string;
-}
+import { useAnimateIn } from "../hooks/useAnimateIn";
 
-export default function DrawLine({ delay = 1, className = "" }: Props) {
-  return (
-    <div
-      className={`h-px bg-line draw-line draw-line-${delay} ${className}`}
-    />
-  );
+export default function DrawLine() {
+  const ref = useAnimateIn();
+  return <div ref={ref} className="animate-rule h-px bg-line" />;
 }

@@ -42,7 +42,7 @@ export default function Nav() {
           ))}
         </ul>
       </div>
-      <div className="h-px bg-line draw-line draw-line-1" />
+      <div className="h-px bg-line" />
     </nav>
   );
 }
