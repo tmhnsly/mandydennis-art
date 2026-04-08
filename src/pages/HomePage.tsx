@@ -90,15 +90,23 @@ export default function HomePage() {
     <>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Only show hero images if they have real Sanity images (not null/placeholder) */}
-        {featured.some((item) => item.image !== null) && featured.map((item, i) => (
-          item.image ? (
+        {/* Hero images — only render active + neighbours to save GPU memory */}
+        {featured.some((item) => item.image !== null) && featured.map((item, i) => {
+          if (!item.image) return null;
+          const isActive = i === safeIndex;
+          const isAdjacent = featured.length > 1 && (
+            i === (safeIndex + 1) % featured.length ||
+            i === (safeIndex - 1 + featured.length) % featured.length
+          );
+          // Only render active slide and its neighbours
+          if (!isActive && !isAdjacent) return null;
+          return (
             <div
               key={item.slug}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                i === safeIndex ? "opacity-100" : "opacity-0"
+                isActive ? "opacity-100" : "opacity-0"
               }`}
-              aria-hidden={i !== safeIndex}
+              aria-hidden={!isActive}
             >
               <img
                 src={heroUrl(item.image)}
@@ -106,17 +114,17 @@ export default function HomePage() {
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className="w-full h-full object-cover object-center will-change-transform"
-                style={{ transform: "scale(1.08)" }}
+                className={`w-full h-full object-cover object-center ${isActive ? "will-change-transform" : ""}`}
+                style={{ transform: "scale(1.08) translate3d(0,0,0)" }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
             </div>
-          ) : null
-        ))}
+          );
+        })}
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-md bg-bg/40 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+          <div className="hero-stagger max-w-xl backdrop-blur-sm bg-bg/60 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             <h1 className="mb-5">
               <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
               <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
