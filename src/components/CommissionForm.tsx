@@ -1,12 +1,50 @@
-import { FaCommentDots } from "react-icons/fa";
+import { useRef, useState } from "react";
+import { FaCommentDots, FaImage, FaTimes } from "react-icons/fa";
+
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_SIZE_MB = 10;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 export default function CommissionForm() {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFileError(null);
+    setFileName(null);
+
+    if (!file) return;
+
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setFileError("Please upload an image file (JPEG, PNG, WebP, or GIF).");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_SIZE_BYTES) {
+      setFileError(`File is too large. Maximum size is ${MAX_SIZE_MB}MB.`);
+      e.target.value = "";
+      return;
+    }
+
+    setFileName(file.name);
+  };
+
+  const clearFile = () => {
+    if (fileRef.current) fileRef.current.value = "";
+    setFileName(null);
+    setFileError(null);
+  };
+
   return (
     <form
       name="commission-enquiry"
       method="POST"
       data-netlify="true"
       netlify-honeypot="bot-field"
+      encType="multipart/form-data"
       className="space-y-5"
     >
       <input type="hidden" name="form-name" value="commission-enquiry" />
@@ -64,16 +102,45 @@ export default function CommissionForm() {
       </div>
 
       <div>
-        <label htmlFor="reference" className="block text-sm font-medium text-text-mid mb-1">
+        <label className="block text-sm font-medium text-text-mid mb-1">
           Reference image (optional)
         </label>
         <input
+          ref={fileRef}
           type="file"
           id="reference"
           name="reference"
-          accept="image/*"
-          className="w-full text-sm text-text-muted file:mr-4 file:min-h-11 file:py-2 file:px-4 file:border file:border-line-strong file:bg-transparent file:text-text-mid file:font-medium file:rounded-none hover:file:bg-text/[0.04]"
+          accept=".jpg,.jpeg,.png,.webp,.gif"
+          onChange={handleFileChange}
+          className="hidden"
         />
+        {fileName ? (
+          <div className="flex items-center gap-3 min-h-11 px-4 py-2.5 border border-line-strong text-sm">
+            <FaImage size={14} className="text-accent flex-shrink-0" />
+            <span className="text-text-mid truncate flex-1">{fileName}</span>
+            <button
+              type="button"
+              onClick={clearFile}
+              className="text-text-subtle hover:text-text transition-colors p-1"
+              aria-label="Remove file"
+            >
+              <FaTimes size={12} />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="w-full min-h-11 px-4 py-2.5 border border-dashed border-line-strong text-sm text-text-muted flex items-center justify-center gap-2 hover:border-text/40 hover:text-text-mid transition-colors"
+          >
+            <FaImage size={14} />
+            Choose an image
+          </button>
+        )}
+        {fileError && (
+          <p className="text-sm text-red-600 mt-1.5">{fileError}</p>
+        )}
+        <p className="text-xs text-text-subtle mt-1">JPEG, PNG, WebP or GIF. Max {MAX_SIZE_MB}MB.</p>
       </div>
 
       <button
