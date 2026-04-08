@@ -10,7 +10,7 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div className="columns-1 sm:columns-2 gap-[3px]">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[3px]">
       {items.map((item, i) => (
         <button
           key={item.slug}
