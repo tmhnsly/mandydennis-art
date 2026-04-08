@@ -34,18 +34,22 @@ export default function HomePage() {
 
   // Parallax scroll — image moves at 30% of scroll speed
   useEffect(() => {
+    const calcParallax = () => {
+      const el = heroRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > 0) setParallaxY(-rect.top * 0.3);
+    };
+
+    // Set initial value immediately so there's no jump
+    calcParallax();
+
     let ticking = false;
     const handleScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const el = heroRef.current;
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.bottom > 0) {
-            setParallaxY(-rect.top * 0.3);
-          }
-        }
+        calcParallax();
         ticking = false;
       });
     };
