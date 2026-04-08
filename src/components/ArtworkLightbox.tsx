@@ -82,7 +82,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   useEffect(() => {
     if (!isOpen) {
       dragY.set(0);
-      setIsDraggingDown(false);
     }
   }, [isOpen, dragY]);
 

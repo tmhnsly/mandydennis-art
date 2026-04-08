@@ -125,7 +125,7 @@ export default function AboutPage() {
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(3rem,6vw,5rem)]">
           <div className={`anim-fade-up ${ctaInView ? "in-view" : ""} text-center max-w-lg mx-auto`}>
             <h2 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-3">
-              Want your own?
+              Want <span className="font-serif italic font-normal text-text-mid">your own?</span>
             </h2>
             <p className="text-text-mid mb-6">
               Commission a portrait of your pet, or browse the gallery to see more of Mandy's work.
