@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { useInView } from "../hooks/useAnimateIn";
 import TextReveal from "./TextReveal";
 
 interface Props {
@@ -7,8 +6,7 @@ interface Props {
 }
 
 export default function SectionHeader({ title }: Props) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const { ref, isInView } = useInView(0.3);
 
   return (
     <div ref={ref} className="mb-8 md:mb-10">
@@ -19,12 +17,7 @@ export default function SectionHeader({ title }: Props) {
         >
           {title}
         </TextReveal>
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={isInView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-          className="flex-1 h-px bg-line-strong origin-left"
-        />
+        <div className={`anim-rule flex-1 h-px bg-line-strong ${isInView ? "in-view" : ""}`} style={{ transitionDelay: "0.1s" }} />
       </div>
     </div>
   );

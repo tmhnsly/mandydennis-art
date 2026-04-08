@@ -63,7 +63,55 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* All animations now handled by motion/react */
+/* ---- Lightweight CSS animations (no JS library) ---- */
+
+/* Fade up — used by sections, content blocks */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.anim-fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scale X rule — used by section header lines, DrawLine */
+.anim-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.anim-rule.in-view {
+  transform: scaleX(1);
+}
+
+/* Text reveal — word slides up from overflow hidden container */
+.anim-word {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.anim-word.in-view {
+  transform: translateY(0);
+}
+
+/* Hero stagger — immediate on load, no scroll trigger needed */
+.hero-stagger > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.3s ease forwards;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.hero-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.hero-stagger > *:nth-child(3) { animation-delay: 0.13s; }
+.hero-stagger > *:nth-child(4) { animation-delay: 0.18s; }
+.hero-stagger > *:nth-child(5) { animation-delay: 0.23s; }
+.hero-stagger > *:nth-child(6) { animation-delay: 0.28s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* Pulse ring for status dot */
 @keyframes pulse-ring {

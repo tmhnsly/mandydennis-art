@@ -1,17 +1,8 @@
-import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { useInView } from "../hooks/useAnimateIn";
 
 export default function DrawLine() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
-
+  const { ref, isInView } = useInView(0.1);
   return (
-    <motion.div
-      ref={ref}
-      initial={{ scaleX: 0 }}
-      animate={isInView ? { scaleX: 1 } : {}}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="h-px bg-line origin-left"
-    />
+    <div ref={ref} className={`anim-rule h-px bg-line ${isInView ? "in-view" : ""}`} />
   );
 }

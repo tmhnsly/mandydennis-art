@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { useInView } from "../hooks/useAnimateIn";
 
 interface Props {
   children: string;
@@ -14,27 +13,21 @@ export default function TextReveal({
   as: Tag = "span",
   delay = 0,
 }: Props) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const { ref, isInView } = useInView(0.1);
 
   const words = children.split(" ");
 
   return (
-    <Tag ref={ref} className={className}>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <Tag ref={ref as any} className={className}>
       {words.map((word, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.1em]">
-          <motion.span
-            className="inline-block"
-            initial={{ y: "110%" }}
-            animate={isInView ? { y: 0 } : { y: "110%" }}
-            transition={{
-              duration: 0.4,
-              ease: [0.25, 1, 0.5, 1],
-              delay: delay + i * 0.04,
-            }}
+          <span
+            className={`anim-word ${isInView ? "in-view" : ""}`}
+            style={{ transitionDelay: `${delay + i * 0.04}s` }}
           >
             {word}
-          </motion.span>
+          </span>
           {i < words.length - 1 && <span>&nbsp;</span>}
         </span>
       ))}

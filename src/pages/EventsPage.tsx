@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getEvents } from "../lib/content";
-import { motion } from "motion/react";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import EventCard from "../components/EventCard";
@@ -54,7 +53,7 @@ export default function EventsPage() {
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
           <SectionHeader title="Events" />
 
-          <motion.div ref={bodyRef} initial={{ opacity: 0, y: 8 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.3 }} className="max-w-[700px]">
+          <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[700px]`}>
             {allEvents.length === 0 ? (
               <p className="text-text-muted py-8">
                 No events scheduled at the moment. Follow Mandy on Facebook for the latest updates.
@@ -84,7 +83,7 @@ export default function EventsPage() {
                 )}
               </>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
       <DrawLine />

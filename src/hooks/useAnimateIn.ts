@@ -1,8 +1,28 @@
-import { useRef } from "react";
-import { useInView } from "motion/react";
+import { useRef, useState, useEffect } from "react";
 
-export function useAnimateIn<T extends HTMLElement = HTMLDivElement>(threshold = 0.1) {
-  const ref = useRef<T>(null);
-  const isInView = useInView(ref, { once: true, amount: threshold });
+export function useInView(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
   return { ref, isInView };
+}
+
+export function useAnimateIn(threshold = 0.1) {
+  return useInView(threshold);
 }
