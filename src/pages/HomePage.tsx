@@ -32,7 +32,7 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax — direct DOM manipulation, no React re-renders
+  // Parallax — direct DOM, single getBoundingClientRect, translate3d for GPU
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -40,10 +40,13 @@ export default function HomePage() {
       ticking = true;
       requestAnimationFrame(() => {
         const el = heroRef.current;
-        if (el && el.getBoundingClientRect().bottom > 0) {
-          const y = -el.getBoundingClientRect().top * 0.12;
-          for (const img of parallaxImgs.current) {
-            img.style.transform = `scale(1.08) translateY(${y}px)`;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            const y = -rect.top * 0.12;
+            for (const img of parallaxImgs.current) {
+              if (img) img.style.transform = `scale(1.08) translate3d(0,${y}px,0)`;
+            }
           }
         }
         ticking = false;
@@ -55,9 +58,21 @@ export default function HomePage() {
 
   useEffect(() => {
     getArtwork().then((all) => {
-      setFeatured(all.filter((a) => a.featured));
+      const newFeatured = all.filter((a) => a.featured);
+      // Only update if data actually changed (avoids re-render with same cache data)
+      setFeatured((prev) =>
+        prev.length === newFeatured.length && prev.every((p, i) => p.slug === newFeatured[i]?.slug)
+          ? prev
+          : newFeatured
+      );
     });
-    getEvents().then(setEvents);
+    getEvents().then((newEvents) => {
+      setEvents((prev) =>
+        prev.length === newEvents.length && prev.every((p, i) => p.slug === newEvents[i]?.slug)
+          ? prev
+          : newEvents
+      );
+    });
   }, []);
 
   // Cycle hero — pauses when lightbox is open

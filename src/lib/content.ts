@@ -300,7 +300,9 @@ export function thumbnailUrl(image: Artwork["image"]): string {
 
 export function heroUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_FULL;
-  return urlFor(image).width(1920).auto("format").quality(90).url() || PLACEHOLDER_FULL;
+  // Responsive: smaller image on mobile saves bandwidth + decode time
+  const width = typeof window !== "undefined" && window.innerWidth < 768 ? 800 : 1920;
+  return urlFor(image).width(width).auto("format").quality(85).url() || PLACEHOLDER_FULL;
 }
 
 export function fullUrl(image: Artwork["image"]): string {
