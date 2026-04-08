@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, thumbnailUrl } from "../lib/content";
@@ -21,15 +21,37 @@ export default function HomePage() {
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [parallaxY, setParallaxY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
   const { ref: eventsRef, isInView: eventsInView } = useInView(0.1);
 
-  // Track lightbox state in ref so the cycle interval can read it
   lightboxOpen.current = lightboxIndex >= 0;
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
+
+  // Parallax scroll — image moves at 30% of scroll speed
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const el = heroRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setParallaxY(-rect.top * 0.3);
+          }
+        }
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     getArtwork().then((all) => {
@@ -67,7 +89,7 @@ export default function HomePage() {
   return (
     <>
       {/* Hero — background cycles through featured, text overlaid */}
-      <div className="relative overflow-hidden bg-surface">
+      <div ref={heroRef} className="relative overflow-hidden bg-surface">
         {/* Only show hero images if they have real Sanity images (not null/placeholder) */}
         {featured.some((item) => item.image !== null) && featured.map((item, i) => (
           item.image ? (
@@ -83,7 +105,8 @@ export default function HomePage() {
                 alt=""
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover scale-110 will-change-transform"
+                style={{ transform: `scale(1.1) translateY(${parallaxY}px)` } as CSSProperties}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
