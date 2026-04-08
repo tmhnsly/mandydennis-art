@@ -105,23 +105,15 @@ export default function HomePage() {
     <>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Hero images — only render active + neighbours to save GPU memory */}
-        {featured.some((item) => item.image !== null) && featured.map((item, i) => {
-          if (!item.image) return null;
-          const isActive = i === safeIndex;
-          const isAdjacent = featured.length > 1 && (
-            i === (safeIndex + 1) % featured.length ||
-            i === (safeIndex - 1 + featured.length) % featured.length
-          );
-          // Only render active slide and its neighbours
-          if (!isActive && !isAdjacent) return null;
-          return (
+        {/* Hero images — all rendered, only active is visible via opacity */}
+        {featured.map((item, i) => (
+          item.image ? (
             <div
               key={item.slug}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? "opacity-100" : "opacity-0"
+                i === safeIndex ? "opacity-100" : "opacity-0 pointer-events-none"
               }`}
-              aria-hidden={!isActive}
+              aria-hidden={i !== safeIndex}
             >
               <img
                 src={heroUrl(item.image)}
@@ -129,14 +121,14 @@ export default function HomePage() {
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className={`w-full h-full object-cover object-center ${isActive ? "will-change-transform" : ""}`}
+                className="w-full h-full object-cover object-center will-change-transform"
                 style={{ transform: "scale(1.08) translate3d(0,0,0)" }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
             </div>
-          );
-        })}
+          ) : null
+        ))}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
