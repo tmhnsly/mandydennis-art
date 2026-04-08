@@ -14,15 +14,16 @@ export default function EventsPage() {
   useEffect(() => { getEvents().then(setAllEvents); }, []);
 
   const now = new Date();
-  const toUTC = (d: string) => {
+  const toUTC = (d: string | null) => {
+    if (!d) return 0;
     const [y, m, dd] = d.split("-").map(Number);
     return Date.UTC(y, m - 1, dd);
   };
   const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  // Use endDate if multi-day (event isn't past until the last day passes)
   const eventEnd = (e: ArtEvent) => toUTC(e.endDate ?? e.startDate);
-  const upcoming = allEvents.filter((e) => eventEnd(e) >= todayUTC);
-  const past = allEvents
+  const eventsWithDates = allEvents.filter((e) => e.startDate);
+  const upcoming = eventsWithDates.filter((e) => eventEnd(e) >= todayUTC);
+  const past = eventsWithDates
     .filter((e) => eventEnd(e) < todayUTC)
     .sort((a, b) => toUTC(b.startDate) - toUTC(a.startDate));
 

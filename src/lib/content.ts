@@ -183,10 +183,10 @@ export function getEvents(): Promise<ArtEvent[]> {
   return cached("events", async () => {
     try {
       const results = await withTimeout(c.fetch(`
-        *[_type == "event"] | order(startDate asc) {
+        *[_type == "event"] | order(coalesce(startDate, date) asc) {
           "slug": slug.current,
           title,
-          startDate,
+          "startDate": coalesce(startDate, date),
           endDate,
           startTime,
           endTime,
@@ -195,7 +195,9 @@ export function getEvents(): Promise<ArtEvent[]> {
           link
         }
       `), 3000);
-      return results && results.length > 0 ? results : DUMMY_EVENTS;
+      if (!results || results.length === 0) return DUMMY_EVENTS;
+      // Filter out any events missing a date entirely
+      return results.filter((e: ArtEvent) => e.startDate);
     } catch {
       return DUMMY_EVENTS;
     }
