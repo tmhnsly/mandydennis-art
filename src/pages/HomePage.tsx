@@ -22,6 +22,7 @@ export default function HomePage() {
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
+  const [heroLoaded, setHeroLoaded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
@@ -82,7 +83,8 @@ export default function HomePage() {
               alt=""
               loading="eager"
               fetchPriority="high"
-              className={`w-full h-full object-cover transition-opacity duration-500 ${heroFading ? "opacity-0" : "opacity-100"}`}
+              onLoad={() => setHeroLoaded(true)}
+              className={`w-full h-full object-cover transition-opacity duration-700 ease-out ${heroFading || !heroLoaded ? "opacity-0" : "opacity-100"}`}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/80 to-bg/40" />
             <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />

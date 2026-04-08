@@ -21,7 +21,10 @@ export default function TextReveal({
     <Tag className={className}>
       <span ref={ref}>
         {words.map((word, i) => (
-          <span key={i} className="inline-block overflow-hidden pb-[0.1em] pr-[0.05em]">
+          <span
+            key={i}
+            className="inline-block overflow-hidden pb-[0.15em] mx-[-0.15em] px-[0.15em]"
+          >
             <span
               className={`anim-word ${isInView ? "in-view" : ""}`}
               style={{ transitionDelay: `${delay + i * 0.04}s` }}
