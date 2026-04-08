@@ -124,7 +124,7 @@ export default function HomePage() {
         })}
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-sm bg-bg/60 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+          <div className="hero-stagger max-w-xl backdrop-blur-[8px] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             <h1 className="mb-5">
               <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
               <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
