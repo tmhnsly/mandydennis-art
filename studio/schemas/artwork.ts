@@ -64,15 +64,16 @@ export default defineType({
       description: "What is this a picture of?",
       options: {
         list: [
-          { title: "Pets", value: "pets" },
+          { title: "Animals", value: "animals" },
           { title: "Dogs", value: "dogs" },
           { title: "Cats", value: "cats" },
           { title: "Horses", value: "horses" },
+          { title: "Birds", value: "birds" },
+          { title: "Wildlife", value: "wildlife" },
           { title: "People", value: "people" },
           { title: "Landscape", value: "landscape" },
           { title: "Seascapes", value: "seascapes" },
           { title: "Still Life", value: "still life" },
-          { title: "Wildlife", value: "wildlife" },
           { title: "Flowers", value: "flowers" },
           { title: "Buildings", value: "buildings" },
         ],
