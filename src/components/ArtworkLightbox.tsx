@@ -11,24 +11,14 @@ interface Props {
   onChange: (index: number) => void;
 }
 
+const supportsViewTransitions = typeof document !== "undefined" && "startViewTransition" in document;
+
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const touchStart = useRef<number | null>(null);
-  const [direction, setDirection] = useState(0); // -1 = left, 1 = right
-  const [isNavigating, setIsNavigating] = useState(false);
-
-  // Once lightbox is open and the initial layoutId animation has settled,
-  // switch to slide mode for prev/next
-  useEffect(() => {
-    if (isOpen) {
-      const timer = window.setTimeout(() => setIsNavigating(true), 500);
-      return () => clearTimeout(timer);
-    }
-    setIsNavigating(false);
-    setDirection(0);
-  }, [isOpen]);
+  const [direction, setDirection] = useState(0);
 
   const goPrev = useCallback(() => {
     if (items.length <= 1) return;
@@ -69,12 +59,14 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     touchStart.current = null;
   };
 
-  // Slide variants for navigating between images
+  // Slide variants for prev/next
   const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? 200 : -200, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -200 : 200, opacity: 0 }),
+    enter: (d: number) => ({ x: d > 0 ? 150 : -150, opacity: 0, scale: 0.95 }),
+    center: { x: 0, opacity: 1, scale: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -150 : 150, opacity: 0, scale: 0.95 }),
   };
+
+  const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
   return (
     <AnimatePresence>
@@ -91,11 +83,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
-            aria-label="Close"
-          >
+          <button onClick={onClose} className={`absolute top-4 right-4 z-10 ${btnClass}`} aria-label="Close">
             <FaTimes size={14} className="text-white/80" />
           </button>
 
@@ -103,44 +91,32 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {items.length > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); goPrev(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center transition-colors hidden sm:flex"
+              className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
               aria-label="Previous"
             >
               <FaChevronLeft size={14} className="text-white/80" />
             </button>
           )}
 
-          {/* Image */}
+          {/* Image + tags */}
           <div
-            className="relative max-w-[90vw] max-h-[85vh] flex flex-col items-center"
+            className="relative flex flex-col items-center px-14 sm:px-16 max-w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <AnimatePresence mode="popLayout" custom={direction}>
-              {isNavigating ? (
-                /* Slide transition for prev/next navigation */
-                <motion.img
-                  key={current.slug}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
-                  src={fullUrl(current.image)}
-                  alt={current.title}
-                  className="max-h-[78vh] max-w-[90vw] object-contain rounded-sm"
-                />
-              ) : (
-                /* layoutId spring for open/close from grid */
-                <motion.img
-                  key={current.slug}
-                  layoutId={`artwork-${current.slug}`}
-                  src={fullUrl(current.image)}
-                  alt={current.title}
-                  className="max-h-[78vh] max-w-[90vw] object-contain rounded-sm"
-                  transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
-                />
-              )}
+            <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+              <motion.img
+                key={current.slug}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                src={fullUrl(current.image)}
+                alt={current.title}
+                className="max-h-[78vh] max-w-full object-contain rounded-sm"
+                style={supportsViewTransitions ? { viewTransitionName: `artwork-${current.slug}` } : undefined}
+              />
             </AnimatePresence>
 
             {/* Tags */}
@@ -151,8 +127,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex justify-center gap-1.5 mt-4 flex-wrap px-4"
+                  transition={{ duration: 0.15 }}
+                  className="flex justify-center gap-1.5 mt-4 flex-wrap"
                 >
                   {tags.map((tag) => (
                     <span
@@ -171,7 +147,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {items.length > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); goNext(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center transition-colors hidden sm:flex"
+              className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
               aria-label="Next"
             >
               <FaChevronRight size={14} className="text-white/80" />

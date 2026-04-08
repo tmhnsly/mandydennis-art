@@ -164,6 +164,42 @@ body {
   to { opacity: 0; transform: translateY(16px); }
 }
 
+/* ---- View Transitions API ---- */
+
+/* Page route transitions */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(page-content) {
+  animation: vt-fade-out 0.2s ease forwards,
+             vt-slide-out 0.2s ease forwards;
+}
+
+::view-transition-new(page-content) {
+  animation: vt-fade-in 0.3s ease 0.1s both,
+             vt-slide-in 0.3s ease 0.1s both;
+}
+
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-slide-out { to { transform: translateY(8px); } }
+@keyframes vt-slide-in { from { transform: translateY(8px); } }
+
+/* Artwork image morph — the image smoothly morphs position/size */
+::view-transition-group(artwork-*) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Keep nav stable during transitions */
+::view-transition-group(nav-bar) {
+  animation: none;
+}
+
+/* Fallback: browsers without View Transitions get no animation (instant swap) */
+/* This is the accessible/performant fallback */
+
 /* Pulse ring for status dot */
 @keyframes pulse-ring {
   0% { transform: scale(0.8); opacity: 0.6; }

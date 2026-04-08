@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, flushSync } from "react";
 import { useLocation } from "react-router-dom";
 
 interface Props {
   children: React.ReactNode;
 }
 
-const EXIT_DURATION = 400; // ms — matches exit transition (0.35s + buffer)
+const supportsVT = typeof document !== "undefined" && "startViewTransition" in document;
 
 export default function PageTransition({ children }: Props) {
   const location = useLocation();
@@ -15,10 +15,9 @@ export default function PageTransition({ children }: Props) {
   const prevPath = useRef(location.pathname);
   const pendingChildren = useRef(children);
 
-  // Always keep latest children ref current
   pendingChildren.current = children;
 
-  const completeTransition = useCallback(() => {
+  const swapContent = useCallback(() => {
     setDisplayChildren(pendingChildren.current);
     setExiting(false);
     window.scrollTo(0, 0);
@@ -26,35 +25,41 @@ export default function PageTransition({ children }: Props) {
 
   useEffect(() => {
     if (location.pathname === prevPath.current) {
-      // Same route, just update children (e.g. data loaded)
       setDisplayChildren(children);
       return;
     }
-
     prevPath.current = location.pathname;
-    setExiting(true);
 
-    // Wait for exit animations to play, then swap
-    const el = containerRef.current;
-    if (!el) {
-      completeTransition();
-      return;
+    if (supportsVT) {
+      // Use View Transitions API — browser handles the animation
+      // eslint-disable-next-line
+      (document as Document & { startViewTransition: (cb: () => void) => void })
+        .startViewTransition(() => {
+          flushSync(() => {
+            setDisplayChildren(pendingChildren.current);
+            window.scrollTo(0, 0);
+          });
+        });
+    } else {
+      // Fallback: CSS class-based exit then swap
+      setExiting(true);
+      const el = containerRef.current;
+      if (!el) { swapContent(); return; }
+
+      const onEnd = () => { swapContent(); el.removeEventListener("transitionend", onEnd); };
+      el.addEventListener("transitionend", onEnd, { once: true });
+
+      const fallback = window.setTimeout(swapContent, 400);
+      return () => clearTimeout(fallback);
     }
-
-    const onEnd = () => {
-      completeTransition();
-      el.removeEventListener("transitionend", onEnd);
-    };
-
-    el.addEventListener("transitionend", onEnd, { once: true });
-
-    // Safety: if transitionend doesn't fire (no animated elements visible)
-    const fallback = setTimeout(completeTransition, EXIT_DURATION);
-    return () => clearTimeout(fallback);
-  }, [location.pathname, children, completeTransition]);
+  }, [location.pathname, children, swapContent]);
 
   return (
-    <div ref={containerRef} className={exiting ? "page-exit" : ""}>
+    <div
+      ref={containerRef}
+      className={exiting ? "page-exit" : ""}
+      style={supportsVT ? { viewTransitionName: "page-content" } : undefined}
+    >
       {displayChildren}
     </div>
   );
