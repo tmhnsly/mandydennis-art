@@ -205,13 +205,23 @@ export async function getAbout(): Promise<AboutPage> {
 // --- Image helpers ---
 
 // Inline SVG placeholder — no network request, matches the warm palette
-const placeholderSvg = (w: number, h: number) =>
-  `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect fill="%23f0e8e2" width="${w}" height="${h}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="14" fill="%23b0a096">Artwork</text></svg>`
-  )}`;
+const PLACEHOLDER_THUMB = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">' +
+  '<rect fill="#f0e8e2" width="600" height="400"/>' +
+  '<circle cx="300" cy="175" r="30" fill="none" stroke="#c8b8ad" stroke-width="1.5"/>' +
+  '<path d="M288 175 L296 185 L312 165" fill="none" stroke="#c8b8ad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '<text x="300" y="230" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="500" letter-spacing="0.1em" fill="#b0a096">ARTWORK</text>' +
+  '</svg>'
+)}`;
 
-const PLACEHOLDER_THUMB = placeholderSvg(600, 400);
-const PLACEHOLDER_FULL = placeholderSvg(1600, 1200);
+const PLACEHOLDER_FULL = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">' +
+  '<rect fill="#f0e8e2" width="1600" height="1200"/>' +
+  '<circle cx="800" cy="560" r="40" fill="none" stroke="#c8b8ad" stroke-width="1.5"/>' +
+  '<path d="M784 560 L796 574 L816 548" fill="none" stroke="#c8b8ad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '<text x="800" y="630" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="500" letter-spacing="0.1em" fill="#b0a096">ARTWORK</text>' +
+  '</svg>'
+)}`;
 
 export function thumbnailUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_THUMB;
