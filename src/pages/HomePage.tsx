@@ -54,8 +54,6 @@ export default function HomePage() {
 
   // Hero cycles through featured images
   const safeIndex = featured.length > 0 ? heroIndex % featured.length : 0;
-  const heroImage = featured.length > 0 ? featured[safeIndex] : allArtwork[0];
-
   // Upcoming events
   const now = new Date();
   const toUTC = (d: string | null) => {
