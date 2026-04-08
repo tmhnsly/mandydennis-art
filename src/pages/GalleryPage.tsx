@@ -35,6 +35,10 @@ export default function GalleryPage() {
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
+    document.title = "Gallery — Mandy Dennis Art";
+  }, []);
+
+  useEffect(() => {
     getArtwork().then((data) => {
       setAllArtwork(data);
       setLoading(false);
@@ -64,7 +68,7 @@ export default function GalleryPage() {
     setShowCount(PAGE_SIZE);
   };
 
-  const lightboxSlides = filtered.map((item) => ({
+  const lightboxSlides = visible.map((item) => ({
     src: fullUrl(item.image),
     alt: item.title,
     title: item.title,

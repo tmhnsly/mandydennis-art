@@ -13,6 +13,10 @@ export default function EventsPage() {
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
+    document.title = "Events — Mandy Dennis Art";
+  }, []);
+
+  useEffect(() => {
     getEvents().then((data) => {
       setAllEvents(data);
       setLoading(false);
@@ -20,10 +24,15 @@ export default function EventsPage() {
   }, []);
 
   const now = new Date();
-  const upcoming = allEvents.filter((e) => new Date(e.date) >= now);
+  const eventDate = (d: string) => {
+    const [y, m, dd] = d.split("-").map(Number);
+    return Date.UTC(y, m - 1, dd);
+  };
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const upcoming = allEvents.filter((e) => eventDate(e.date) >= todayUTC);
   const past = allEvents
-    .filter((e) => new Date(e.date) < now)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .filter((e) => eventDate(e.date) < todayUTC)
+    .sort((a, b) => eventDate(b.date) - eventDate(a.date));
 
   if (loading) {
     return (

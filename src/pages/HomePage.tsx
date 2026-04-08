@@ -23,6 +23,10 @@ export default function HomePage() {
   const featuredInView = useInView(featuredRef, { once: true, amount: 0.1 });
 
   useEffect(() => {
+    document.title = "Mandy Dennis Art";
+  }, []);
+
+  useEffect(() => {
     getArtwork().then((all) => {
       setAllArtwork(all);
       setFeatured(all.filter((a) => a.featured));

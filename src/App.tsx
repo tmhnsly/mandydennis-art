@@ -5,6 +5,7 @@ import GalleryPage from "./pages/GalleryPage";
 import AboutPage from "./pages/AboutPage";
 import EventsPage from "./pages/EventsPage";
 import HomePage from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/commissions" element={<CommissionsPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Layout>
   );

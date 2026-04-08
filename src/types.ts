@@ -1,6 +1,7 @@
+import type { SanityImageSource } from "@sanity/image-url";
+
 // Sanity image reference object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SanityImage = any;
+export type SanityImage = SanityImageSource | null;
 
 export interface Artwork {
   slug: string;

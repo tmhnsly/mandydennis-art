@@ -15,6 +15,10 @@ export default function CommissionsPage() {
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
+    document.title = "Commissions — Mandy Dennis Art";
+  }, []);
+
+  useEffect(() => {
     getCommissions().then(setCommissions);
   }, []);
 

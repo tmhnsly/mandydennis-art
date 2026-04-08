@@ -6,9 +6,10 @@ interface Props {
 }
 
 export default function EventCard({ event, isPast }: Props) {
-  const date = new Date(event.date);
-  const day = date.getDate();
-  const month = date.toLocaleDateString("en-GB", { month: "short" });
+  const [year, month, dayNum] = event.date.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, dayNum));
+  const day = date.getUTCDate();
+  const monthStr = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
 
   return (
     <div
@@ -21,7 +22,7 @@ export default function EventCard({ event, isPast }: Props) {
           {day}
         </div>
         <div className="text-[0.58rem] tracking-widest uppercase text-text-subtle font-medium mt-0.5">
-          {month}
+          {monthStr}
         </div>
       </div>
 

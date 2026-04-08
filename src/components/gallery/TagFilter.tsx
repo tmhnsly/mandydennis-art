@@ -26,22 +26,25 @@ export default function TagFilter({
       {showFeatured && onToggleFeatured && (
         <button
           onClick={onToggleFeatured}
+          aria-pressed={featuredActive}
+          aria-label="Show featured artwork only"
           className={`${TAG_BASE} ${
             featuredActive
               ? "bg-text border-text text-bg"
               : "border-line-strong text-text-muted hover:border-text hover:text-text"
           }`}
         >
-          <FaStar size={13} />
+          <FaStar size={13} aria-hidden="true" />
           Featured
         </button>
       )}
       {activeTags.length > 0 && (
         <button
           onClick={onClear}
+          aria-label="Clear all filters"
           className={`${TAG_BASE} bg-text border-text text-bg`}
         >
-          <FaTimes size={13} />
+          <FaTimes size={13} aria-hidden="true" />
           Clear
         </button>
       )}
@@ -51,6 +54,7 @@ export default function TagFilter({
           <button
             key={tag}
             onClick={() => onToggle(tag)}
+            aria-pressed={isActive}
             className={`${TAG_BASE} capitalize ${
               isActive
                 ? "bg-text border-text text-bg"

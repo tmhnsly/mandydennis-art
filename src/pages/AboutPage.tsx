@@ -14,6 +14,10 @@ export default function AboutPage() {
   const { ref: bodyRef, isInView } = useAnimateIn();
 
   useEffect(() => {
+    document.title = "About — Mandy Dennis Art";
+  }, []);
+
+  useEffect(() => {
     getAbout().then(setAbout);
   }, []);
 
@@ -38,21 +42,27 @@ export default function AboutPage() {
 
           <div>
             <div className="text-base text-text-mid leading-[1.8] space-y-4 max-w-[65ch]">
-              <p>
-                Mandy Dennis is a self-taught artist whose work is extremely varied, including
-                pet portraiture, wildlife, seascapes and still life. Her medium is predominantly
-                soft pastels or watercolours.
-              </p>
-              <p>
-                Born in a British Military Hospital in Germany where her father was serving as a
-                soldier, she has also lived in Hong Kong and Brunei — experiences which enriched
-                her passion for arts and culture.
-              </p>
-              <p>
-                As a child, Mandy could be found at family gatherings scribbling a portrait of
-                the lucky person opposite. Her favourite lessons at school were always art, drama
-                &amp; music.
-              </p>
+              {about.bio ? (
+                about.bio.split(/\n\n+/).map((para, i) => <p key={i}>{para}</p>)
+              ) : (
+                <>
+                  <p>
+                    Mandy Dennis is a self-taught artist whose work is extremely varied, including
+                    pet portraiture, wildlife, seascapes and still life. Her medium is predominantly
+                    soft pastels or watercolours.
+                  </p>
+                  <p>
+                    Born in a British Military Hospital in Germany where her father was serving as a
+                    soldier, she has also lived in Hong Kong and Brunei — experiences which enriched
+                    her passion for arts and culture.
+                  </p>
+                  <p>
+                    As a child, Mandy could be found at family gatherings scribbling a portrait of
+                    the lucky person opposite. Her favourite lessons at school were always art, drama
+                    &amp; music.
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="mt-7 pt-5 border-t border-line flex gap-10 flex-wrap">

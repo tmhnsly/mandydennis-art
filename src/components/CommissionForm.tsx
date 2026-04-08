@@ -1,14 +1,33 @@
 import { useRef, useState } from "react";
 import { FaCommentDots, FaImage, FaTimes } from "react-icons/fa";
+import { useSiteSettings } from "../context/SiteSettings";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
 const MAX_SIZE_MB = 10;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
+type FormStatus = "idle" | "sending" | "sent" | "error";
+
 export default function CommissionForm() {
+  const settings = useSiteSettings();
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus("sending");
+    try {
+      const form = e.currentTarget;
+      const data = new FormData(form);
+      const res = await fetch("/", { method: "POST", body: data });
+      if (!res.ok) throw new Error("Submit failed");
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,6 +57,22 @@ export default function CommissionForm() {
     setFileError(null);
   };
 
+  if (status === "sent") {
+    return (
+      <div className="space-y-4">
+        <p className="text-text-mid text-sm">Thanks! Mandy will be in touch.</p>
+        {settings.contact_email && (
+          <p className="text-text-subtle text-xs">
+            You can also reach Mandy at{" "}
+            <a href={`mailto:${settings.contact_email}`} className="underline">
+              {settings.contact_email}
+            </a>
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <form
       name="commission-enquiry"
@@ -46,6 +81,7 @@ export default function CommissionForm() {
       netlify-honeypot="bot-field"
       encType="multipart/form-data"
       className="space-y-5"
+      onSubmit={handleSubmit}
     >
       <input type="hidden" name="form-name" value="commission-enquiry" />
       <p className="hidden">
@@ -143,12 +179,23 @@ export default function CommissionForm() {
         <p className="text-xs text-text-subtle mt-1">JPEG, PNG, WebP, GIF or HEIC. Max {MAX_SIZE_MB}MB.</p>
       </div>
 
+      {status === "error" && (
+        <p className="text-sm text-red-600">
+          Something went wrong. Please try again
+          {settings.contact_email && (
+            <> or email <a href={`mailto:${settings.contact_email}`} className="underline">{settings.contact_email}</a></>
+          )}
+          .
+        </p>
+      )}
+
       <button
         type="submit"
-        className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity"
+        disabled={status === "sending"}
+        className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity disabled:opacity-50"
       >
         <FaCommentDots size={14} />
-        Send Enquiry
+        {status === "sending" ? "Sending..." : "Send Enquiry"}
       </button>
     </form>
   );
