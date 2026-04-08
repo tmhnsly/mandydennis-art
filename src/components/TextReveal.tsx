@@ -13,24 +13,25 @@ export default function TextReveal({
   as: Tag = "span",
   delay = 0,
 }: Props) {
-  const { ref, isInView } = useInView(0.1);
+  const { ref, isInView } = useInView<HTMLSpanElement>(0.1);
 
   const words = children.split(" ");
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Tag ref={ref as any} className={className}>
-      {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden pb-[0.1em]">
-          <span
-            className={`anim-word ${isInView ? "in-view" : ""}`}
-            style={{ transitionDelay: `${delay + i * 0.04}s` }}
-          >
-            {word}
+    <Tag className={className}>
+      <span ref={ref}>
+        {words.map((word, i) => (
+          <span key={i} className="inline-block overflow-hidden pb-[0.1em]">
+            <span
+              className={`anim-word ${isInView ? "in-view" : ""}`}
+              style={{ transitionDelay: `${delay + i * 0.04}s` }}
+            >
+              {word}
+            </span>
+            {i < words.length - 1 && <span>&nbsp;</span>}
           </span>
-          {i < words.length - 1 && <span>&nbsp;</span>}
-        </span>
-      ))}
+        ))}
+      </span>
     </Tag>
   );
 }

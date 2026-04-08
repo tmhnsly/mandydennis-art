@@ -24,8 +24,9 @@ const nullBuilder = {
   url: () => "",
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function urlFor(source: any) {
+import type { SanityImage } from "../types";
+
+export function urlFor(source: SanityImage) {
   if (!builder || !source) return nullBuilder;
   return builder.image(source);
 }
