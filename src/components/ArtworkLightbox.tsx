@@ -117,8 +117,18 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           <div className="absolute inset-y-0 right-0 w-12 z-10 cursor-pointer" onClick={onClose} />
 
           {/* Bottom controls */}
+          {/* Bottom bar — tags left, controls right */}
           <div className="absolute bottom-0 left-0 right-0 z-20">
-            <div className="max-w-[1400px] mx-auto flex items-center gap-3 px-4 py-4">
+            <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3 px-4 py-4">
+              {tags.length > 0 ? (
+                <div className="flex gap-1.5 flex-wrap flex-1">
+                  {tags.map((tag) => (
+                    <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : <div />}
               {canNav && (
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button onClick={goPrev} className={btnClass} aria-label="Previous">
@@ -130,15 +140,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
                   <button onClick={goNext} className={btnClass} aria-label="Next">
                     <FaChevronRight size={12} className="text-white/70" />
                   </button>
-                </div>
-              )}
-              {tags.length > 0 && (
-                <div className="flex gap-1.5 flex-wrap flex-1">
-                  {tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
-                      {tag}
-                    </span>
-                  ))}
                 </div>
               )}
             </div>

@@ -22,6 +22,7 @@ export default function HomePage() {
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [parallaxY, setParallaxY] = useState(0);
+  const parallaxActive = useRef(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
@@ -32,24 +33,19 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax scroll — image moves at 30% of scroll speed
+  // Parallax scroll — only activates after first scroll to prevent jump on load
   useEffect(() => {
-    const calcParallax = () => {
-      const el = heroRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.bottom > 0) setParallaxY(-rect.top * 0.3);
-    };
-
-    // Set initial value immediately so there's no jump
-    calcParallax();
-
     let ticking = false;
     const handleScroll = () => {
+      parallaxActive.current = true;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        calcParallax();
+        const el = heroRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.bottom > 0) setParallaxY(-rect.top * 0.3);
+        }
         ticking = false;
       });
     };
