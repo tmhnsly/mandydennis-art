@@ -1,4 +1,3 @@
-import { motion } from "motion/react";
 import type { Artwork } from "../../types";
 import { thumbnailUrl } from "../../lib/content";
 
@@ -24,11 +23,10 @@ export default function GalleryGrid({ items, onSelect }: Props) {
           onClick={() => onSelect(i)}
           className="block w-full break-inside-avoid mb-[3px] relative overflow-hidden cursor-pointer group text-left"
         >
-          <motion.img
-            layoutId={`artwork-${item.slug}`}
+          <img
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-auto block"
+            className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.78)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-4">

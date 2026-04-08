@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useEffect, useCallback, useState } from "react";
+import { motion, AnimatePresence, type PanInfo } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl, thumbnailUrl } from "../lib/content";
 import type { Artwork } from "../types";
@@ -15,31 +15,17 @@ function wrap(i: number, len: number) {
   return ((i % len) + len) % len;
 }
 
-const spring = { type: "spring" as const, stiffness: 300, damping: 30, mass: 0.8 };
+const SWIPE_THRESHOLD = 50;
 
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
-  const touchStart = useRef<number | null>(null);
   const [direction, setDirection] = useState(0);
-  const [isNavigating, setIsNavigating] = useState(false);
 
   const canNav = items.length > 1;
   const prevItem = canNav ? items[wrap(index - 1, items.length)] : null;
   const nextItem = canNav ? items[wrap(index + 1, items.length)] : null;
-
-  // After opening animation settles, switch to slide mode for nav
-  useEffect(() => {
-    if (isOpen) {
-      const id = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setIsNavigating(true));
-      });
-      return () => cancelAnimationFrame(id);
-    }
-    setIsNavigating(false);
-    setDirection(0);
-  }, [isOpen]);
 
   const goPrev = useCallback(() => {
     if (!canNav) return;
@@ -68,20 +54,15 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart.current === null) return;
-    const diff = e.changedTouches[0].clientX - touchStart.current;
-    if (Math.abs(diff) > 50) diff > 0 ? goPrev() : goNext();
-    touchStart.current = null;
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    if (info.offset.x > SWIPE_THRESHOLD) goPrev();
+    else if (info.offset.x < -SWIPE_THRESHOLD) goNext();
   };
 
   const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? "60%" : "-60%", opacity: 0.5, scale: 0.92 }),
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit: (d: number) => ({ x: d > 0 ? "-60%" : "60%", opacity: 0.5, scale: 0.92 }),
+    enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -300 : 300, opacity: 0 }),
   };
 
   const btnClass = "w-10 h-10 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
@@ -97,55 +78,54 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
           onClick={onClose}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
           <div className="absolute top-4 right-4 z-20">
-            <button onClick={onClose} className={btnClass} aria-label="Close">
+            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={btnClass} aria-label="Close">
               <FaTimes size={13} className="text-white/80" />
             </button>
           </div>
 
           {/* Image area */}
-          <div className="flex-1 flex items-center justify-center relative overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
             {/* Peek prev */}
             {prevItem && (
               <button
                 onClick={(e) => { e.stopPropagation(); goPrev(); }}
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 flex items-center justify-start pl-2 cursor-pointer group"
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 cursor-pointer group"
                 aria-label="Previous"
               >
                 <img src={thumbnailUrl(prevItem.image)} alt="" className="h-full w-full object-cover rounded-sm opacity-20 group-hover:opacity-35 transition-opacity" />
               </button>
             )}
 
-            {/* Main image */}
-            <div className="relative z-10 px-[10%] sm:px-[14%] max-w-full">
+            {/* Main image — draggable for swipe */}
+            <div className="relative z-10 px-[10%] sm:px-[14%] max-w-full" onClick={(e) => e.stopPropagation()}>
               <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-                {isNavigating ? (
+                <motion.div
+                  key={current.slug}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                  drag={canNav ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.15}
+                  onDragEnd={handleDragEnd}
+                  className="cursor-grab active:cursor-grabbing"
+                >
                   <motion.img
-                    key={current.slug}
-                    custom={direction}
-                    variants={slideVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                     src={fullUrl(current.image)}
                     alt={current.title}
-                    className="max-h-[70vh] max-w-full object-contain rounded-sm"
+                    className="max-h-[70vh] max-w-full object-contain rounded-sm select-none pointer-events-none"
+                    draggable={false}
                   />
-                ) : (
-                  <motion.img
-                    key={current.slug}
-                    layoutId={`artwork-${current.slug}`}
-                    src={fullUrl(current.image)}
-                    alt={current.title}
-                    className="max-h-[70vh] max-w-full object-contain rounded-sm"
-                    transition={spring}
-                  />
-                )}
+                </motion.div>
               </AnimatePresence>
             </div>
 
@@ -153,7 +133,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
             {nextItem && (
               <button
                 onClick={(e) => { e.stopPropagation(); goNext(); }}
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 flex items-center justify-end pr-2 cursor-pointer group"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-[8%] sm:w-[12%] h-[60%] z-10 cursor-pointer group"
                 aria-label="Next"
               >
                 <img src={thumbnailUrl(nextItem.image)} alt="" className="h-full w-full object-cover rounded-sm opacity-20 group-hover:opacity-35 transition-opacity" />
