@@ -146,15 +146,15 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {/* Click backdrop (above/below image) to close */}
 
           {/* Bottom bar — tags left, controls right */}
-          <div className="absolute bottom-0 left-0 right-0 z-20">
+          <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
             <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
               {tags.length > 0 ? (
-                <div className="flex gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
+                <div className="flex gap-1.5 flex-wrap flex-1 pointer-events-auto">
                   {tags.map((tag) => (
                     <button
                       key={tag}
                       onClick={() => { onClose(); navigate(`/gallery?tag=${encodeURIComponent(tag)}`); }}
-                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer whitespace-nowrap flex-shrink-0"
+                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
                     >
                       {tag}
                     </button>
