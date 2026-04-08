@@ -128,9 +128,10 @@ function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
 
 export function getArtwork(): Promise<Artwork[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_ARTWORK);
+  const c = client;
   return cached("artwork", async () => {
     try {
-      const results = await withTimeout(client.fetch(`
+      const results = await withTimeout(c.fetch(`
       *[_type == "artwork"] | order(date desc) {
         "slug": slug.current,
         title,
@@ -158,9 +159,10 @@ export function getArtwork(): Promise<Artwork[]> {
 
 export function getEvents(): Promise<ArtEvent[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_EVENTS);
+  const c = client;
   return cached("events", async () => {
     try {
-      const results = await withTimeout(client.fetch(`
+      const results = await withTimeout(c.fetch(`
         *[_type == "event"] | order(date asc) {
           "slug": slug.current,
           title,
@@ -179,9 +181,10 @@ export function getEvents(): Promise<ArtEvent[]> {
 
 export function getCommissions(): Promise<CommissionCategory[]> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_COMMISSIONS);
+  const c = client;
   return cached("commissions", async () => {
     try {
-      const results = await withTimeout(client.fetch(`
+      const results = await withTimeout(c.fetch(`
         *[_type == "commissionCategory"] | order(title asc) {
           "slug": slug.current,
           title,
@@ -200,9 +203,10 @@ export function getCommissions(): Promise<CommissionCategory[]> {
 
 export function getSettings(): Promise<SiteSettings> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_SETTINGS);
+  const c = client;
   return cached("settings", async () => {
     try {
-      const result = await withTimeout(client.fetch(`
+      const result = await withTimeout(c.fetch(`
         *[_type == "siteSettings"][0] {
           tagline,
           contact_email,
@@ -220,9 +224,10 @@ export function getSettings(): Promise<SiteSettings> {
 
 export function getAbout(): Promise<AboutPage> {
   if (!isConfigured || !client) return Promise.resolve(DUMMY_ABOUT);
+  const c = client;
   return cached("about", async () => {
     try {
-      const result = await withTimeout(client.fetch(`
+      const result = await withTimeout(c.fetch(`
         *[_type == "about"][0] {
           bio,
         photo
