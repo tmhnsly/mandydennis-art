@@ -1,7 +1,6 @@
-import Lightbox, { type Slide } from "yet-another-react-lightbox";
-import Captions from "yet-another-react-lightbox/plugins/captions";
+import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
-import "yet-another-react-lightbox/plugins/captions.css";
+import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
 
@@ -13,68 +12,62 @@ interface Props {
 }
 
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
-  const slides: Slide[] = items.map((item) => ({
+  const current = index >= 0 && index < items.length ? items[index] : null;
+  const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
+
+  const slides = items.map((item) => ({
     src: fullUrl(item.image),
     alt: item.title,
-    title: item.title,
-    description: [
-      item.description,
-      [...(item.medium ?? []), ...(item.subject ?? [])].map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" · "),
-    ]
-      .filter(Boolean)
-      .join("\n"),
   }));
 
   return (
-    <Lightbox
-      open={index >= 0}
-      index={index}
-      close={onClose}
-      on={{ view: ({ index: i }) => onChange(i) }}
-      slides={slides}
-      plugins={[Captions]}
-      captions={{ descriptionTextAlign: "center", descriptionMaxLines: 3 }}
-      carousel={{ finite: items.length <= 1 }}
-      animation={{ swipe: 200 }}
-      controller={{ closeOnBackdropClick: true }}
-      styles={{
-        container: { backgroundColor: "rgba(0,0,0,0.94)" },
-        captionsTitle: {
-          fontFamily: "var(--font-display)",
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          letterSpacing: "-0.02em",
-        },
-        captionsTitleContainer: {
-          background: "none",
-          paddingBottom: 0,
-        },
-        captionsDescription: {
-          fontFamily: "var(--font-body)",
-          fontSize: "0.8rem",
-          color: "rgba(255,255,255,0.55)",
-          letterSpacing: "0.02em",
-        },
-        captionsDescriptionContainer: {
-          background: "none",
-          paddingTop: "0.35rem",
-        },
-        navigationPrev: {
-          color: "rgba(255,255,255,0.6)",
-        },
-        navigationNext: {
-          color: "rgba(255,255,255,0.6)",
-        },
-        button: {
-          color: "rgba(255,255,255,0.6)",
-          filter: "none",
-        },
-      }}
-      render={{
-        iconPrev: () => <span className="font-display text-2xl">‹</span>,
-        iconNext: () => <span className="font-display text-2xl">›</span>,
-        iconClose: () => <span className="font-display text-xl">✕</span>,
-      }}
-    />
+    <>
+      <Lightbox
+        open={index >= 0}
+        index={index}
+        close={onClose}
+        on={{ view: ({ index: i }) => onChange(i) }}
+        slides={slides}
+        carousel={{ finite: items.length <= 1 }}
+        animation={{ swipe: 200 }}
+        controller={{ closeOnBackdropClick: true }}
+        styles={{
+          container: { backgroundColor: "rgba(0,0,0,0.95)" },
+          button: { filter: "none" },
+          navigationPrev: { display: items.length <= 1 ? "none" : undefined },
+          navigationNext: { display: items.length <= 1 ? "none" : undefined },
+        }}
+        render={{
+          iconPrev: () => (
+            <div className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+              <FaChevronLeft size={14} className="text-white/80" />
+            </div>
+          ),
+          iconNext: () => (
+            <div className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+              <FaChevronRight size={14} className="text-white/80" />
+            </div>
+          ),
+          iconClose: () => (
+            <div className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+              <FaTimes size={14} className="text-white/80" />
+            </div>
+          ),
+          slideFooter: () =>
+            tags.length > 0 ? (
+              <div className="flex justify-center gap-1.5 pb-6 pt-3 flex-wrap px-4">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 rounded-full text-[0.65rem] tracking-wide uppercase text-white/60 border border-white/15 bg-white/5"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : null,
+        }}
+      />
+    </>
   );
 }

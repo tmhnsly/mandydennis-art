@@ -10,7 +10,7 @@ interface Props {
   onToggleFeatured?: () => void;
 }
 
-const TAG_BASE = "inline-flex items-center justify-center gap-1.5 min-h-11 px-4 text-[0.8rem] font-medium border transition-colors";
+const TAG_BASE = "inline-flex items-center justify-center gap-1.5 min-h-11 px-5 rounded-full text-[0.78rem] font-medium border transition-colors";
 
 export default function TagFilter({
   availableTags,

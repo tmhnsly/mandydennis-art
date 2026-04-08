@@ -31,7 +31,7 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
               {[...(item.medium ?? []), ...(item.subject ?? [])].map((tag) => (
                 <span
                   key={tag}
-                  className="text-[0.6rem] tracking-wide uppercase text-white/65 px-1.5 py-0.5 border border-white/20"
+                  className="px-2.5 py-0.5 rounded-full text-[0.6rem] tracking-wide uppercase text-white/65 border border-white/15 bg-white/5"
                 >
                   {tag}
                 </span>
