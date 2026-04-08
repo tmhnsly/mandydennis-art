@@ -11,8 +11,6 @@ interface Props {
   onChange: (index: number) => void;
 }
 
-const supportsViewTransitions = typeof document !== "undefined" && "startViewTransition" in document;
-
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
@@ -59,102 +57,91 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     touchStart.current = null;
   };
 
-  // Slide variants for prev/next
   const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? 150 : -150, opacity: 0, scale: 0.95 }),
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -150 : 150, opacity: 0, scale: 0.95 }),
+    enter: (d: number) => ({ x: d > 0 ? 120 : -120, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -120 : 120, opacity: 0 }),
   };
+
+  if (!isOpen || !current) return null;
 
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
   return (
-    <AnimatePresence>
-      {isOpen && current && (
-        <motion.div
-          key="lightbox-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
-          onClick={onClose}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+    <div
+      className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
+      onClick={onClose}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Close */}
+      <button onClick={onClose} className={`absolute top-4 right-4 z-10 ${btnClass}`} aria-label="Close">
+        <FaTimes size={14} className="text-white/80" />
+      </button>
+
+      {/* Prev */}
+      {items.length > 1 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); goPrev(); }}
+          className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
+          aria-label="Previous"
         >
-          {/* Close */}
-          <button onClick={onClose} className={`absolute top-4 right-4 z-10 ${btnClass}`} aria-label="Close">
-            <FaTimes size={14} className="text-white/80" />
-          </button>
-
-          {/* Prev */}
-          {items.length > 1 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goPrev(); }}
-              className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
-              aria-label="Previous"
-            >
-              <FaChevronLeft size={14} className="text-white/80" />
-            </button>
-          )}
-
-          {/* Image + tags */}
-          <div
-            className="relative flex flex-col items-center px-14 sm:px-16 max-w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-              <motion.img
-                key={current.slug}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                src={fullUrl(current.image)}
-                alt={current.title}
-                className="max-h-[78vh] max-w-full object-contain rounded-sm"
-                style={supportsViewTransitions ? { viewTransitionName: `artwork-${current.slug}` } : undefined}
-              />
-            </AnimatePresence>
-
-            {/* Tags */}
-            <AnimatePresence mode="wait">
-              {tags.length > 0 && (
-                <motion.div
-                  key={current.slug + "-tags"}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex justify-center gap-1.5 mt-4 flex-wrap"
-                >
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/60 border border-white/10 bg-white/5 backdrop-blur-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Next */}
-          {items.length > 1 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goNext(); }}
-              className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
-              aria-label="Next"
-            >
-              <FaChevronRight size={14} className="text-white/80" />
-            </button>
-          )}
-        </motion.div>
+          <FaChevronLeft size={14} className="text-white/80" />
+        </button>
       )}
-    </AnimatePresence>
+
+      {/* Image */}
+      <div className="relative flex flex-col items-center px-14 sm:px-16 max-w-full" onClick={(e) => e.stopPropagation()}>
+        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+          <motion.img
+            key={current.slug}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+            src={fullUrl(current.image)}
+            alt={current.title}
+            className="max-h-[78vh] max-w-full object-contain rounded-sm"
+            style={{ viewTransitionName: `artwork-${current.slug}` }}
+          />
+        </AnimatePresence>
+
+        {/* Tags */}
+        <AnimatePresence mode="wait">
+          {tags.length > 0 && (
+            <motion.div
+              key={current.slug + "-tags"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex justify-center gap-1.5 mt-4 flex-wrap"
+            >
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/60 border border-white/10 bg-white/5 backdrop-blur-sm"
+                >
+                  {tag}
+                </span>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Next */}
+      {items.length > 1 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); goNext(); }}
+          className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 ${btnClass}`}
+          aria-label="Next"
+        >
+          <FaChevronRight size={14} className="text-white/80" />
+        </button>
+      )}
+    </div>
   );
 }
