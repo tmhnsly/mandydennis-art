@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, thumbnailUrl } from "../lib/content";
@@ -21,12 +21,15 @@ export default function HomePage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
-  const [heroFading, setHeroFading] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
   const { ref: eventsRef, isInView: eventsInView } = useInView(0.1);
+
+  // Track lightbox state in ref so the cycle interval can read it
+  lightboxOpen.current = lightboxIndex >= 0;
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
@@ -38,17 +41,10 @@ export default function HomePage() {
     getEvents().then(setEvents);
   }, []);
 
+  // Cycle hero — pauses when lightbox is open
   const cycleHero = useCallback(() => {
-    if (featured.length <= 1) return;
-    setHeroFading(true);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.setTimeout(() => {
-          setHeroIndex((i) => (i + 1) % featured.length);
-          setHeroFading(false);
-        }, 400);
-      });
-    });
+    if (featured.length <= 1 || lightboxOpen.current) return;
+    setHeroIndex((i) => (i + 1) % featured.length);
   }, [featured.length]);
 
   useEffect(() => {
@@ -57,10 +53,11 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [featured.length, cycleHero]);
 
-  const heroImage = featured.length > 0 ? featured[heroIndex % featured.length] : allArtwork[0];
-  const gridItems = featured.filter((_, i) => i !== heroIndex % featured.length);
+  // Hero cycles through featured images
+  const safeIndex = featured.length > 0 ? heroIndex % featured.length : 0;
+  const heroImage = featured.length > 0 ? featured[safeIndex] : allArtwork[0];
 
-  // Upcoming events only
+  // Upcoming events
   const now = new Date();
   const toUTC = (d: string | null) => {
     if (!d) return 0;
@@ -74,18 +71,34 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — background cycles through featured, text overlaid */}
       <div className="relative overflow-hidden">
-        {heroImage && (
-          <div className="absolute inset-0">
+        {/* Crossfade: render all featured images, only the active one is visible */}
+        {featured.map((item, i) => (
+          <div
+            key={item.slug}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              i === safeIndex ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={i !== safeIndex}
+          >
             <img
-              src={thumbnailUrl(heroImage.image)}
+              src={thumbnailUrl(item.image)}
               alt=""
-              loading="eager"
-              fetchPriority="high"
-              onLoad={() => setHeroLoaded(true)}
-              className={`w-full h-full object-cover transition-opacity duration-700 ease-out ${heroFading || !heroLoaded ? "opacity-0" : "opacity-100"}`}
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : undefined}
+              onLoad={i === 0 ? () => setHeroLoaded(true) : undefined}
+              className={`w-full h-full object-cover ${i === 0 && !heroLoaded ? "opacity-0" : ""}`}
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/80 to-bg/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />
+          </div>
+        ))}
+
+        {/* Fallback if no featured images */}
+        {featured.length === 0 && heroImage && (
+          <div className="absolute inset-0">
+            <img src={thumbnailUrl(heroImage.image)} alt="" loading="eager" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/80 to-bg/40" />
             <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />
           </div>
@@ -125,9 +138,9 @@ export default function HomePage() {
               {featured.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => { setHeroIndex(i); setHeroFading(false); }}
+                  onClick={() => setHeroIndex(i)}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    i === heroIndex % featured.length ? "w-6 bg-text/60" : "w-1.5 bg-text/20 hover:bg-text/30"
+                    i === safeIndex ? "w-6 bg-text/60" : "w-1.5 bg-text/20 hover:bg-text/30"
                   }`}
                   aria-label={`Show artwork ${i + 1}`}
                 />
@@ -145,10 +158,7 @@ export default function HomePage() {
             <p className="text-text-mid text-[1rem] leading-relaxed max-w-lg">
               Self-taught artist creating bespoke artwork for over 30 years. Born in Germany, raised across the world, now based in the UK.
             </p>
-            <Link
-              to="/about"
-              className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors whitespace-nowrap min-h-11"
-            >
+            <Link to="/about" className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors whitespace-nowrap min-h-11">
               About Mandy <FaArrowRight size={12} />
             </Link>
           </div>
@@ -156,14 +166,14 @@ export default function HomePage() {
       </div>
       <DrawLine />
 
-      {/* Featured Work */}
-      {gridItems.length > 0 && (
+      {/* Featured Work — always shows ALL featured items */}
+      {featured.length > 0 && (
         <>
           <div ref={featuredRef}>
             <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
-                <FeaturedGrid items={gridItems} onSelect={(i) => setLightboxIndex(i)} />
+                <FeaturedGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
                 <div className="mt-8 text-center">
                   <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors">
                     <FaArrowRight size={14} />
@@ -176,7 +186,7 @@ export default function HomePage() {
           <DrawLine />
 
           <ArtworkLightbox
-            items={gridItems}
+            items={featured}
             index={lightboxIndex}
             onClose={() => setLightboxIndex(-1)}
             onChange={setLightboxIndex}
