@@ -133,26 +133,24 @@ export default function HomePage() {
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)] relative">
             {/* Top-right info block */}
-            <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-3">
-              <span className="flex items-center gap-2 text-[0.7rem] text-text-muted tracking-wide">
-                <span className="relative flex h-2 w-2">
+            <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-4">
+              <span className="flex items-center gap-2.5 text-[0.85rem] text-text-mid font-medium tracking-wide">
+                <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute h-full w-full rounded-full bg-emerald-400/40 animate-[pulse-ring_2s_ease-out_infinite]" />
-                  <span className="relative rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="relative rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
                 Open for commissions
               </span>
-              <span className="text-[0.65rem] text-text-subtle tracking-wide">Based in the UK</span>
-              <span className="text-[0.65rem] text-text-subtle tracking-wide">30+ years creating</span>
               {(settings.facebook_url || settings.instagram_url) && (
-                <div className="flex gap-2 mt-1">
+                <div className="flex gap-1">
                   {settings.facebook_url && (
-                    <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-text-subtle hover:text-text transition-colors" aria-label="Facebook">
-                      <FaFacebookF size={13} />
+                    <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="min-w-11 min-h-11 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-text/[0.04] transition-colors" aria-label="Facebook">
+                      <FaFacebookF size={16} />
                     </a>
                   )}
                   {settings.instagram_url && (
-                    <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-text-subtle hover:text-text transition-colors" aria-label="Instagram">
-                      <FaInstagram size={14} />
+                    <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-11 min-h-11 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-text/[0.04] transition-colors" aria-label="Instagram">
+                      <FaInstagram size={18} />
                     </a>
                   )}
                 </div>
