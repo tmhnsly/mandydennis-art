@@ -23,6 +23,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
     startIndex: index >= 0 ? index : 0,
     dragFree: false,
     containScroll: false,
+    duration: 25,
+    skipSnaps: false,
   });
 
   // Sync embla → parent state
