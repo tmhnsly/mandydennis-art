@@ -83,8 +83,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
         <FaTimes size={13} className="text-white/70" />
       </button>
 
-      {/* Full canvas image area */}
-      <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-6" onClick={(e) => e.stopPropagation()}>
+      {/* Full canvas image area — image can fill edge to edge */}
+      <div className="absolute inset-0 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
         <motion.div
           key={current.slug}
           drag={canNav ? "x" : false}
@@ -92,21 +92,21 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           dragElastic={0.2}
           onDragEnd={handleDragEnd}
           onDrag={(_, info) => { dragX.current = info.offset.x; }}
-          className="relative max-w-full max-h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+          className="relative max-w-full max-h-full flex items-center justify-center cursor-grab active:cursor-grabbing p-2"
         >
           <img
             src={fullUrl(current.image)}
             alt={current.title}
             onLoad={() => setImgLoaded(true)}
-            className={`max-w-full max-h-[calc(100vh-6rem)] object-contain select-none transition-opacity duration-200 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+            className={`max-w-full max-h-[100vh] object-contain select-none transition-opacity duration-200 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
             draggable={false}
           />
         </motion.div>
       </div>
 
-      {/* Bottom bar — nav + tags */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 pt-2" onClick={(e) => e.stopPropagation()}>
-        <div className="max-w-[1400px] mx-auto flex items-center gap-4">
+      {/* Bottom bar — floats above image with frosted background */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 backdrop-blur-md bg-black/40 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+        <div className="max-w-[1400px] mx-auto flex items-center gap-4 px-4 py-3">
           {canNav && (
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button onClick={goPrev} className={btnClass} aria-label="Previous">
@@ -123,7 +123,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {tags.length > 0 && (
             <div className="flex gap-1.5 flex-wrap flex-1">
               {tags.map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/45 border border-white/8 bg-white/4">
+                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/50 border border-white/10 bg-white/5">
                   {tag}
                 </span>
               ))}
