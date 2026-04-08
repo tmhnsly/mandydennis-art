@@ -134,14 +134,13 @@ export default function HomePage() {
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)] relative">
             {/* Top-right info block */}
             <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-3">
-              <span className="flex items-center gap-2.5 text-[0.82rem] text-text-mid font-medium">
-                Open for commissions
+              <span className="flex items-center gap-2.5">
+                <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Open for commissions</span>
                 <span className="relative flex h-3 w-3">
                   <span className="absolute h-full w-full rounded-full bg-emerald-400/50 animate-ping" />
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
               </span>
-              <span className="text-[0.7rem] text-text-subtle">Self-taught · 30+ years</span>
               <div className="flex gap-1">
                 {settings.contact_email && (
                   <a href={`mailto:${settings.contact_email}`} className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Email">
