@@ -2,8 +2,6 @@
 
 /*
  * Warm muted palette — light & dark mode
- * Inspired by the original warm-50..warm-900 tones
- * with Radix-style semantic naming
  */
 :root {
   --color-bg: #faf7f4;
@@ -65,36 +63,56 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scroll-triggered animation utility */
+/* ---- Drawing lines: staggered horizontal rules on page load ---- */
+.draw-line {
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: drawIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+/* Stagger delays for sequential section borders */
+.draw-line-1 { animation-delay: 0.1s; }
+.draw-line-2 { animation-delay: 0.25s; }
+.draw-line-3 { animation-delay: 0.4s; }
+.draw-line-4 { animation-delay: 0.55s; }
+.draw-line-5 { animation-delay: 0.7s; }
+.draw-line-6 { animation-delay: 0.85s; }
+
+@keyframes drawIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ---- Scroll-triggered content reveal ---- */
 .animate-in {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(12px);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .animate-in.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* Section title rule — animates on scroll */
 .animate-rule {
   transform-origin: left;
   transform: scaleX(0);
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
 }
 .animate-rule.visible {
   transform: scaleX(1);
 }
 
-/* Hero stagger */
-.hero-stagger-1 { opacity: 0; animation: slideUp 0.6s ease 0.1s forwards; }
-.hero-stagger-2 { opacity: 0; animation: slideUp 0.6s ease 0.25s forwards; }
-.hero-stagger-3 { opacity: 0; animation: slideUp 0.6s ease 0.4s forwards; }
-.hero-stagger-4 { opacity: 0; animation: slideUp 0.6s ease 0.55s forwards; }
-.hero-stagger-5 { opacity: 0; animation: slideUp 0.6s ease 0.7s forwards; }
+/* ---- Hero stagger — snappier timing ---- */
+.hero-stagger-1 { opacity: 0; animation: revealUp 0.4s ease 0.15s forwards; }
+.hero-stagger-2 { opacity: 0; animation: revealUp 0.4s ease 0.25s forwards; }
+.hero-stagger-3 { opacity: 0; animation: revealUp 0.4s ease 0.35s forwards; }
+.hero-stagger-4 { opacity: 0; animation: revealUp 0.4s ease 0.45s forwards; }
+.hero-stagger-5 { opacity: 0; animation: revealUp 0.4s ease 0.55s forwards; }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

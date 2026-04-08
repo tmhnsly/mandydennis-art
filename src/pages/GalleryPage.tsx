@@ -7,6 +7,7 @@ import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
 import GalleryGrid from "../components/gallery/GalleryGrid";
 import type { Artwork } from "../types";
+import DrawLine from "../components/DrawLine";
 
 const PAGE_SIZE = 12;
 
@@ -70,17 +71,21 @@ export default function GalleryPage() {
 
   if (loading) {
     return (
-      <div className="border-b border-line">
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-          <SectionHeader title="Gallery" />
-          <p className="text-text-muted">Loading artwork...</p>
+      <>
+        <div>
+          <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+            <SectionHeader title="Gallery" />
+            <p className="text-text-muted">Loading artwork...</p>
+          </div>
         </div>
-      </div>
+        <DrawLine delay={2} />
+      </>
     );
   }
 
   return (
-    <div className="border-b border-line">
+    <>
+    <div>
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
         <SectionHeader title="Gallery" />
 
@@ -125,5 +130,7 @@ export default function GalleryPage() {
         animation={{ swipe: 250 }}
       />
     </div>
+    <DrawLine delay={2} />
+    </>
   );
 }

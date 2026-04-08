@@ -5,6 +5,7 @@ import { urlFor } from "../lib/sanity";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import type { AboutPage as AboutData } from "../types";
+import DrawLine from "../components/DrawLine";
 
 export default function AboutPage() {
   const settings = useSiteSettings();
@@ -16,7 +17,8 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="border-b border-line">
+    <>
+    <div>
       <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
         <SectionHeader title="About" />
 
@@ -83,5 +85,7 @@ export default function AboutPage() {
         </div>
       </div>
     </div>
+    <DrawLine delay={2} />
+    </>
   );
 }

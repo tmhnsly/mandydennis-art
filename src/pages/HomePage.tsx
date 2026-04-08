@@ -6,6 +6,7 @@ import { useSiteSettings } from "../context/SiteSettings";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import FeaturedGrid from "../components/FeaturedGrid";
+import DrawLine from "../components/DrawLine";
 import type { Artwork } from "../types";
 
 export default function HomePage() {
@@ -20,7 +21,7 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <div className="border-b border-line">
+      <div>
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,10vw,8rem)] pb-[clamp(3rem,6vw,5rem)]">
           <div className="hero-stagger-1 text-[0.65rem] font-medium tracking-[0.18em] uppercase text-text-subtle mb-4">
             Self-taught artist · UK Based
@@ -64,26 +65,30 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      <DrawLine delay={2} />
 
       {/* Featured Work */}
       {featured.length > 0 && (
-        <div className="border-b border-line">
-          <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
-            <SectionHeader title="Featured Work" />
-            <div ref={bodyRef} className="animate-in">
-              <FeaturedGrid items={featured} />
-              <div className="mt-8 text-center">
-                <Link
-                  to="/gallery"
-                  className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
-                >
-                  <FaArrowRight size={14} />
-                  Browse all work
-                </Link>
+        <>
+          <div>
+            <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(2.5rem,6vw,4.5rem)]">
+              <SectionHeader title="Featured Work" />
+              <div ref={bodyRef} className="animate-in">
+                <FeaturedGrid items={featured} />
+                <div className="mt-8 text-center">
+                  <Link
+                    to="/gallery"
+                    className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors"
+                  >
+                    <FaArrowRight size={14} />
+                    Browse all work
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <DrawLine delay={3} />
+        </>
       )}
     </>
   );
