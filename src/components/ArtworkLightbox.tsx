@@ -12,7 +12,8 @@ interface Props {
 }
 
 export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
-  const current = index >= 0 && index < items.length ? items[index] : null;
+  const isOpen = index >= 0;
+  const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
 
   const slides = items.map((item) => ({
@@ -23,7 +24,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   return (
     <>
       <Lightbox
-        open={index >= 0}
+        open={isOpen}
         index={index}
         close={onClose}
         on={{ view: ({ index: i }) => onChange(i) }}
@@ -34,6 +35,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
         styles={{
           container: { backgroundColor: "rgba(0,0,0,0.95)" },
           button: { filter: "none" },
+          slide: { padding: "3rem 0.5rem 4rem" },
           navigationPrev: { display: items.length <= 1 ? "none" : undefined },
           navigationNext: { display: items.length <= 1 ? "none" : undefined },
         }}
@@ -53,21 +55,22 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
               <FaTimes size={14} className="text-white/80" />
             </div>
           ),
-          slideFooter: () =>
-            tags.length > 0 ? (
-              <div className="flex justify-center gap-1.5 pb-6 pt-3 flex-wrap px-4">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-full text-[0.65rem] tracking-wide uppercase text-white/60 border border-white/15 bg-white/5"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            ) : null,
         }}
       />
+
+      {/* Tags overlay — positioned outside the lightbox slide container */}
+      {isOpen && tags.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-[10001] flex justify-center gap-1.5 pb-4 pt-2 px-4 flex-wrap pointer-events-none">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/55 border border-white/10 bg-black/30 backdrop-blur-sm"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
     </>
   );
 }
