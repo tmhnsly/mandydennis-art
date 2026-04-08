@@ -18,7 +18,6 @@ export default function HomePage() {
   const settings = useSiteSettings();
   const initial = getInitialArtwork();
   const [featured, setFeatured] = useState<Artwork[]>(() => initial.filter((a) => a.featured));
-  const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
