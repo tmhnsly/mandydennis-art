@@ -17,7 +17,7 @@ export default function SectionHeader({ title }: Props) {
         >
           {title}
         </TextReveal>
-        <div className={`anim-rule flex-1 h-px bg-line-strong ${isInView ? "in-view" : ""}`} style={{ transitionDelay: "0.1s" }} />
+        <div className={`anim-rule flex-1 h-px bg-line-strong delay-100 ${isInView ? "in-view" : ""}`} />
       </div>
     </div>
   );

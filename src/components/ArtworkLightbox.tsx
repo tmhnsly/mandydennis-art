@@ -11,9 +11,10 @@ interface Props {
   index: number;
   onClose: () => void;
   onChange: (index: number) => void;
+  onTagClick?: (tag: string) => void;
 }
 
-export default function ArtworkLightbox({ items, index, onClose, onChange }: Props) {
+export default function ArtworkLightbox({ items, index, onClose, onChange, onTagClick }: Props) {
   const isOpen = index >= 0;
   const current = isOpen && index < items.length ? items[index] : null;
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
@@ -24,6 +25,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
   // Vertical drag to dismiss
   const dragY = useMotionValue(0);
   const backdropOpacity = useTransform(dragY, [0, closeThreshold * 2], [0.95, 0]);
+  const backdropBg = useTransform(backdropOpacity, (v) => `rgba(0,0,0,${v})`);
   const dragScale = useTransform(dragY, [0, closeThreshold * 2], [1, 0.85]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -97,7 +99,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
           className="fixed inset-0 z-[9999] flex flex-col"
-          style={{ backgroundColor: useTransform(backdropOpacity, (v) => `rgba(0,0,0,${v})`) }}
+          style={{ backgroundColor: backdropBg }}
         >
           {/* Close */}
           <button
@@ -123,7 +125,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
               }
             }}
           >
-            <div className="h-full overflow-hidden" ref={emblaRef} style={{ touchAction: "none" }}>
+            <div className="h-full overflow-hidden touch-none" ref={emblaRef}>
               <div className="flex h-full">
                 {items.map((item) => (
                   <div
@@ -153,7 +155,11 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
                   {tags.map((tag) => (
                     <button
                       key={tag}
-                      onClick={() => { onClose(); navigate(`/gallery?tag=${encodeURIComponent(tag)}`); }}
+                      onClick={() => {
+                        onClose();
+                        if (onTagClick) onTagClick(tag);
+                        else navigate(`/gallery?tag=${encodeURIComponent(tag)}`);
+                      }}
                       className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
                     >
                       {tag}

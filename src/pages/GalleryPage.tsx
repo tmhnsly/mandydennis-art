@@ -197,6 +197,7 @@ export default function GalleryPage() {
           index={lightboxIndex}
           onClose={closeLightbox}
           onChange={changeLightbox}
+          onTagClick={(tag) => { closeLightbox(); toggleTag(tag); }}
         />
       </div>
       <DrawLine />
