@@ -13,27 +13,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
-      /* Hide page until fonts are loaded to prevent FOUT */
-      html { visibility: hidden; }
-      html.fonts-ready { visibility: visible; }
+      #loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #faf7f4;
+        transition: opacity 0.3s ease;
+      }
+      #loader.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #loader span {
+        font-family: system-ui, sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: #b0a096;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+      }
+      @media (prefers-color-scheme: dark) {
+        #loader { background: #1c1513; }
+        #loader span { color: #6e5e55; }
+      }
     </style>
   </head>
   <body>
+    <div id="loader"><span>M</span></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      if (document.fonts) {
-        document.fonts.ready.then(function() {
-          document.documentElement.classList.add('fonts-ready');
-        });
-        // Safety fallback — show page after 500ms even if fonts haven't loaded
-        setTimeout(function() {
-          document.documentElement.classList.add('fonts-ready');
-        }, 500);
-      } else {
-        // Browser doesn't support document.fonts — show immediately
-        document.documentElement.classList.add('fonts-ready');
+      function hideLoader() {
+        var loader = document.getElementById('loader');
+        if (loader) {
+          loader.classList.add('fade-out');
+          setTimeout(function() { loader.remove(); }, 300);
+        }
       }
+      // Wait for fonts, then hide
+      if (document.fonts) {
+        document.fonts.ready.then(hideLoader);
+      }
+      // Safety fallback
+      setTimeout(hideLoader, 2000);
     </script>
   </body>
 </html>
