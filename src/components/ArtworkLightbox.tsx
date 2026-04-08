@@ -104,15 +104,15 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
         </motion.div>
       </div>
 
-      {/* Bottom bar — floats above image with frosted background */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 backdrop-blur-md bg-black/40 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
-        <div className="max-w-[1400px] mx-auto flex items-center gap-4 px-4 py-3">
+      {/* Bottom bar — individual items have blur, no full-width background */}
+      <div className="absolute bottom-0 left-0 right-0 z-20" onClick={(e) => e.stopPropagation()}>
+        <div className="max-w-[1400px] mx-auto flex items-center gap-3 px-4 py-4">
           {canNav && (
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button onClick={goPrev} className={btnClass} aria-label="Previous">
                 <FaChevronLeft size={12} className="text-white/70" />
               </button>
-              <span className="text-white/35 text-xs tabular-nums font-medium min-w-[3rem] text-center">
+              <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
                 {index + 1} / {items.length}
               </span>
               <button onClick={goNext} className={btnClass} aria-label="Next">
@@ -123,7 +123,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange }: Pro
           {tags.length > 0 && (
             <div className="flex gap-1.5 flex-wrap flex-1">
               {tags.map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/50 border border-white/10 bg-white/5">
+                <span key={tag} className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md">
                   {tag}
                 </span>
               ))}
