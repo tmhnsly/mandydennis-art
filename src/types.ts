@@ -46,6 +46,7 @@ export interface SiteSettings {
   tagline: string;
   contact_email: string;
   facebook_url: string;
+  instagram_url: string;
   currency_symbol: string;
 }
 

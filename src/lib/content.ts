@@ -95,6 +95,7 @@ const DUMMY_SETTINGS: SiteSettings = {
   tagline: "Original artwork & commissions",
   contact_email: "mandy@example.com",
   facebook_url: "",
+  instagram_url: "",
   currency_symbol: "£",
 };
 
@@ -176,6 +177,7 @@ export async function getSettings(): Promise<SiteSettings> {
         tagline,
         contact_email,
         facebook_url,
+        instagram_url,
         currency_symbol
       }
     `);

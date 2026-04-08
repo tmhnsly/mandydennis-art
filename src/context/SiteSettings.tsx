@@ -6,6 +6,7 @@ const defaults: SiteSettings = {
   tagline: "",
   contact_email: "",
   facebook_url: "",
+  instagram_url: "",
   currency_symbol: "£",
 };
 

@@ -23,6 +23,11 @@ export default defineType({
       type: "url",
     }),
     defineField({
+      name: "instagram_url",
+      title: "Instagram URL",
+      type: "url",
+    }),
+    defineField({
       name: "currency_symbol",
       title: "Currency Symbol",
       type: "string",

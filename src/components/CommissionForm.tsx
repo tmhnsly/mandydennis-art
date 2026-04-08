@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { FaCommentDots, FaImage, FaTimes } from "react-icons/fa";
 
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
 const MAX_SIZE_MB = 10;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
@@ -18,7 +18,7 @@ export default function CommissionForm() {
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setFileError("Please upload an image file (JPEG, PNG, WebP, or GIF).");
+      setFileError("Please upload an image file (JPEG, PNG, WebP, GIF, or HEIC).");
       e.target.value = "";
       return;
     }
@@ -110,7 +110,7 @@ export default function CommissionForm() {
           type="file"
           id="reference"
           name="reference"
-          accept=".jpg,.jpeg,.png,.webp,.gif"
+          accept=".jpg,.jpeg,.png,.webp,.gif,.heic,.heif"
           onChange={handleFileChange}
           className="hidden"
         />
@@ -140,7 +140,7 @@ export default function CommissionForm() {
         {fileError && (
           <p className="text-sm text-red-600 mt-1.5">{fileError}</p>
         )}
-        <p className="text-xs text-text-subtle mt-1">JPEG, PNG, WebP or GIF. Max {MAX_SIZE_MB}MB.</p>
+        <p className="text-xs text-text-subtle mt-1">JPEG, PNG, WebP, GIF or HEIC. Max {MAX_SIZE_MB}MB.</p>
       </div>
 
       <button
