@@ -21,7 +21,6 @@ export default function HomePage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(initial);
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
-  const [heroLoaded, setHeroLoaded] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
@@ -72,37 +71,29 @@ export default function HomePage() {
   return (
     <>
       {/* Hero — background cycles through featured, text overlaid */}
-      <div className="relative overflow-hidden">
-        {/* Crossfade: render all featured images, only the active one is visible */}
-        {featured.map((item, i) => (
-          <div
-            key={item.slug}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              i === safeIndex ? "opacity-100" : "opacity-0"
-            }`}
-            aria-hidden={i !== safeIndex}
-          >
-            <img
-              src={thumbnailUrl(item.image)}
-              alt=""
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : undefined}
-              onLoad={i === 0 ? () => setHeroLoaded(true) : undefined}
-              className={`w-full h-full object-cover ${i === 0 && !heroLoaded ? "opacity-0" : ""}`}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
-          </div>
+      <div className="relative overflow-hidden bg-surface">
+        {/* Only show hero images if they have real Sanity images (not null/placeholder) */}
+        {featured.some((item) => item.image !== null) && featured.map((item, i) => (
+          item.image ? (
+            <div
+              key={item.slug}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                i === safeIndex ? "opacity-100" : "opacity-0"
+              }`}
+              aria-hidden={i !== safeIndex}
+            >
+              <img
+                src={thumbnailUrl(item.image)}
+                alt=""
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : undefined}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
+            </div>
+          ) : null
         ))}
-
-        {/* Fallback if no featured images */}
-        {featured.length === 0 && heroImage && (
-          <div className="absolute inset-0">
-            <img src={thumbnailUrl(heroImage.image)} alt="" loading="eager" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
-          </div>
-        )}
 
         <div className="relative max-w-[1400px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-[clamp(4rem,8vw,7rem)]">
           {/* Glassmorphism panel behind hero text */}
