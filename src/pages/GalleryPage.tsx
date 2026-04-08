@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import { withViewTransition } from "../lib/viewTransition";
 import ArtworkLightbox from "../components/ArtworkLightbox";
