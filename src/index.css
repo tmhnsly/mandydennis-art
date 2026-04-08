@@ -81,82 +81,87 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---- Lightweight CSS animations (no JS library) ---- */
+/* ---- Animations ---- */
+/* Shared easing — smooth deceleration for entrances, acceleration for exits */
+/* Duration: 0.5s entrance, 0.35s exit (exit feels snappier) */
 
-/* Fade up — used by sections, content blocks */
+/* Fade up — sections, content blocks */
 .anim-fade-up {
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-fade-up.in-view {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Scale X rule — used by section header lines, DrawLine */
+/* Scale X rule — section header lines, DrawLine */
 .anim-rule {
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.4s ease;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-rule.in-view {
   transform: scaleX(1);
 }
 
-/* Text reveal — word slides up from overflow hidden container */
+/* Text reveal — word slides up from overflow hidden */
 .anim-word {
   display: inline-block;
   transform: translateY(110%);
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-word.in-view {
   transform: translateY(0);
 }
 
-/* Hero stagger — immediate on load, no scroll trigger needed */
+/* Hero stagger — on load */
 .hero-stagger > * {
   opacity: 0;
-  transform: translateY(8px);
-  animation: fadeUp 0.3s ease forwards;
+  transform: translateY(16px);
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.hero-stagger > *:nth-child(1) { animation-delay: 0.03s; }
-.hero-stagger > *:nth-child(2) { animation-delay: 0.08s; }
-.hero-stagger > *:nth-child(3) { animation-delay: 0.13s; }
-.hero-stagger > *:nth-child(4) { animation-delay: 0.18s; }
-.hero-stagger > *:nth-child(5) { animation-delay: 0.23s; }
-.hero-stagger > *:nth-child(6) { animation-delay: 0.28s; }
+.hero-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.hero-stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.hero-stagger > *:nth-child(4) { animation-delay: 0.26s; }
+.hero-stagger > *:nth-child(5) { animation-delay: 0.33s; }
+.hero-stagger > *:nth-child(6) { animation-delay: 0.40s; }
 
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- Page exit — reverse all entrance animations ---- */
+/* ---- Page exit — mirror of entrance ---- */
 
 .page-exit .anim-fade-up.in-view {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(16px);
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
-.page-exit .anim-rule.in-view {
+.page-exit .anim-rule.in-view,
+.page-exit .anim-rule {
   transform: scaleX(0);
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
 .page-exit .anim-word.in-view {
   transform: translateY(110%);
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
 .page-exit .hero-stagger > * {
-  animation: fadeDown 0.2s ease forwards;
+  animation: fadeDown 0.35s cubic-bezier(0.7, 0, 0.84, 0) forwards;
 }
 
 @keyframes fadeDown {
-  to { opacity: 0; transform: translateY(8px); }
-}
-
-/* DrawLine exit */
-.page-exit .anim-rule {
-  transform: scaleX(0);
+  to { opacity: 0; transform: translateY(16px); }
 }
 
 /* Pulse ring for status dot */

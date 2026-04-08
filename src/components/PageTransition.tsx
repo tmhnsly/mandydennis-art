@@ -5,7 +5,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const EXIT_DURATION = 250; // ms — matches longest CSS transition
+const EXIT_DURATION = 400; // ms — matches exit transition (0.35s + buffer)
 
 export default function PageTransition({ children }: Props) {
   const location = useLocation();
