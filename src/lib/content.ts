@@ -93,8 +93,8 @@ const DUMMY_COMMISSIONS: CommissionCategory[] = [
       { description: "Each extra pet (A3)", price: 50 },
       { description: "Specific background", price: 50 },
     ],
-    included: "A5-A3 includes a basic frame and mount. Add extra for specific frame requirements.",
-    notes: "Extra for P&P if required.",
+    included: "All work sent without a frame due to glass breakage during transit, unless specifically requested.",
+    notes: "Postage & packaging available if required.",
   },
 ];
 
@@ -152,10 +152,22 @@ export function getInitialArtwork(): Artwork[] { return getCached("artwork") ?? 
 export function getInitialEvents(): ArtEvent[] { return getCached("events") ?? DUMMY_EVENTS; }
 export function getInitialCommissions(): CommissionCategory[] { return getCached("commissions") ?? DUMMY_COMMISSIONS; }
 export function getInitialTestimonials(): Testimonial[] { return getCached("testimonials") ?? DUMMY_TESTIMONIALS; }
+export function getInitialSettings(): SiteSettings { return getCached("settings") ?? DUMMY_SETTINGS; }
 
-// Async fetchers — update cache in background. Pages use getInitial* for first render.
-// Only call these in useEffect — they won't cause layout shift because pages
-// already have data from getInitial*.
+// Pre-fetch everything — called once before React mounts.
+// Populates the cache so getInitial*() has real data on first render.
+export async function prefetchAll(): Promise<void> {
+  await Promise.all([
+    getArtwork(),
+    getEvents(),
+    getCommissions(),
+    getSettings(),
+    getAbout(),
+    getTestimonials(),
+  ]);
+}
+
+// Async fetchers — also called in useEffect to refresh stale cache.
 
 async function fetchAndCache<T>(key: string, fetcher: () => Promise<T>, fallback: T): Promise<T> {
   // If cache is fresh, skip the fetch entirely

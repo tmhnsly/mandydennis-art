@@ -33,7 +33,6 @@ export default function HomePage() {
 
   useEffect(() => {
     getArtwork().then((all) => {
-      setAllArtwork(all);
       setFeatured(all.filter((a) => a.featured));
     });
     getEvents().then(setEvents);

@@ -2,18 +2,13 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { getSettings } from "../lib/content";
 import type { SiteSettings } from "../types";
 
-const defaults: SiteSettings = {
-  tagline: "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours.",
-  contact_email: "",
-  facebook_url: "",
-  instagram_url: "",
-  currency_symbol: "£",
-};
+// This runs after prefetchAll, so getCached("settings") has real data
+import { getInitialSettings } from "../lib/content";
 
-const SiteSettingsContext = createContext<SiteSettings>(defaults);
+const SiteSettingsContext = createContext<SiteSettings>(getInitialSettings());
 
 export function SiteSettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings>(defaults);
+  const [settings, setSettings] = useState<SiteSettings>(getInitialSettings);
 
   useEffect(() => {
     getSettings().then(setSettings);
