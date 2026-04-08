@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaMapMarkerAlt } from "react-icons/fa";
-import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, thumbnailUrl } from "../lib/content";
+import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useSiteSettings } from "../context/SiteSettings";
@@ -101,12 +101,12 @@ export default function HomePage() {
               aria-hidden={i !== safeIndex}
             >
               <img
-                src={thumbnailUrl(item.image)}
+                src={heroUrl(item.image)}
                 alt=""
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : undefined}
-                className="w-full h-full object-cover scale-110 will-change-transform"
-                style={{ transform: `scale(1.1) translateY(${parallaxY}px)` } as CSSProperties}
+                className="w-full h-full object-cover object-center will-change-transform"
+                style={{ transform: `scale(1.15) translateY(${parallaxY}px)` } as CSSProperties}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />

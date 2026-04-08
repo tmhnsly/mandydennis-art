@@ -290,7 +290,12 @@ export function thumbnailUrl(image: Artwork["image"]): string {
   return urlFor(image).width(600).auto("format").quality(75).url() || PLACEHOLDER_THUMB;
 }
 
+export function heroUrl(image: Artwork["image"]): string {
+  if (!image) return PLACEHOLDER_FULL;
+  return urlFor(image).width(1920).auto("format").quality(90).url() || PLACEHOLDER_FULL;
+}
+
 export function fullUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_FULL;
-  return urlFor(image).width(1600).auto("format").quality(80).url() || PLACEHOLDER_FULL;
+  return urlFor(image).width(1600).auto("format").quality(85).url() || PLACEHOLDER_FULL;
 }
