@@ -13,7 +13,7 @@ import DrawLine from "../components/DrawLine";
 const PAGE_SIZE = 12;
 
 // Priority tags shown first in the filter bar
-const PRIORITY_TAGS = ["animals", "dogs", "cats", "horses", "birds", "wildlife"];
+const PRIORITY_TAGS = ["pets", "animals", "dogs", "cats", "horses", "birds", "wildlife"];
 
 function getAllTags(items: Artwork[]): string[] {
   const tags = new Set<string>();

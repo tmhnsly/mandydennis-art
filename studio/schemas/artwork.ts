@@ -64,6 +64,7 @@ export default defineType({
       description: "What is this a picture of?",
       options: {
         list: [
+          { title: "Pets", value: "pets" },
           { title: "Animals", value: "animals" },
           { title: "Dogs", value: "dogs" },
           { title: "Cats", value: "cats" },

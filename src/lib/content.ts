@@ -191,7 +191,7 @@ export function getArtwork(): Promise<Artwork[]> {
       }
     `), 3000);
     if (!results || results.length === 0) return DUMMY_ARTWORK;
-    const ANIMAL_TAGS = ["animals", "dogs", "cats", "horses", "birds", "wildlife"];
+    const ANIMAL_TAGS = ["pets", "animals", "dogs", "cats", "horses", "birds", "wildlife"];
     const mapped = results.map((item: Artwork) => ({
       ...item,
       description: item.description ?? "",
