@@ -131,17 +131,44 @@ export default function HomePage() {
         ))}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)] relative">
-            {/* Top-right: status + socials — absolute so they don't push content down */}
-            <div className="absolute top-[clamp(1.5rem,4vw,2.5rem)] right-[clamp(1.5rem,4vw,2.5rem)] hidden sm:flex flex-col items-end gap-2">
+          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+            {/* Row 1: line + status label + pulse */}
+            <div className="hidden sm:flex items-center gap-3 mb-6">
+              <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
-                <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Accepting work</span>
+                <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Available for work</span>
                 <span className="relative flex h-3 w-3">
                   <span className="absolute h-full w-full rounded-full bg-emerald-400/50 animate-ping" />
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
               </span>
-              <div className="flex gap-1">
+            </div>
+
+            {/* Row 2: two columns — main content (left) + socials (right) */}
+            <div className="flex gap-6">
+              {/* Left: name, tagline, CTAs */}
+              <div className="flex-1 min-w-0">
+                <h1 className="mb-5">
+                  <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
+                  <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
+                </h1>
+
+                <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[var(--width-text)] mb-8">
+                  {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
+                </p>
+
+                <div className="flex gap-2.5 flex-wrap">
+                  <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
+                    View Gallery
+                  </Link>
+                  <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
+                    Get in Touch
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right: social/email icons — hidden on mobile */}
+              <div className="hidden sm:flex flex-col items-center gap-1 flex-shrink-0">
                 {settings.contact_email && (
                   <a href={`mailto:${settings.contact_email}`} className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Email">
                     <FaEnvelope size={14} />
@@ -160,25 +187,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            <h1 className="mb-5">
-              <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
-              <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
-            </h1>
-
-            <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[var(--width-text)] mb-8">
-              {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
-            </p>
-
-            <div className="flex gap-2.5 flex-wrap mb-10">
-              <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
-                View Gallery
-              </Link>
-              <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
-                Get in Touch
-              </Link>
-            </div>
-
-            <div className="flex gap-[clamp(1.5rem,4vw,3rem)] pt-5 border-t border-text/10 flex-wrap">
+            {/* Row 3: bottom stats with line */}
+            <div className="flex gap-[clamp(1.5rem,4vw,3rem)] pt-5 mt-10 border-t border-text/10 flex-wrap">
               <div>
                 <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mb-0.5">Medium</div>
                 <div className="font-display text-[0.85rem] font-semibold tracking-tight">Pastels & Watercolours</div>
