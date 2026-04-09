@@ -87,15 +87,15 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     }
   }, [isOpen, dragY]);
 
-  const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/8 hover:bg-white/15 border border-white/8 flex items-center justify-center transition-colors";
+  const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-bg/10 hover:bg-bg/20 border border-bg/10 flex items-center justify-center transition-colors";
 
   return (
     <AnimatePresence>
       {isOpen && current && (
         <motion.div
           key="lightbox"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.15 } }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0 } }}
           className="fixed inset-0 z-[9999] flex flex-col"
           style={{ backgroundColor: backdropBg }}
@@ -106,7 +106,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             className={`absolute top-3 right-3 z-20 ${btnClass}`}
             aria-label="Close"
           >
-            <FaTimes size={13} className="text-white/70" />
+            <FaTimes size={13} className="text-bg/70" />
           </button>
 
           {/* Carousel with vertical drag wrapper */}
@@ -159,7 +159,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
                         if (onTagClick) onTagClick(tag);
                         else navigate(`/gallery?tag=${encodeURIComponent(tag)}`);
                       }}
-                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-bg/70 border border-bg/10 bg-text/30 backdrop-blur-md hover:bg-bg/15 hover:text-bg transition-colors cursor-pointer"
                     >
                       {tag}
                     </button>
@@ -169,13 +169,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
               {canNav && (
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button onClick={goPrev} className={btnClass} aria-label="Previous">
-                    <FaChevronLeft size={12} className="text-white/70" />
+                    <FaChevronLeft size={12} className="text-bg/70" />
                   </button>
-                  <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
+                  <span className="text-bg/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-text/30 backdrop-blur-md">
                     {index + 1} / {items.length}
                   </span>
                   <button onClick={goNext} className={btnClass} aria-label="Next">
-                    <FaChevronRight size={12} className="text-white/70" />
+                    <FaChevronRight size={12} className="text-bg/70" />
                   </button>
                 </div>
               )}
