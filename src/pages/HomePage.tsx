@@ -133,7 +133,7 @@ export default function HomePage() {
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             {/* Row 1: line + status label + pulse */}
-            <div className="hidden sm:flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
                 <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Available for work</span>
@@ -167,8 +167,8 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right: quick actions — hidden on mobile */}
-              <div className="hidden sm:flex flex-col items-center gap-1.5 flex-shrink-0 pt-2">
+              {/* Right: quick actions */}
+              <div className="flex flex-row sm:flex-col items-center gap-1.5 flex-shrink-0 pt-2">
                 <Link to="/commissions" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
                   <FaEnvelope size={14} />
                 </Link>
