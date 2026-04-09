@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import { useSiteSettings } from "../context/SiteSettings";
 
@@ -22,13 +23,13 @@ export default function Footer() {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-2 text-xs text-text-subtle tracking-wide">
+          <Link to="/commissions" className="flex items-center gap-2 text-xs text-text-subtle tracking-wide hover:text-text transition-colors">
             <span className="relative flex h-2.5 w-2.5 items-center justify-center">
               <span className="absolute h-full w-full rounded-full bg-emerald-400/40 animate-[pulse-ring_2s_ease-out_infinite]" />
               <span className="relative rounded-full h-1.5 w-1.5 bg-emerald-500" />
             </span>
             Open for commissions
-          </span>
+          </Link>
 
           {hasSocials && (
             <div className="flex items-center gap-1">

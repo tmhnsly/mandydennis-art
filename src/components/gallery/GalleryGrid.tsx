@@ -16,7 +16,7 @@ export default function GalleryGrid({ items, onSelect }: Props) {
   }
 
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)]">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)] [column-fill:auto]">
       {items.map((item, i) => (
         <button
           key={item.slug}
