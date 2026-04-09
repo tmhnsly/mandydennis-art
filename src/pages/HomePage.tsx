@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaMapMarkerAlt, FaFacebookF, FaInstagram, FaEnvelope } from "react-icons/fa";
+import { FaArrowRight, FaMapMarkerAlt, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
@@ -167,18 +167,11 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right: social/email icons — hidden on mobile */}
-              <div className="hidden sm:flex flex-row items-start gap-1.5 flex-shrink-0 pt-2">
-                {settings.contact_email && (
-                  <a href={`mailto:${settings.contact_email}`} className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Email">
-                    <FaEnvelope size={14} />
-                  </a>
-                )}
-                {settings.facebook_url && (
-                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Facebook">
-                    <FaFacebookF size={14} />
-                  </a>
-                )}
+              {/* Right: quick actions — hidden on mobile */}
+              <div className="hidden sm:flex flex-col items-center gap-1.5 flex-shrink-0 pt-2">
+                <Link to="/commissions" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
+                  <FaEnvelope size={14} />
+                </Link>
                 {settings.instagram_url && (
                   <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
                     <FaInstagram size={15} />
