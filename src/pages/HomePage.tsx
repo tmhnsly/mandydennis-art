@@ -168,7 +168,7 @@ export default function HomePage() {
               </div>
 
               {/* Right: social/email icons — hidden on mobile */}
-              <div className="hidden sm:flex flex-col items-center gap-1 flex-shrink-0">
+              <div className="hidden sm:flex flex-row items-start gap-1.5 flex-shrink-0 pt-2">
                 {settings.contact_email && (
                   <a href={`mailto:${settings.contact_email}`} className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Email">
                     <FaEnvelope size={14} />
