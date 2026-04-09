@@ -95,9 +95,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
         <motion.div
           key="lightbox"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          animate={{ opacity: 1, transition: { duration: 0.15 } }}
+          exit={{ opacity: 0, transition: { duration: 0 } }}
           className="fixed inset-0 z-[9999] flex flex-col"
           style={{ backgroundColor: backdropBg }}
         >
