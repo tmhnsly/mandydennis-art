@@ -97,6 +97,9 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0 } }}
+          role="dialog"
+          aria-label="Image viewer"
+          aria-modal="true"
           className="fixed inset-0 z-[9999] flex flex-col"
           style={{ backgroundColor: backdropBg }}
         >
