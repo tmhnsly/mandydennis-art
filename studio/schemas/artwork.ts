@@ -74,6 +74,7 @@ export default defineType({
           { title: "Landscape", value: "landscape" },
           { title: "Seascapes", value: "seascapes" },
           { title: "Still Life", value: "still life" },
+          { title: "Food", value: "food" },
           { title: "Flowers", value: "flowers" },
           { title: "Buildings", value: "buildings" },
         ],
