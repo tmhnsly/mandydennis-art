@@ -199,6 +199,12 @@ body {
 
 /* Page exit animations now handled by motion AnimatePresence */
 
+/* Grid item entrance */
+@keyframes gridFadeIn {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
 /* Hide scrollbar but keep scroll functionality */
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
