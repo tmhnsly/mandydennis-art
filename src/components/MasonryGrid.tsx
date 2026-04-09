@@ -15,7 +15,7 @@ export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
   }
 
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)] [column-fill:auto]">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)]">
       {items.map((item, i) => (
         <button
           key={item.slug}
