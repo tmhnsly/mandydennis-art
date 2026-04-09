@@ -4,10 +4,15 @@ import { thumbnailUrl } from "../lib/content";
 interface Props {
   items: Artwork[];
   onSelect: (index: number) => void;
+  emptyMessage?: string;
 }
 
-export default function FeaturedGrid({ items, onSelect }: Props) {
-  if (items.length === 0) return null;
+export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
+  if (items.length === 0) {
+    return emptyMessage ? (
+      <p className="text-text-muted text-center py-16">{emptyMessage}</p>
+    ) : null;
+  }
 
   return (
     <div className="columns-1 sm:columns-2 lg:columns-3 gap-[var(--gap-masonry)] [column-fill:auto]">
@@ -20,11 +25,11 @@ export default function FeaturedGrid({ items, onSelect }: Props) {
           <img
             src={thumbnailUrl(item.image)}
             alt={item.title}
-            className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
-            <h3 className="font-display text-[0.95rem] font-semibold text-white mb-1">
+          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-4">
+            <h3 className="font-display text-[0.95rem] font-semibold text-white tracking-tight mb-1">
               {item.title}
             </h3>
             <div className="flex gap-1.5 flex-wrap">

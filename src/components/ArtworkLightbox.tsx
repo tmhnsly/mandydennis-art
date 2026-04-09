@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
@@ -20,13 +20,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const navigate = useNavigate();
   const canNav = items.length > 1;
-  const closeThreshold = 120;
-
-  // Vertical drag to dismiss
-  const dragY = useMotionValue(0);
-  const backdropOpacity = useTransform(dragY, [0, closeThreshold * 2], [0.95, 0]);
-  const backdropBg = useTransform(backdropOpacity, (v) => `rgba(0,0,0,${v})`);
-  const dragScale = useTransform(dragY, [0, closeThreshold * 2], [1, 0.85]);
+  const touchStartY = useRef<number | null>(null);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: canNav,
@@ -36,9 +30,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     duration: 20,
     skipSnaps: false,
   });
-
-  // Prevent embla from capturing vertical drags
-  const slideRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -80,12 +71,16 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Reset drag when closing
-  useEffect(() => {
-    if (!isOpen) {
-      dragY.set(0);
-    }
-  }, [isOpen, dragY]);
+  // Swipe down to close — simple touch tracking
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (dy > 100) onClose();
+    touchStartY.current = null;
+  };
 
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
@@ -100,8 +95,9 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
           role="dialog"
           aria-label="Image viewer"
           aria-modal="true"
-          className="fixed inset-0 z-[9999] flex flex-col"
-          style={{ backgroundColor: backdropBg }}
+          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
           <button
@@ -112,42 +108,24 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             <FaTimes size={13} className="text-white/70" />
           </button>
 
-          {/* Carousel with vertical drag wrapper */}
-          <motion.div
-            className="flex-1 overflow-hidden"
-            style={{ y: dragY, scale: dragScale }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.05, bottom: 0.4 }}
-            onDragEnd={(_, info) => {
-              if (info.offset.y > closeThreshold || info.velocity.y > 500) {
-                onClose();
-              } else {
-                dragY.set(0);
-              }
-            }}
-          >
-            <div className="h-full overflow-hidden touch-none" ref={emblaRef}>
-              <div className="flex h-full">
-                {items.map((item) => (
-                  <div
-                    key={item.slug}
-                    ref={slideRef}
-                    className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
-                  >
-                    <img
-                      src={fullUrl(item.image)}
-                      alt={item.title}
-                      className="max-w-full max-h-full object-contain select-none"
-                      draggable={false}
-                    />
-                  </div>
-                ))}
-              </div>
+          {/* Embla carousel — handles all swipe gestures natively */}
+          <div className="flex-1 overflow-hidden" ref={emblaRef}>
+            <div className="flex h-full">
+              {items.map((item) => (
+                <div
+                  key={item.slug}
+                  className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
+                >
+                  <img
+                    src={fullUrl(item.image)}
+                    alt={item.title}
+                    className="max-w-full max-h-full object-contain select-none"
+                    draggable={false}
+                  />
+                </div>
+              ))}
             </div>
-          </motion.div>
-
-          {/* Click backdrop (above/below image) to close */}
+          </div>
 
           {/* Bottom bar — tags left, controls right */}
           <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
@@ -170,7 +148,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
                 </div>
               ) : <div />}
               {canNav && (
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1.5 flex-shrink-0 pointer-events-auto">
                   <button onClick={goPrev} className={btnClass} aria-label="Previous">
                     <FaChevronLeft size={12} className="text-white/70" />
                   </button>

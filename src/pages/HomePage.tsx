@@ -7,7 +7,7 @@ import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
-import FeaturedGrid from "../components/FeaturedGrid";
+import MasonryGrid from "../components/MasonryGrid";
 import DrawLine from "../components/DrawLine";
 import TextReveal from "../components/TextReveal";
 import type { Artwork, ArtEvent } from "../types";
@@ -235,7 +235,7 @@ export default function HomePage() {
             <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
-                <FeaturedGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
+                <MasonryGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
                 <div className="mt-8 text-center">
                   <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors">
                     <FaArrowRight size={14} />

@@ -6,7 +6,7 @@ import { useAnimateIn } from "../hooks/useAnimateIn";
 import CtaBanner from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
-import GalleryGrid from "../components/gallery/GalleryGrid";
+import MasonryGrid from "../components/MasonryGrid";
 import type { Artwork } from "../types";
 import DrawLine from "../components/DrawLine";
 
@@ -181,9 +181,10 @@ export default function GalleryPage() {
                   onToggleFeatured={() => { setFeaturedOnly((p) => !p); setShowCount(PAGE_SIZE); }}
                 />
 
-                <GalleryGrid
+                <MasonryGrid
                   items={visible}
                   onSelect={openLightbox}
+                  emptyMessage="No artwork matches the selected filters."
                 />
 
                 {hasMore && <div ref={loadMoreRef} className="h-1" />}
