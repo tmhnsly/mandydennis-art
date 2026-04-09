@@ -145,7 +145,7 @@ export default function HomePage() {
             </div>
 
             {/* Row 2: two columns — main content (left) + socials (right) */}
-            <div className="flex gap-6">
+            <div className="flex items-start gap-6">
               {/* Left: name, tagline, CTAs */}
               <div className="flex-1 min-w-0">
                 <h1 className="mb-5">
