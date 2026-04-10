@@ -296,7 +296,7 @@ export default function HomePage() {
               <SectionHeader title="Upcoming Events" />
               <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[var(--width-narrow)]`}>
                 {upcomingEvents.map((event) => (
-                  <EventCard key={event.slug} event={event} isPast={false} compact />
+                  <EventCard key={event.slug} event={event} isPast={false} />
                 ))}
                 <div className="pt-4">
                   <Link to="/events" className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors min-h-11">
