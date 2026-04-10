@@ -68,10 +68,15 @@ export default function EventCard({ event, isPast }: Props) {
         </h3>
 
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-[0.78rem] text-text-muted mb-2">
-          <span className="inline-flex items-center gap-1.5">
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-text transition-colors"
+          >
             <FaMapMarkerAlt size={11} className="text-text-subtle" />
             {event.location}
-          </span>
+          </a>
           {timeStr && (
             <span className="inline-flex items-center gap-1.5">
               <FaClock size={11} className="text-text-subtle" />

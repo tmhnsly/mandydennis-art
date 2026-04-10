@@ -277,10 +277,16 @@ export default function HomePage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-display font-semibold text-[0.9rem] tracking-tight">{event.title}</div>
-                        <div className="flex items-center gap-1.5 text-[0.78rem] text-text-muted mt-0.5">
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-[0.78rem] text-text-muted mt-0.5 hover:text-text transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <FaMapMarkerAlt size={10} className="text-text-subtle flex-shrink-0" />
                           {event.location}
-                        </div>
+                        </a>
                       </div>
                       <span className="text-[0.55rem] tracking-widest uppercase text-accent font-medium px-2.5 py-1 border border-accent/30 flex-shrink-0">
                         Upcoming
