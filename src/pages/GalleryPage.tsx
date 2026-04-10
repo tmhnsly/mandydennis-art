@@ -67,6 +67,14 @@ export default function GalleryPage() {
         const tags = artworkTags(item);
         return activeTags.every((t) => tags.includes(t));
       });
+    } else {
+      // No tags selected: boost dogs/pets to the top for the initial view
+      const DOG_PET_TAGS = ["dogs", "pets"];
+      items = [...items].sort((a, b) => {
+        const aScore = a.subject.some((s) => DOG_PET_TAGS.includes(s)) ? 0 : 1;
+        const bScore = b.subject.some((s) => DOG_PET_TAGS.includes(s)) ? 0 : 1;
+        return aScore - bScore;
+      });
     }
     return items;
   }, [activeTags, featuredOnly, allArtwork]);
@@ -166,7 +174,13 @@ export default function GalleryPage() {
           index={lightboxIndex}
           onClose={closeLightbox}
           onChange={changeLightbox}
-          onTagClick={(tag) => { closeLightbox(); toggleTag(tag); }}
+          onTagClick={(tag) => {
+            closeLightbox();
+            setActiveTags([tag]);
+            setFeaturedOnly(false);
+            setSearchParams({ tag }, { replace: true });
+            setShowCount(PAGE_SIZE);
+          }}
         />
       </div>
       <DrawLine />

@@ -307,3 +307,14 @@ export function fullUrl(image: Artwork["image"]): string {
   if (!image) return PLACEHOLDER_FULL;
   return urlFor(image).width(1600).auto("format").quality(85).url() || PLACEHOLDER_FULL;
 }
+
+/** Parse width × height from a Sanity image asset _ref (format: image-{hash}-{w}x{h}-{ext}) */
+export function imageDimensions(image: Artwork["image"]): { width: number; height: number } | null {
+  if (!image || typeof image === "string") return null;
+  // Sanity image objects have asset._ref; narrow through the union safely
+  const asset = "asset" in image ? image.asset : null;
+  if (!asset || !("_ref" in asset)) return null;
+  const match = asset._ref.match(/-(\d+)x(\d+)-/);
+  if (!match) return null;
+  return { width: parseInt(match[1]), height: parseInt(match[2]) };
+}

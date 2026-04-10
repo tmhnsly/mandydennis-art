@@ -1,4 +1,5 @@
-import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaClock, FaMapMarkerAlt, FaCalendarPlus, FaDirections } from "react-icons/fa";
+import { parseDate, formatDay, formatMonth, formatFullDate, formatTimeRange, mapsUrl, downloadIcs } from "../lib/events";
 import type { ArtEvent } from "../types";
 
 interface Props {
@@ -6,33 +7,12 @@ interface Props {
   isPast: boolean;
 }
 
-function parseDate(d: string) {
-  const [y, m, dd] = d.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, dd));
-}
-
-function formatDay(d: Date) {
-  return d.getUTCDate();
-}
-
-function formatMonth(d: Date) {
-  return d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-}
-
-function formatFullDate(d: Date) {
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
-}
-
 export default function EventCard({ event, isPast }: Props) {
   const start = parseDate(event.startDate);
   const end = event.endDate ? parseDate(event.endDate) : null;
   const isMultiDay = end && end.getTime() !== start.getTime();
-
-  const timeStr = event.startTime
-    ? event.endTime
-      ? `${event.startTime} – ${event.endTime}`
-      : `From ${event.startTime}`
-    : null;
+  const timeStr = formatTimeRange(event);
+  const maps = mapsUrl(event.location);
 
   return (
     <div
@@ -69,7 +49,7 @@ export default function EventCard({ event, isPast }: Props) {
 
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-[0.78rem] text-text-muted mb-2">
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+            href={maps}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 hover:text-text transition-colors"
@@ -105,6 +85,26 @@ export default function EventCard({ event, isPast }: Props) {
             More info →
           </a>
         )}
+
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          <button
+            onClick={() => downloadIcs(event)}
+            className="inline-flex items-center gap-1.5 text-[0.7rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-3 py-1.5 transition-colors cursor-pointer"
+          >
+            <FaCalendarPlus size={10} />
+            Add to calendar
+          </button>
+          <a
+            href={maps}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[0.7rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-3 py-1.5 transition-colors"
+          >
+            <FaDirections size={10} />
+            Get directions
+          </a>
+        </div>
       </div>
 
       {/* Status badge */}

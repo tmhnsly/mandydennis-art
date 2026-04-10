@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { FaClock, FaMapMarkerAlt, FaCalendarPlus, FaDirections } from "react-icons/fa";
 import { getEvents, getInitialEvents } from "../lib/content";
+import { parseDate, formatFullDateWithYear, formatTimeRange, mapsUrl, downloadIcs, countdown } from "../lib/events";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -21,12 +23,42 @@ export default function EventsPage() {
     return Date.UTC(y, m - 1, dd);
   };
   const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const currentMonth = now.getUTCMonth();
+  const currentYear = now.getUTCFullYear();
   const eventEnd = (e: ArtEvent) => toUTC(e.endDate ?? e.startDate);
   const eventsWithDates = allEvents.filter((e) => e.startDate);
-  const upcoming = eventsWithDates.filter((e) => eventEnd(e) >= todayUTC);
-  const past = eventsWithDates
-    .filter((e) => eventEnd(e) < todayUTC)
-    .sort((a, b) => toUTC(b.startDate) - toUTC(a.startDate));
+
+  const { featured, thisMonth, comingUp, past } = useMemo(() => {
+    const upcoming = eventsWithDates
+      .filter((e) => eventEnd(e) >= todayUTC)
+      .sort((a, b) => toUTC(a.startDate) - toUTC(b.startDate));
+
+    const pastEvents = eventsWithDates
+      .filter((e) => eventEnd(e) < todayUTC)
+      .sort((a, b) => toUTC(b.startDate) - toUTC(a.startDate));
+
+    const feat = upcoming.length > 0 ? upcoming[0] : null;
+    const rest = upcoming.slice(1);
+
+    const thisMonthEvents: ArtEvent[] = [];
+    const comingUpEvents: ArtEvent[] = [];
+
+    for (const e of rest) {
+      const d = parseDate(e.startDate);
+      if (d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear) {
+        thisMonthEvents.push(e);
+      } else {
+        comingUpEvents.push(e);
+      }
+    }
+
+    return {
+      featured: feat,
+      thisMonth: thisMonthEvents,
+      comingUp: comingUpEvents,
+      past: pastEvents,
+    };
+  }, [allEvents, todayUTC]);
 
   return (
     <>
@@ -41,27 +73,42 @@ export default function EventsPage() {
               </p>
             ) : (
               <>
-                {upcoming.length > 0 ? (
-                  <div className="space-y-3 mb-10">
-                    <h2 className="font-display text-lg font-semibold text-text-mid mb-3">Upcoming</h2>
-                    {upcoming.map((event) => (
-                      <EventCard key={event.slug} event={event} isPast={false} />
-                    ))}
-                  </div>
-                ) : (
+                {featured && <FeaturedHero event={featured} todayUTC={todayUTC} />}
+
+                {!featured && (
                   <p className="text-text-muted mb-10">
                     No upcoming events at the moment. Check back soon!
                   </p>
                 )}
 
-                {past.length > 0 && (
-                  <div className="space-y-3">
-                    <h2 className="font-display text-lg font-semibold text-text-subtle mb-3">Past Events</h2>
-                    {past.map((event) => (
-                      <EventCard key={event.slug} event={event} isPast={true} />
+                {thisMonth.length > 0 && (
+                  <div className="space-y-3 mb-10">
+                    <h2 className="font-display text-lg font-semibold text-text-mid mb-3">This Month</h2>
+                    {thisMonth.map((event) => (
+                      <EventCard key={event.slug} event={event} isPast={false} />
                     ))}
                   </div>
                 )}
+
+                {comingUp.length > 0 && (
+                  <div className="space-y-3 mb-10">
+                    <h2 className="font-display text-lg font-semibold text-text-mid mb-3">Coming Up</h2>
+                    {comingUp.map((event) => (
+                      <EventCard key={event.slug} event={event} isPast={false} />
+                    ))}
+                  </div>
+                )}
+
+                <div className="space-y-3 mt-12 pt-10 border-t border-line">
+                  <h2 className="font-display text-lg font-semibold text-text-subtle mb-3">Past Events</h2>
+                  {past.length > 0 ? (
+                    past.map((event) => (
+                      <EventCard key={event.slug} event={event} isPast={true} />
+                    ))
+                  ) : (
+                    <p className="text-text-subtle text-[0.85rem] py-4">No past events yet.</p>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -79,5 +126,85 @@ export default function EventsPage() {
       />
       <DrawLine />
     </>
+  );
+}
+
+function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }) {
+  const start = parseDate(event.startDate);
+  const end = event.endDate ? parseDate(event.endDate) : null;
+  const isMultiDay = end && end.getTime() !== start.getTime();
+  const timeStr = formatTimeRange(event);
+  const maps = mapsUrl(event.location);
+  const countdownText = countdown(event.startDate, todayUTC);
+
+  return (
+    <div className="border border-line p-[clamp(1.5rem,4vw,2.5rem)] mb-10">
+      <span className="inline-block text-[0.6rem] tracking-widest uppercase font-medium px-3 py-1 border border-accent/30 text-accent mb-6">
+        {countdownText}
+      </span>
+
+      <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-bold tracking-tight leading-tight mb-3">
+        {event.title}
+      </h2>
+
+      <p className="text-[0.95rem] text-text-mid mb-1">
+        {formatFullDateWithYear(start)}
+        {isMultiDay && end && <> – {formatFullDateWithYear(end)}</>}
+      </p>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[0.85rem] text-text-muted mb-5">
+        <a
+          href={maps}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 hover:text-text transition-colors"
+        >
+          <FaMapMarkerAlt size={12} className="text-text-subtle" />
+          {event.location}
+        </a>
+        {timeStr && (
+          <span className="inline-flex items-center gap-1.5">
+            <FaClock size={12} className="text-text-subtle" />
+            {timeStr}
+          </span>
+        )}
+      </div>
+
+      {event.description && (
+        <p className="text-[0.95rem] text-text-mid leading-relaxed max-w-[55ch] mb-6">
+          {event.description}
+        </p>
+      )}
+
+      {event.link && (
+        <a
+          href={event.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block mb-6 text-[0.85rem] text-text-mid underline hover:text-text transition-colors"
+        >
+          More info →
+        </a>
+      )}
+
+      <div className="flex flex-wrap gap-2.5">
+        <button
+          onClick={() => downloadIcs(event)}
+          className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 transition-colors cursor-pointer"
+        >
+          <FaCalendarPlus size={11} />
+          Add to calendar
+        </button>
+        <a
+          href={maps}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 transition-colors"
+        >
+          <FaDirections size={11} />
+          Get directions
+        </a>
+      </div>
+    </div>
   );
 }

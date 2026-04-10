@@ -21,8 +21,16 @@ export default function HomePage() {
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [heroReady, setHeroReady] = useState(() => {
+    // If the first hero image is already in browser cache, show immediately (no fade)
+    const first = initial.filter((a) => a.featured).find((a) => a.image);
+    if (!first) return true;
+    const img = new Image();
+    img.src = heroUrl(first.image);
+    return img.complete;
+  });
   const heroRef = useRef<HTMLDivElement>(null);
-  const parallaxImgs = useRef<HTMLImageElement[]>([]);
+  const parallaxImgs = useRef<HTMLElement[]>([]);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
@@ -32,28 +40,35 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax — direct DOM, single getBoundingClientRect, translate3d for GPU
+  // Parallax — rAF-throttled to avoid layout thrashing in Chrome
   useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const el = heroRef.current;
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.bottom > 0) {
-            const y = -rect.top * 0.12;
-            for (const img of parallaxImgs.current) {
-              if (img) img.style.transform = `scale(1.08) translate3d(0,${y}px,0)`;
-            }
-          }
+    let rafId = 0;
+
+    const update = () => {
+      const el = heroRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > 0) {
+        const y = -rect.top * 0.10;
+        for (const img of parallaxImgs.current) {
+          if (img) img.style.transform = `scale(1.12) translate3d(0,${y}px,0)`;
         }
-        ticking = false;
-      });
+      }
     };
+
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(update);
+    };
+
+    // Set correct position immediately (prevents jump if page is already scrolled)
+    update();
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {
@@ -89,6 +104,9 @@ export default function HomePage() {
 
   // Hero cycles through featured images
   const safeIndex = featured.length > 0 ? heroIndex % featured.length : 0;
+  // If no featured items have images, reveal hero immediately
+  const hasHeroImages = featured.some((f) => f.image);
+  useEffect(() => { if (!hasHeroImages) setHeroReady(true); }, [hasHeroImages]);
   // Upcoming events
   const now = new Date();
   const toUTC = (d: string | null) => {
@@ -111,19 +129,23 @@ export default function HomePage() {
             <div
               key={item.slug}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                i === safeIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+                i === safeIndex ? (heroReady ? "opacity-100" : "opacity-0") : "opacity-0 pointer-events-none"
               }`}
               aria-hidden={i !== safeIndex}
             >
-              <img
-                src={heroUrl(item.image)}
-                alt=""
-                loading={i === 0 ? "eager" : "lazy"}
-                fetchPriority={i === 0 ? "high" : undefined}
+              <div
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className="w-full h-full object-cover object-center will-change-transform"
-                style={{ transform: "scale(1.08) translate3d(0,0,0)" }}
-              />
+                className="absolute inset-0 will-change-transform scale-[1.12]"
+              >
+                <img
+                  src={heroUrl(item.image)}
+                  alt=""
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  onLoad={i === 0 ? () => setHeroReady(true) : undefined}
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
             </div>

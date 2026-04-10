@@ -20,7 +20,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const navigate = useNavigate();
   const canNav = items.length > 1;
   const scrollRef = useRef<HTMLDivElement>(null);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const isScrolling = useRef(false);
 
   // Scroll to the correct slide when index changes (from buttons/keyboard)
@@ -103,18 +102,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Swipe down to close
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStart.current) return;
-    const dx = Math.abs(e.changedTouches[0].clientX - touchStart.current.x);
-    const dy = e.changedTouches[0].clientY - touchStart.current.y;
-    if (dy > 120 && dy > dx * 2) onClose();
-    touchStart.current = null;
-  };
-
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
   return (
@@ -129,8 +116,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
           aria-label="Image viewer"
           aria-modal="true"
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
           <button

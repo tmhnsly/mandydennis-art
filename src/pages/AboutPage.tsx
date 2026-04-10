@@ -34,7 +34,7 @@ export default function AboutPage() {
           <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start`}>
             {about.photo ? (
               <img
-                src={urlFor(about.photo).width(400).auto("format").quality(85).url()}
+                src={urlFor(about.photo).width(800).auto("format").quality(85).url()}
                 alt="Mandy Dennis"
                 className="w-full aspect-[3/4] object-cover border border-line"
               />
