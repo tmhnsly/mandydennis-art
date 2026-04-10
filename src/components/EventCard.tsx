@@ -18,7 +18,7 @@ export default function EventCard({ event, isPast, compact }: Props) {
 
   return (
     <div
-      className={`border border-line p-4 sm:p-5 grid grid-cols-[3.5rem_1fr] sm:grid-cols-[4rem_1fr] gap-3 sm:gap-4 items-start transition-colors hover:border-line-strong ${
+      className={`border border-line bg-text/[0.03] p-4 sm:p-5 grid grid-cols-[3.5rem_1fr] sm:grid-cols-[4rem_1fr] gap-3 sm:gap-4 items-start transition-colors hover:border-line-strong ${
         isPast ? "opacity-50" : ""
       }`}
     >

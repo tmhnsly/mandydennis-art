@@ -106,7 +106,7 @@ export default function AboutPage() {
 
               <div className={`anim-fade-up ${testimonialsInView ? "in-view" : ""} grid grid-cols-1 md:grid-cols-2 gap-6`}>
                 {testimonials.map((t, i) => (
-                  <div key={i} className="border border-line p-6 flex flex-col">
+                  <div key={i} className="border border-line bg-text/[0.03] p-6 flex flex-col">
                     <FaQuoteLeft size={16} className="text-text-subtle mb-4" />
                     <p className="text-[0.95rem] text-text-mid leading-relaxed flex-1">
                       {t.quote}

@@ -139,7 +139,7 @@ function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }
   const countdownText = countdown(event.startDate, todayUTC);
 
   return (
-    <div className="border border-line p-[clamp(1.5rem,4vw,2.5rem)] mb-10 grid grid-cols-[4.5rem_1fr] gap-5 items-start">
+    <div className="border border-line bg-text/[0.03] p-[clamp(1.5rem,4vw,2.5rem)] mb-10 grid grid-cols-[4.5rem_1fr] gap-5 items-start">
       {/* Date block — same style as EventCard but larger */}
       <div className="text-center pt-1">
         <div className="font-display font-bold text-4xl tracking-tight leading-none">
