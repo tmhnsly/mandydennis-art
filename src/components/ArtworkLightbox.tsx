@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
 import type { Artwork } from "../types";
@@ -20,13 +19,15 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const navigate = useNavigate();
   const canNav = items.length > 1;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const isScrolling = useRef(false);
   const [loadedUrls, setLoadedUrls] = useState(new Set<string>());
 
-  // Swipe-down-to-close state
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const touchRef = useRef<{ x: number; y: number; locked: "vertical" | "horizontal" | null }>({ x: 0, y: 0, locked: null });
+  // Swipe-down refs — direct DOM for 60fps
+  const touchRef = useRef<{ x: number; y: number; locked: "v" | "h" | null }>({ x: 0, y: 0, locked: null });
+  const dragging = useRef(false);
+  const closing = useRef(false);
 
   const onImageLoad = useCallback((url: string) => {
     setLoadedUrls((prev) => {
@@ -50,6 +51,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   // Scroll to initial position when opening
   useEffect(() => {
     if (!isOpen) return;
+    closing.current = false;
     const el = scrollRef.current;
     if (!el) return;
     requestAnimationFrame(() => {
@@ -114,140 +116,168 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Interactive swipe-down-to-close — image follows finger, fades out
-  const handleTouchStart = (e: React.TouchEvent) => {
+  // iOS-style swipe-down-to-close — direct DOM manipulation for 60fps
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (closing.current) return;
     touchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, locked: null };
-  };
-  const handleTouchMove = (e: React.TouchEvent) => {
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (closing.current) return;
     const t = touchRef.current;
     const dx = e.touches[0].clientX - t.x;
     const dy = e.touches[0].clientY - t.y;
 
-    // Lock direction after 10px of movement
     if (!t.locked) {
-      if (Math.abs(dy) > 10 || Math.abs(dx) > 10) {
-        t.locked = Math.abs(dy) > Math.abs(dx) ? "vertical" : "horizontal";
+      if (Math.abs(dy) > 8 || Math.abs(dx) > 8) {
+        t.locked = Math.abs(dy) > Math.abs(dx) ? "v" : "h";
       }
       return;
     }
 
-    if (t.locked === "vertical" && dy > 0) {
-      setIsDragging(true);
-      setDragY(dy);
-    }
-  };
-  const handleTouchEnd = () => {
-    if (isDragging) {
-      if (dragY > 120) {
-        onClose();
-      }
-      setDragY(0);
-      setIsDragging(false);
-    }
-    touchRef.current = { x: 0, y: 0, locked: null };
-  };
+    if (t.locked !== "v" || dy <= 0) return;
 
-  const dragOpacity = isDragging ? Math.max(0.2, 1 - dragY / 400) : 1;
-  const dragTransform = isDragging ? `translateY(${dragY}px) scale(${Math.max(0.9, 1 - dragY / 1200)})` : "";
+    dragging.current = true;
+    const carousel = carouselRef.current;
+    const backdrop = backdropRef.current;
+    if (!carousel || !backdrop) return;
+
+    const progress = Math.min(dy / 300, 1);
+    const scale = 1 - progress * 0.15;
+    carousel.style.transform = `translateY(${dy}px) scale(${scale})`;
+    carousel.style.transition = "none";
+    backdrop.style.backgroundColor = `rgba(0,0,0,${0.95 - progress * 0.7})`;
+    backdrop.style.transition = "none";
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    const t = touchRef.current;
+    const dy = dragging.current ? (() => {
+      const carousel = carouselRef.current;
+      if (!carousel) return 0;
+      const match = carousel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
+      return match ? parseFloat(match[1]) : 0;
+    })() : 0;
+
+    if (dragging.current && dy > 100) {
+      // Commit close — animate image off screen
+      closing.current = true;
+      const carousel = carouselRef.current;
+      const backdrop = backdropRef.current;
+      if (carousel && backdrop) {
+        carousel.style.transition = "transform 0.2s ease-out";
+        carousel.style.transform = `translateY(${window.innerHeight}px) scale(0.8)`;
+        backdrop.style.transition = "background-color 0.2s ease-out";
+        backdrop.style.backgroundColor = "rgba(0,0,0,0)";
+        setTimeout(onClose, 200);
+      }
+    } else if (dragging.current) {
+      // Spring back
+      const carousel = carouselRef.current;
+      const backdrop = backdropRef.current;
+      if (carousel && backdrop) {
+        carousel.style.transition = "transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1)";
+        carousel.style.transform = "";
+        backdrop.style.transition = "background-color 0.3s ease-out";
+        backdrop.style.backgroundColor = "";
+      }
+    }
+
+    dragging.current = false;
+    touchRef.current = { x: 0, y: 0, locked: null };
+  }, [onClose]);
 
   const btnClass = "min-w-[44px] min-h-[44px] rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
+  if (!isOpen || !current) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && current && (
-        <motion.div
-          key="lightbox"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.15 } }}
-          role="dialog"
-          aria-label="Image viewer"
-          aria-modal="true"
-          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
-          style={{ opacity: dragOpacity }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Close */}
-          <button
-            onClick={onClose}
-            className={`absolute top-3 right-3 z-20 ${btnClass}`}
-            aria-label="Close"
-          >
-            <FaTimes size={13} className="text-white/70" />
-          </button>
+    <div
+      ref={backdropRef}
+      role="dialog"
+      aria-label="Image viewer"
+      aria-modal="true"
+      className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Close */}
+      <button
+        onClick={onClose}
+        className={`absolute top-3 right-3 z-20 ${btnClass}`}
+        aria-label="Close"
+      >
+        <FaTimes size={13} className="text-white/70" />
+      </button>
 
-          {/* Scroll-snap carousel */}
-          <div
-            ref={scrollRef}
-            className="flex-1 flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
-            style={isDragging ? { transform: dragTransform, transition: "none" } : { transform: "", transition: "transform 0.25s ease-out" }}
-          >
-            {items.map((item) => {
-              const url = fullUrl(item.image);
-              const isLoaded = loadedUrls.has(url);
-              return (
-                <div
-                  key={item.slug}
-                  className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6 relative"
-                >
-                  {!isLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-                    </div>
-                  )}
-                  <img
-                    src={url}
-                    alt={item.title}
-                    loading="eager"
-                    decoding="async"
-                    onLoad={() => onImageLoad(url)}
-                    className={`max-w-full max-h-full object-contain select-none transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-                    draggable={false}
-                  />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bottom bar — tags grow upward from bottom, nav pinned right */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-            <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
-              {tags.length > 0 ? (
-                <div className="flex gap-1.5 flex-wrap-reverse content-end flex-1 pointer-events-auto">
-                  {tags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => {
-                        onClose();
-                        if (onTagClick) onTagClick(tag);
-                        else navigate(`/gallery?tag=${encodeURIComponent(tag)}`);
-                      }}
-                      className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              ) : <div />}
-              {canNav && (
-                <div className="flex items-center gap-1.5 flex-shrink-0 pointer-events-auto">
-                  <button onClick={(e) => { e.stopPropagation(); goPrev(); }} className={btnClass} aria-label="Previous">
-                    <FaChevronLeft size={12} className="text-white/70" />
-                  </button>
-                  <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
-                    {index + 1} / {items.length}
-                  </span>
-                  <button onClick={(e) => { e.stopPropagation(); goNext(); }} className={btnClass} aria-label="Next">
-                    <FaChevronRight size={12} className="text-white/70" />
-                  </button>
+      {/* Scroll-snap carousel */}
+      <div
+        ref={(el) => { scrollRef.current = el; carouselRef.current = el; }}
+        className="flex-1 flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
+      >
+        {items.map((item) => {
+          const url = fullUrl(item.image);
+          const isLoaded = loadedUrls.has(url);
+          return (
+            <div
+              key={item.slug}
+              className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6 relative"
+            >
+              {!isLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
                 </div>
               )}
+              <img
+                src={url}
+                alt={item.title}
+                loading="eager"
+                decoding="async"
+                onLoad={() => onImageLoad(url)}
+                className={`max-w-full max-h-full object-contain select-none transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+                draggable={false}
+              />
             </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          );
+        })}
+      </div>
+
+      {/* Bottom bar — tags grow upward, nav pinned right */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+        <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
+          {tags.length > 0 ? (
+            <div className="flex gap-1.5 flex-wrap-reverse content-end flex-1 pointer-events-auto">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    onClose();
+                    if (onTagClick) onTagClick(tag);
+                    else navigate(`/gallery?tag=${encodeURIComponent(tag)}`);
+                  }}
+                  className="px-3 py-1 rounded-full text-[0.6rem] tracking-wide uppercase text-white/70 border border-white/10 bg-black/30 backdrop-blur-md hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          ) : <div />}
+          {canNav && (
+            <div className="flex items-center gap-1.5 flex-shrink-0 pointer-events-auto">
+              <button onClick={(e) => { e.stopPropagation(); goPrev(); }} className={btnClass} aria-label="Previous">
+                <FaChevronLeft size={12} className="text-white/70" />
+              </button>
+              <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
+                {index + 1} / {items.length}
+              </span>
+              <button onClick={(e) => { e.stopPropagation(); goNext(); }} className={btnClass} aria-label="Next">
+                <FaChevronRight size={12} className="text-white/70" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
