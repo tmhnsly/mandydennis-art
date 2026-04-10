@@ -4,7 +4,7 @@ import { thumbnailUrl } from "../lib/content";
 
 interface Props {
   items: Artwork[];
-  onSelect: (index: number) => void;
+  onSelect: (index: number, slug: string) => void;
   emptyMessage?: string;
 }
 
@@ -29,7 +29,7 @@ export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
       {items.map((item, i) => (
         <button
           key={item.slug}
-          onClick={() => onSelect(i)}
+          onClick={() => onSelect(i, item.slug)}
           className="block w-full break-inside-avoid mb-[var(--gap-masonry)] relative overflow-hidden cursor-pointer group text-left"
           style={{
             animation: isNew(item.slug) ? `gridFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${Math.min(i * 0.03, 0.3)}s both` : undefined,

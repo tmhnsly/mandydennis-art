@@ -235,7 +235,10 @@ export default function HomePage() {
             <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
-                <MasonryGrid items={featured} onSelect={(i) => setLightboxIndex(i)} />
+                <MasonryGrid items={featured} onSelect={(_i, slug) => {
+                  const idx = slug ? featured.findIndex((f) => f.slug === slug) : _i;
+                  setLightboxIndex(idx >= 0 ? idx : _i);
+                }} />
                 <div className="mt-8 text-center">
                   <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-text text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:bg-text hover:text-bg transition-colors">
                     <FaArrowRight size={14} />

@@ -109,8 +109,9 @@ export default function GalleryPage() {
   };
 
   // Update URL when lightbox opens/closes
-  const openLightbox = (i: number) => {
-    const item = visible[i];
+  const openLightbox = (_i: number, slug?: string) => {
+    const idx = slug ? visible.findIndex((v) => v.slug === slug) : _i;
+    const item = visible[idx >= 0 ? idx : _i];
     if (item) {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
@@ -118,7 +119,7 @@ export default function GalleryPage() {
         return next;
       }, { replace: true });
     }
-    setLightboxIndex(i);
+    setLightboxIndex(idx >= 0 ? idx : _i);
   };
 
   const closeLightbox = () => {
