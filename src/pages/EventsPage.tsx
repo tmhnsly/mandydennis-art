@@ -186,12 +186,12 @@ function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 hover:text-text transition-colors min-w-0"
           >
-            <FaMapMarkerAlt size={12} className="text-accent flex-shrink-0" />
+            <FaMapMarkerAlt size={12} className="text-text-subtle flex-shrink-0" />
             <span className="truncate">{event.location}</span>
           </a>
           {timeStr && (
             <span className="inline-flex items-center gap-1.5 flex-shrink-0">
-              <FaClock size={12} className="text-accent" />
+              <FaClock size={12} className="text-text-subtle" />
               {timeStr}
             </span>
           )}
