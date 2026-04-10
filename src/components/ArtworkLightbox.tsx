@@ -50,19 +50,26 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+
+    const detectSlide = () => {
+      isScrolling.current = false;
+      const newIndex = Math.round(el.scrollLeft / el.clientWidth);
+      if (newIndex !== index && newIndex >= 0 && newIndex < items.length) {
+        onChange(newIndex);
+      }
+    };
+
+    // Use scrollend event if supported, otherwise fall back to debounced scroll
+    if ("onscrollend" in window) {
+      el.addEventListener("scrollend", detectSlide);
+      return () => el.removeEventListener("scrollend", detectSlide);
+    }
+
     let scrollTimer: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
       isScrolling.current = true;
       clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        isScrolling.current = false;
-        const scrollLeft = el.scrollLeft;
-        const slideWidth = el.clientWidth;
-        const newIndex = Math.round(scrollLeft / slideWidth);
-        if (newIndex !== index && newIndex >= 0 && newIndex < items.length) {
-          onChange(newIndex);
-        }
-      }, 50);
+      scrollTimer = setTimeout(detectSlide, 80);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
     return () => { el.removeEventListener("scroll", handleScroll); clearTimeout(scrollTimer); };

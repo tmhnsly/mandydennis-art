@@ -277,8 +277,8 @@ export default function HomePage() {
               <SectionHeader title="Upcoming Events" />
               <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[var(--width-narrow)]`}>
                 {upcomingEvents.map((event) => {
-                  const [, m, d] = event.startDate.split("-").map(Number);
-                  const date = new Date(Date.UTC(2026, m - 1, d));
+                  const [y, m, d] = event.startDate.split("-").map(Number);
+                  const date = new Date(Date.UTC(y, m - 1, d));
                   const day = date.getUTCDate();
                   const month = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
 
