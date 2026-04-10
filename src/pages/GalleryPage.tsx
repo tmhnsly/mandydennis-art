@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { scrollToTop } from "../components/PageTransition";
-import { useAnimateIn } from "../hooks/useAnimateIn";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
@@ -37,7 +36,7 @@ export default function GalleryPage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
   const [lightboxSlug, setLightboxSlug] = useState<string | null>(null);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
-  const { ref: bodyRef, isInView } = useAnimateIn(0);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Read tag from URL
@@ -141,7 +140,7 @@ export default function GalleryPage() {
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Gallery" />
 
-          <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""}`}>
+          <div ref={bodyRef}>
             {allArtwork.length === 0 ? (
               <p className="text-text-muted py-8">
                 Gallery coming soon. Check back for Mandy's latest work.
