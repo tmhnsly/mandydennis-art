@@ -132,7 +132,7 @@ export default function HomePage() {
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            {/* Row 1: line + status label + pulse */}
+            {/* Row 1: line + status + social icons */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
@@ -142,33 +142,43 @@ export default function HomePage() {
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
               </span>
+              {/* Social icons inline on mobile, separate column on sm+ */}
+              <div className="flex items-center gap-1 sm:hidden">
+                <Link to="/commissions" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
+                  <FaEnvelope size={12} />
+                </Link>
+                {settings.instagram_url && (
+                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
+                    <FaInstagram size={13} />
+                  </a>
+                )}
+              </div>
             </div>
 
-            {/* Row 2: two columns — main content (left) + socials (right) */}
+            {/* Row 2: two columns on sm+, single column on mobile */}
             <div className="flex items-start gap-6">
-              {/* Left: name, tagline, CTAs */}
               <div className="flex-1 min-w-0">
                 <h1 className="mb-5">
                   <TextReveal as="span" className="block font-display text-[clamp(3rem,8vw,5rem)] font-bold tracking-[-0.04em] leading-[0.85]">Mandy</TextReveal>
                   <TextReveal as="span" delay={0.08} className="block font-serif italic font-normal text-text-mid text-[clamp(3.5rem,9vw,6rem)] leading-[0.85]">Dennis</TextReveal>
                 </h1>
 
-                <p className="text-[1.05rem] text-text-mid leading-relaxed max-w-[var(--width-text)] mb-8">
+                <p className="text-[1.05rem] text-text-mid leading-relaxed sm:max-w-[var(--width-text)] mb-8">
                   {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
                 </p>
 
-                <div className="flex gap-2.5 flex-wrap">
-                  <Link to="/gallery" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
+                <div className="flex sm:inline-flex gap-2.5 flex-col sm:flex-row">
+                  <Link to="/gallery" className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
                     View Gallery
                   </Link>
-                  <Link to="/commissions" className="inline-flex items-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
+                  <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
                     Get in Touch
                   </Link>
                 </div>
               </div>
 
-              {/* Right: quick actions */}
-              <div className="flex flex-row items-center gap-1.5 flex-shrink-0">
+              {/* Social icons — column on sm+, hidden on mobile (shown in top bar instead) */}
+              <div className="hidden sm:flex flex-row items-center gap-1.5 flex-shrink-0">
                 <Link to="/commissions" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
                   <FaEnvelope size={14} />
                 </Link>
