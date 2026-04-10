@@ -40,7 +40,8 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax — rAF-throttled to avoid layout thrashing in Chrome
+  // Parallax — uses CSS custom property to avoid Chrome layout thrashing
+  // Writing a CSS variable is cheaper than rewriting the full transform string
   useEffect(() => {
     let rafId = 0;
 
@@ -51,7 +52,7 @@ export default function HomePage() {
       if (rect.bottom > 0) {
         const y = -rect.top * 0.10;
         for (const img of parallaxImgs.current) {
-          if (img) img.style.transform = `scale(1.12) translate3d(0,${y}px,0)`;
+          if (img) img.style.setProperty("--parallax-y", `${y}px`);
         }
       }
     };
@@ -61,7 +62,6 @@ export default function HomePage() {
       rafId = requestAnimationFrame(update);
     };
 
-    // Set correct position immediately (prevents jump if page is already scrolled)
     update();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -135,7 +135,8 @@ export default function HomePage() {
             >
               <div
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className="absolute inset-0 will-change-transform scale-[1.12]"
+                className="absolute inset-0 will-change-transform"
+                style={{ transform: "scale(1.12) translate3d(0, var(--parallax-y, 0px), 0)" }}
               >
                 <img
                   src={heroUrl(item.image)}
@@ -154,7 +155,7 @@ export default function HomePage() {
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            {/* Row 1: line + status + social icons */}
+            {/* Row 1: line + status */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
@@ -164,17 +165,6 @@ export default function HomePage() {
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
               </span>
-              {/* Social icons inline on mobile, separate column on sm+ */}
-              <div className="flex items-center gap-1 sm:hidden">
-                <Link to="/commissions" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
-                  <FaEnvelope size={12} />
-                </Link>
-                {settings.instagram_url && (
-                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
-                    <FaInstagram size={13} />
-                  </a>
-                )}
-              </div>
             </div>
 
             {/* Row 2: two columns on sm+, single column on mobile */}
@@ -196,6 +186,18 @@ export default function HomePage() {
                   <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
                     Get in Touch
                   </Link>
+                </div>
+
+                {/* Social icons — below buttons on mobile */}
+                <div className="flex items-center gap-1.5 mt-4 sm:hidden">
+                  <Link to="/commissions" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
+                    <FaEnvelope size={12} />
+                  </Link>
+                  {settings.instagram_url && (
+                    <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
+                      <FaInstagram size={13} />
+                    </a>
+                  )}
                 </div>
               </div>
 

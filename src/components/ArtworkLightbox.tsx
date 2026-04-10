@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
@@ -21,6 +21,18 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const canNav = items.length > 1;
   const scrollRef = useRef<HTMLDivElement>(null);
   const isScrolling = useRef(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const [loadedUrls, setLoadedUrls] = useState(new Set<string>());
+
+  // Track loaded images for spinner
+  const onImageLoad = useCallback((url: string) => {
+    setLoadedUrls((prev) => {
+      if (prev.has(url)) return prev;
+      const next = new Set(prev);
+      next.add(url);
+      return next;
+    });
+  }, []);
 
   // Scroll to the correct slide when index changes (from buttons/keyboard)
   useEffect(() => {
@@ -58,7 +70,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
       }
     };
 
-    // Use scrollend event if supported, otherwise fall back to debounced scroll
     if ("onscrollend" in window) {
       el.addEventListener("scrollend", detectSlide);
       return () => el.removeEventListener("scrollend", detectSlide);
@@ -102,6 +113,19 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
+  // Swipe down to close — only triggers on vertical swipe, not horizontal scroll
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart.current) return;
+    const dx = Math.abs(e.changedTouches[0].clientX - touchStart.current.x);
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    // Must be clearly vertical (down > 80px, ratio 3:1 vertical to horizontal)
+    if (dy > 80 && dy > dx * 3) onClose();
+    touchStart.current = null;
+  };
+
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
   return (
@@ -116,6 +140,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
           aria-label="Image viewer"
           aria-modal="true"
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
           <button
@@ -131,28 +157,39 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             ref={scrollRef}
             className="flex-1 flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
           >
-            {items.map((item) => (
-              <div
-                key={item.slug}
-                className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6"
-              >
-                <img
-                  src={fullUrl(item.image)}
-                  alt={item.title}
-                  loading="eager"
-                  decoding="async"
-                  className="max-w-full max-h-full object-contain select-none"
-                  draggable={false}
-                />
-              </div>
-            ))}
+            {items.map((item) => {
+              const url = fullUrl(item.image);
+              const isLoaded = loadedUrls.has(url);
+              return (
+                <div
+                  key={item.slug}
+                  className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6 relative"
+                >
+                  {/* Loading spinner */}
+                  {!isLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+                    </div>
+                  )}
+                  <img
+                    src={url}
+                    alt={item.title}
+                    loading="eager"
+                    decoding="async"
+                    onLoad={() => onImageLoad(url)}
+                    className={`max-w-full max-h-full object-contain select-none transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+                    draggable={false}
+                  />
+                </div>
+              );
+            })}
           </div>
 
-          {/* Bottom bar */}
+          {/* Bottom bar — tags left-aligned, nav right-aligned */}
           <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
             <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
               {tags.length > 0 ? (
-                <div className="flex gap-1.5 flex-wrap flex-1 pointer-events-auto">
+                <div className="flex gap-1.5 flex-wrap items-end flex-1 pointer-events-auto">
                   {tags.map((tag) => (
                     <button
                       key={tag}

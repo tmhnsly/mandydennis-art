@@ -19,3 +19,8 @@ export default function PageTransition({ children }: Props) {
 
   return <>{children}</>;
 }
+
+/** Call from event handlers that navigate within the same page (e.g. tag clicks from lightbox) */
+export function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "instant" });
+}

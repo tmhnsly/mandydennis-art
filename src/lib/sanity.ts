@@ -1,5 +1,5 @@
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 import type { SanityImage } from "../types";
 
 const projectId = import.meta.env.VITE_SANITY_PROJECT_ID;
@@ -15,7 +15,7 @@ export const client = isConfigured
     })
   : null;
 
-const builder = isConfigured && client ? imageUrlBuilder(client) : null;
+const builder = isConfigured && client ? createImageUrlBuilder(client) : null;
 
 const nullBuilder = {
   width: () => nullBuilder,

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
+import { scrollToTop } from "../components/PageTransition";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
@@ -36,7 +37,7 @@ export default function GalleryPage() {
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
   const [lightboxSlug, setLightboxSlug] = useState<string | null>(null);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
-  const { ref: bodyRef, isInView } = useAnimateIn();
+  const { ref: bodyRef, isInView } = useAnimateIn(0);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Read tag from URL
@@ -180,6 +181,7 @@ export default function GalleryPage() {
             setFeaturedOnly(false);
             setSearchParams({ tag }, { replace: true });
             setShowCount(PAGE_SIZE);
+            scrollToTop();
           }}
         />
       </div>
