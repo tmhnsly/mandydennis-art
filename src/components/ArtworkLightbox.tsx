@@ -20,42 +20,41 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const navigate = useNavigate();
   const canNav = items.length > 1;
-  const touchStartY = useRef<number | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  // Stable key from item slugs — forces embla remount when items change
+  const itemsKey = items.map((i) => i.slug).join(",");
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: canNav,
     startIndex: index >= 0 ? index : 0,
-    dragFree: false,
-    containScroll: false,
     duration: 20,
-    skipSnaps: false,
   });
 
+  // Sync embla selection → parent
   useEffect(() => {
     if (!emblaApi) return;
     const onSelect = () => {
-      const selected = emblaApi.selectedScrollSnap();
-      if (selected !== index) onChange(selected);
+      const sel = emblaApi.selectedScrollSnap();
+      if (sel !== index) onChange(sel);
     };
     emblaApi.on("select", onSelect);
     return () => { emblaApi.off("select", onSelect); };
   }, [emblaApi, index, onChange]);
 
+  // Sync parent → embla (button clicks, keyboard)
   useEffect(() => {
     if (!emblaApi || !isOpen) return;
-    if (emblaApi.selectedScrollSnap() !== index) {
-      emblaApi.scrollTo(index);
+    const snap = emblaApi.selectedScrollSnap();
+    if (snap !== index && index >= 0) {
+      emblaApi.scrollTo(index, false);
     }
   }, [emblaApi, index, isOpen]);
-
-  useEffect(() => {
-    if (!emblaApi || !isOpen) return;
-    emblaApi.reInit({ startIndex: index >= 0 ? index : 0 });
-  }, [emblaApi, isOpen]);
 
   const goPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const goNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
+  // Keyboard nav
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -71,15 +70,17 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Swipe down to close — simple touch tracking
+  // Swipe down to close — only if vertical movement dominates
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    if (dy > 100) onClose();
-    touchStartY.current = null;
+    if (!touchStart.current) return;
+    const dx = Math.abs(e.changedTouches[0].clientX - touchStart.current.x);
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    // Only close if mostly vertical (dy > dx) and downward > 120px
+    if (dy > 120 && dy > dx * 2) onClose();
+    touchStart.current = null;
   };
 
   const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
@@ -108,8 +109,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             <FaTimes size={13} className="text-white/70" />
           </button>
 
-          {/* Embla carousel — handles all swipe gestures natively */}
-          <div className="flex-1 overflow-hidden" ref={emblaRef}>
+          {/* Embla carousel — keyed by items so it remounts on filter change */}
+          <div className="flex-1 overflow-hidden" ref={emblaRef} key={itemsKey}>
             <div className="flex h-full">
               {items.map((item) => (
                 <div
@@ -127,7 +128,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             </div>
           </div>
 
-          {/* Bottom bar — tags left, controls right */}
+          {/* Bottom bar */}
           <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
             <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
               {tags.length > 0 ? (
