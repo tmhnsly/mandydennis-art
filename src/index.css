@@ -200,9 +200,9 @@ body {
 
 /* Page exit animations now handled by motion AnimatePresence */
 
-/* Embla carousel slide transitions */
-.embla__slide {
-  transition: opacity 0.2s ease;
+/* Embla lightbox — GPU compositing for smooth drag */
+[data-embla] {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Grid item entrance */

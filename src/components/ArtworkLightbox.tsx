@@ -28,7 +28,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: canNav,
     startIndex: index >= 0 ? index : 0,
-    duration: 30,
+    duration: 40,
   });
 
   // Sync embla selection → parent (only from user interaction, not reinit)
@@ -119,7 +119,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
 
           {/* Embla carousel — keyed by items so it remounts on filter change */}
           <div className="flex-1 overflow-hidden" ref={emblaRef} key={itemsKey}>
-            <div className="flex h-full">
+            <div className="flex h-full will-change-transform">
               {items.map((item) => (
                 <div
                   key={item.slug}
@@ -128,6 +128,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
                   <img
                     src={fullUrl(item.image)}
                     alt={item.title}
+                    loading="eager"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain select-none"
                     draggable={false}
                   />
