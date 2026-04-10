@@ -200,10 +200,6 @@ body {
 
 /* Page exit animations now handled by motion AnimatePresence */
 
-/* Embla lightbox — GPU compositing for smooth drag */
-[data-embla] {
-  -webkit-overflow-scrolling: touch;
-}
 
 /* Grid item entrance */
 @keyframes gridFadeIn {

@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import useEmblaCarousel from "embla-carousel-react";
 import { motion, AnimatePresence } from "motion/react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { fullUrl } from "../lib/content";
@@ -20,51 +19,68 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const tags = current ? [...(current.medium ?? []), ...(current.subject ?? [])] : [];
   const navigate = useNavigate();
   const canNav = items.length > 1;
+  const scrollRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const isScrolling = useRef(false);
 
-  // Stable key from item slugs — forces embla remount when items change
-  const itemsKey = items.map((i) => i.slug).join(",");
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: canNav,
-    startIndex: index >= 0 ? index : 0,
-    duration: 60,
-    dragThreshold: 10,
-    inViewThreshold: 0.7,
-  });
-
-  // Sync embla selection → parent (only from user interaction, not reinit)
-  const userInteracted = useRef(false);
+  // Scroll to the correct slide when index changes (from buttons/keyboard)
   useEffect(() => {
-    if (!emblaApi) return;
-    const onPointerDown = () => { userInteracted.current = true; };
-    const onSelect = () => {
-      if (!userInteracted.current) return;
-      userInteracted.current = false;
-      const sel = emblaApi.selectedScrollSnap();
-      if (sel !== index) onChange(sel);
-    };
-    emblaApi.on("pointerDown", onPointerDown);
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("pointerDown", onPointerDown);
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, index, onChange]);
-
-  // Sync parent → embla (button clicks, keyboard)
-  useEffect(() => {
-    if (!emblaApi || !isOpen) return;
-    const snap = emblaApi.selectedScrollSnap();
-    if (snap !== index && index >= 0) {
-      emblaApi.scrollTo(index, false);
+    const el = scrollRef.current;
+    if (!el || !isOpen) return;
+    const slide = el.children[index] as HTMLElement | undefined;
+    if (slide) {
+      slide.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
     }
-  }, [emblaApi, index, isOpen]);
+  }, [index, isOpen]);
 
-  const goPrev = useCallback(() => { userInteracted.current = true; emblaApi?.scrollPrev(); }, [emblaApi]);
-  const goNext = useCallback(() => { userInteracted.current = true; emblaApi?.scrollNext(); }, [emblaApi]);
+  // Scroll to initial position when opening (instant, no animation)
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      const slide = el.children[index] as HTMLElement | undefined;
+      if (slide) {
+        slide.scrollIntoView({ behavior: "instant", inline: "start", block: "nearest" });
+      }
+    });
+  }, [isOpen]);
 
-  // Keyboard nav
+  // Detect which slide is visible after scroll ends
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let scrollTimer: ReturnType<typeof setTimeout>;
+    const handleScroll = () => {
+      isScrolling.current = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isScrolling.current = false;
+        const scrollLeft = el.scrollLeft;
+        const slideWidth = el.clientWidth;
+        const newIndex = Math.round(scrollLeft / slideWidth);
+        if (newIndex !== index && newIndex >= 0 && newIndex < items.length) {
+          onChange(newIndex);
+        }
+      }, 100);
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => { el.removeEventListener("scroll", handleScroll); clearTimeout(scrollTimer); };
+  }, [index, items.length, onChange]);
+
+  const goPrev = useCallback(() => {
+    if (!canNav) return;
+    const prev = index === 0 ? items.length - 1 : index - 1;
+    onChange(prev);
+  }, [index, items.length, canNav, onChange]);
+
+  const goNext = useCallback(() => {
+    if (!canNav) return;
+    const next = index === items.length - 1 ? 0 : index + 1;
+    onChange(next);
+  }, [index, items.length, canNav, onChange]);
+
+  // Keyboard
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -80,7 +96,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Swipe down to close — only if vertical movement dominates
+  // Swipe down to close
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   };
@@ -88,7 +104,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     if (!touchStart.current) return;
     const dx = Math.abs(e.changedTouches[0].clientX - touchStart.current.x);
     const dy = e.changedTouches[0].clientY - touchStart.current.y;
-    // Only close if mostly vertical (dy > dx) and downward > 120px
     if (dy > 120 && dy > dx * 2) onClose();
     touchStart.current = null;
   };
@@ -119,25 +134,26 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             <FaTimes size={13} className="text-white/70" />
           </button>
 
-          {/* Embla carousel — keyed by items so it remounts on filter change */}
-          <div className="flex-1 overflow-hidden" ref={emblaRef} key={itemsKey}>
-            <div className="flex h-full will-change-transform">
-              {items.map((item) => (
-                <div
-                  key={item.slug}
-                  className="flex-[0_0_100%] min-w-0 flex items-center justify-center p-3 sm:p-6"
-                >
-                  <img
-                    src={fullUrl(item.image)}
-                    alt={item.title}
-                    loading="eager"
-                    decoding="async"
-                    className="max-w-full max-h-full object-contain select-none"
-                    draggable={false}
-                  />
-                </div>
-              ))}
-            </div>
+          {/* Native scroll-snap carousel */}
+          <div
+            ref={scrollRef}
+            className="flex-1 flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
+          >
+            {items.map((item) => (
+              <div
+                key={item.slug}
+                className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6"
+              >
+                <img
+                  src={fullUrl(item.image)}
+                  alt={item.title}
+                  loading="eager"
+                  decoding="async"
+                  className="max-w-full max-h-full object-contain select-none"
+                  draggable={false}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Bottom bar */}
