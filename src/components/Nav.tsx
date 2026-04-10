@@ -44,7 +44,7 @@ function MobileNav() {
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <button
-            className="min-w-11 min-h-11 rounded-md flex items-center justify-center text-text-muted hover:text-text hover:bg-text/[0.04] transition-colors"
+            className="min-w-11 min-h-11 rounded-md flex items-center justify-center text-text-muted hover:text-text hover:bg-text/[0.04] transition-colors cursor-pointer"
             aria-label="Menu"
           >
             <FaBars size={16} />

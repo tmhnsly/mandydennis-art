@@ -228,7 +228,7 @@ export default function HomePage() {
                 <button
                   key={i}
                   onClick={() => setHeroIndex(i)}
-                  className={`rounded-full backdrop-blur-md transition-all duration-300 ${
+                  className={`rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
                     i === safeIndex
                       ? "w-8 h-2.5 bg-text/50 shadow-sm"
                       : "w-2.5 h-2.5 bg-text/15 hover:bg-text/25"

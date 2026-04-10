@@ -131,12 +131,12 @@ export default function CommissionForm({
             <div className="flex items-center gap-3 min-h-11 px-4 py-2.5 border border-line-strong text-sm">
               <FaImage size={14} className="text-accent flex-shrink-0" />
               <span className="text-text-mid truncate flex-1">{fileName}</span>
-              <button type="button" onClick={clearFile} className="text-text-subtle hover:text-text transition-colors p-1" aria-label="Remove file">
+              <button type="button" onClick={clearFile} className="text-text-subtle hover:text-text transition-colors p-1 cursor-pointer" aria-label="Remove file">
                 <FaTimes size={12} />
               </button>
             </div>
           ) : (
-            <button type="button" onClick={() => fileRef.current?.click()} className="w-full min-h-11 px-4 py-2.5 border border-dashed border-line-strong text-sm text-text-muted flex items-center justify-center gap-2 hover:border-text/40 hover:text-text-mid transition-colors">
+            <button type="button" onClick={() => fileRef.current?.click()} className="w-full min-h-11 px-4 py-2.5 border border-dashed border-line-strong text-sm text-text-muted flex items-center justify-center gap-2 hover:border-text/40 hover:text-text-mid transition-colors cursor-pointer">
               <FaImage size={14} /> Choose an image
             </button>
           )}
@@ -152,7 +152,7 @@ export default function CommissionForm({
         </p>
       )}
 
-      <button type="submit" disabled={status === "sending"} className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity disabled:opacity-50">
+      <button type="submit" disabled={status === "sending"} className="w-full min-h-11 py-3 bg-text text-bg font-medium text-sm tracking-wide uppercase flex items-center justify-center gap-2 hover:opacity-85 transition-opacity disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
         <FaCommentDots size={14} />
         {status === "sending" ? "Sending..." : "Send Message"}
       </button>

@@ -187,7 +187,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     touchRef.current = { x: 0, y: 0, locked: null };
   }, [onClose]);
 
-  const btnClass = "min-w-[44px] min-h-[44px] rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
+  const btnClass = "min-w-[44px] min-h-[44px] rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors cursor-pointer";
 
   if (!isOpen || !current) return null;
 
