@@ -46,7 +46,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     });
   }, [isOpen]);
 
-  // Detect which slide is visible after scroll ends
+  // Detect which slide is visible after scroll settles
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -62,7 +62,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
         if (newIndex !== index && newIndex >= 0 && newIndex < items.length) {
           onChange(newIndex);
         }
-      }, 100);
+      }, 50);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
     return () => { el.removeEventListener("scroll", handleScroll); clearTimeout(scrollTimer); };
