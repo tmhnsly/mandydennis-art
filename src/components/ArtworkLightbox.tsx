@@ -31,15 +31,23 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     duration: 20,
   });
 
-  // Sync embla selection → parent
+  // Sync embla selection → parent (only from user interaction, not reinit)
+  const userInteracted = useRef(false);
   useEffect(() => {
     if (!emblaApi) return;
+    const onPointerDown = () => { userInteracted.current = true; };
     const onSelect = () => {
+      if (!userInteracted.current) return;
+      userInteracted.current = false;
       const sel = emblaApi.selectedScrollSnap();
       if (sel !== index) onChange(sel);
     };
+    emblaApi.on("pointerDown", onPointerDown);
     emblaApi.on("select", onSelect);
-    return () => { emblaApi.off("select", onSelect); };
+    return () => {
+      emblaApi.off("pointerDown", onPointerDown);
+      emblaApi.off("select", onSelect);
+    };
   }, [emblaApi, index, onChange]);
 
   // Sync parent → embla (button clicks, keyboard)
@@ -51,8 +59,8 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     }
   }, [emblaApi, index, isOpen]);
 
-  const goPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const goNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const goPrev = useCallback(() => { userInteracted.current = true; emblaApi?.scrollPrev(); }, [emblaApi]);
+  const goNext = useCallback(() => { userInteracted.current = true; emblaApi?.scrollNext(); }, [emblaApi]);
 
   // Keyboard nav
   useEffect(() => {
@@ -150,13 +158,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
               ) : <div />}
               {canNav && (
                 <div className="flex items-center gap-1.5 flex-shrink-0 pointer-events-auto">
-                  <button onClick={goPrev} className={btnClass} aria-label="Previous">
+                  <button onClick={(e) => { e.stopPropagation(); goPrev(); }} className={btnClass} aria-label="Previous">
                     <FaChevronLeft size={12} className="text-white/70" />
                   </button>
                   <span className="text-white/60 text-xs tabular-nums font-medium min-w-[3rem] text-center px-2 py-1 rounded-full bg-black/30 backdrop-blur-md">
                     {index + 1} / {items.length}
                   </span>
-                  <button onClick={goNext} className={btnClass} aria-label="Next">
+                  <button onClick={(e) => { e.stopPropagation(); goNext(); }} className={btnClass} aria-label="Next">
                     <FaChevronRight size={12} className="text-white/70" />
                   </button>
                 </div>

@@ -22,7 +22,6 @@ function getAllTags(items: Artwork[]): string[] {
     item.subject.forEach((t) => tags.add(t));
   }
   const sorted = Array.from(tags).sort();
-  // Move priority tags to the front
   const priority = PRIORITY_TAGS.filter((t) => sorted.includes(t));
   const rest = sorted.filter((t) => !PRIORITY_TAGS.includes(t));
   return [...priority, ...rest];
@@ -35,14 +34,13 @@ function artworkTags(item: Artwork): string[] {
 export default function GalleryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [allArtwork, setAllArtwork] = useState<Artwork[]>(getInitialArtwork);
-  const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [lightboxSlug, setLightboxSlug] = useState<string | null>(null);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const { ref: bodyRef, isInView } = useAnimateIn();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Read tag + image from URL params
+  // Read tag from URL
   const urlTag = searchParams.get("tag");
-  const urlImage = searchParams.get("image");
 
   const [activeTags, setActiveTags] = useState<string[]>(() =>
     urlTag ? [urlTag] : []
@@ -52,7 +50,7 @@ export default function GalleryPage() {
   useEffect(() => { document.title = "Gallery — Mandy Dennis Art"; }, []);
   useEffect(() => { getArtwork().then(setAllArtwork); }, []);
 
-  // Apply tag from URL when it changes (e.g. from lightbox tag click)
+  // Apply tag from URL when it changes
   useEffect(() => {
     if (urlTag) {
       setActiveTags([urlTag]);
@@ -60,17 +58,6 @@ export default function GalleryPage() {
       setShowCount(PAGE_SIZE);
     }
   }, [urlTag]);
-
-  // Open lightbox from URL param (e.g. shared link)
-  useEffect(() => {
-    if (urlImage && allArtwork.length > 0) {
-      const idx = allArtwork.findIndex((a) => a.slug === urlImage);
-      if (idx >= 0) {
-        setShowCount(Math.max(PAGE_SIZE, idx + 1));
-        setLightboxIndex(idx);
-      }
-    }
-  }, [urlImage, allArtwork]);
 
   const filtered = useMemo(() => {
     let items = allArtwork;
@@ -88,10 +75,12 @@ export default function GalleryPage() {
   const hasMore = showCount < filtered.length;
   const availableTags = useMemo(() => getAllTags(filtered), [filtered]);
 
+  // Resolve lightbox index from slug
+  const lightboxIndex = lightboxSlug ? visible.findIndex((v) => v.slug === lightboxSlug) : -1;
+
   const toggleTag = (tag: string) => {
     setActiveTags((prev) => {
       const next = prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag];
-      // Update URL to reflect tag state
       if (next.length === 1) {
         setSearchParams({ tag: next[0] }, { replace: true });
       } else {
@@ -108,39 +97,17 @@ export default function GalleryPage() {
     setShowCount(PAGE_SIZE);
   };
 
-  // Update URL when lightbox opens/closes
   const openLightbox = (_i: number, slug?: string) => {
-    const idx = slug ? visible.findIndex((v) => v.slug === slug) : _i;
-    const item = visible[idx >= 0 ? idx : _i];
-    if (item) {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("image", item.slug);
-        return next;
-      }, { replace: true });
-    }
-    setLightboxIndex(idx >= 0 ? idx : _i);
+    setLightboxSlug(slug ?? visible[_i]?.slug ?? null);
   };
 
   const closeLightbox = () => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.delete("image");
-      return next;
-    }, { replace: true });
-    setLightboxIndex(-1);
+    setLightboxSlug(null);
   };
 
-  const changeLightbox = (i: number) => {
-    const item = visible[i];
-    if (item) {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("image", item.slug);
-        return next;
-      }, { replace: true });
-    }
-    setLightboxIndex(i);
+  const changeLightbox = (newIndex: number) => {
+    const item = visible[newIndex];
+    if (item) setLightboxSlug(item.slug);
   };
 
   // Infinite scroll
