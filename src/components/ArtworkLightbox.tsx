@@ -28,7 +28,9 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: canNav,
     startIndex: index >= 0 ? index : 0,
-    duration: 40,
+    duration: 60,
+    dragThreshold: 10,
+    inViewThreshold: 0.7,
   });
 
   // Sync embla selection → parent (only from user interaction, not reinit)
