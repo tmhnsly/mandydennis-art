@@ -200,6 +200,11 @@ body {
 
 /* Page exit animations now handled by motion AnimatePresence */
 
+/* Embla carousel slide transitions */
+.embla__slide {
+  transition: opacity 0.2s ease;
+}
+
 /* Grid item entrance */
 @keyframes gridFadeIn {
   from { opacity: 0; transform: translate3d(0, 8px, 0); }
