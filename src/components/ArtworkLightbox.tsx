@@ -63,14 +63,10 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
       if (e.key === "ArrowRight") goNext();
     };
     document.addEventListener("keydown", handleKey);
-    // Prevent scroll without removing scrollbar (avoids layout shift)
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = "hidden";
-    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.documentElement.classList.add("overflow-hidden");
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
+      document.documentElement.classList.remove("overflow-hidden");
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
