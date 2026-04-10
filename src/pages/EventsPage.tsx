@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { FaClock, FaMapMarkerAlt, FaCalendarPlus, FaDirections } from "react-icons/fa";
 import { getEvents, getInitialEvents } from "../lib/content";
 import { parseDate, formatDay, formatMonth, formatFullDate, formatTimeRange, mapsUrl, downloadIcs, countdown } from "../lib/events";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
-import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import EventCard from "../components/EventCard";
 import type { ArtEvent } from "../types";
@@ -11,10 +10,19 @@ import DrawLine from "../components/DrawLine";
 
 export default function EventsPage() {
   const [allEvents, setAllEvents] = useState<ArtEvent[]>(getInitialEvents);
-  const { ref: bodyRef, isInView } = useAnimateIn(0);
+  // Skip entrance animation — content is above the fold on navigation
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { document.title = "Events — Mandy Dennis Art"; }, []);
-  useEffect(() => { getEvents().then(setAllEvents); }, []);
+  useEffect(() => {
+    getEvents().then((next) => {
+      setAllEvents((prev) =>
+        prev.length === next.length && prev.every((p, i) => p.slug === next[i]?.slug)
+          ? prev
+          : next
+      );
+    });
+  }, []);
 
   const now = new Date();
   const toUTC = (d: string | null) => {
@@ -66,7 +74,7 @@ export default function EventsPage() {
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Events" />
 
-          <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} max-w-[var(--width-narrow)]`}>
+          <div ref={bodyRef} className="max-w-[var(--width-narrow)]">
             {allEvents.length === 0 ? (
               <p className="text-text-muted py-8">
                 No events scheduled at the moment. Follow Mandy on Facebook for the latest updates.
