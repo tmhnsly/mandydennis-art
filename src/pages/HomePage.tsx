@@ -186,11 +186,11 @@ export default function HomePage() {
                   {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
                 </p>
 
-                <div className="flex gap-2.5">
-                  <Link to="/gallery" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity flex-1 sm:flex-initial">
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <Link to="/gallery" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
                     View Gallery
                   </Link>
-                  <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors flex-1 sm:flex-initial">
+                  <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
                     Get in Touch
                   </Link>
                 </div>

@@ -219,10 +219,10 @@ function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }
           </a>
         )}
 
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-col sm:flex-row gap-2.5">
           <button
             onClick={() => downloadIcs(event)}
-            className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 min-h-[44px] transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2.5 min-h-[44px] transition-colors cursor-pointer"
           >
             <FaCalendarPlus size={11} />
             Add to calendar
@@ -231,7 +231,7 @@ function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }
             href={maps}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 min-h-[44px] transition-colors"
+            className="inline-flex items-center justify-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2.5 min-h-[44px] transition-colors"
           >
             <FaDirections size={11} />
             Get directions
