@@ -14,7 +14,7 @@ export default function CommissionCard({ category, currency }: Props) {
         <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
           <FaPaw size={14} className="text-accent" />
         </div>
-        <h3 className="font-display text-xl font-bold tracking-tight">
+        <h3 className="font-display text-xl font-bold tracking-tight truncate min-w-0">
           {category.title}
         </h3>
       </div>

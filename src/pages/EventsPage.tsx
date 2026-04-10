@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { FaClock, FaMapMarkerAlt, FaCalendarPlus, FaDirections } from "react-icons/fa";
 import { getEvents, getInitialEvents } from "../lib/content";
-import { parseDate, formatFullDateWithYear, formatTimeRange, mapsUrl, downloadIcs, countdown } from "../lib/events";
+import { parseDate, formatDay, formatMonth, formatFullDate, formatTimeRange, mapsUrl, downloadIcs, countdown } from "../lib/events";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -11,7 +11,7 @@ import DrawLine from "../components/DrawLine";
 
 export default function EventsPage() {
   const [allEvents, setAllEvents] = useState<ArtEvent[]>(getInitialEvents);
-  const { ref: bodyRef, isInView } = useAnimateIn();
+  const { ref: bodyRef, isInView } = useAnimateIn(0);
 
   useEffect(() => { document.title = "Events — Mandy Dennis Art"; }, []);
   useEffect(() => { getEvents().then(setAllEvents); }, []);
@@ -129,6 +129,7 @@ export default function EventsPage() {
   );
 }
 
+/** Featured event — same date block as EventCard, larger typography + countdown */
 function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }) {
   const start = parseDate(event.startDate);
   const end = event.endDate ? parseDate(event.endDate) : null;
@@ -138,72 +139,96 @@ function FeaturedHero({ event, todayUTC }: { event: ArtEvent; todayUTC: number }
   const countdownText = countdown(event.startDate, todayUTC);
 
   return (
-    <div className="border border-line p-[clamp(1.5rem,4vw,2.5rem)] mb-10">
-      <span className="inline-block text-[0.6rem] tracking-widest uppercase font-medium px-3 py-1 border border-accent/30 text-accent mb-6">
-        {countdownText}
-      </span>
-
-      <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-bold tracking-tight leading-tight mb-3">
-        {event.title}
-      </h2>
-
-      <p className="text-[0.95rem] text-text-mid mb-1">
-        {formatFullDateWithYear(start)}
-        {isMultiDay && end && <> – {formatFullDateWithYear(end)}</>}
-      </p>
-
-      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[0.85rem] text-text-muted mb-5">
-        <a
-          href={maps}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 hover:text-text transition-colors"
-        >
-          <FaMapMarkerAlt size={12} className="text-text-subtle" />
-          {event.location}
-        </a>
-        {timeStr && (
-          <span className="inline-flex items-center gap-1.5">
-            <FaClock size={12} className="text-text-subtle" />
-            {timeStr}
-          </span>
+    <div className="border border-line p-[clamp(1.5rem,4vw,2.5rem)] mb-10 grid grid-cols-[4.5rem_1fr] gap-5 items-start">
+      {/* Date block — same style as EventCard but larger */}
+      <div className="text-center pt-1">
+        <div className="font-display font-bold text-4xl tracking-tight leading-none">
+          {formatDay(start)}
+        </div>
+        <div className="text-[0.65rem] tracking-widest uppercase text-text-subtle font-medium mt-1">
+          {formatMonth(start)}
+        </div>
+        {isMultiDay && (
+          <>
+            <div className="text-[0.65rem] text-text-subtle my-1">—</div>
+            <div className="font-display font-bold text-2xl tracking-tight leading-none">
+              {formatDay(end)}
+            </div>
+            <div className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium mt-0.5">
+              {formatMonth(end)}
+            </div>
+          </>
         )}
       </div>
 
-      {event.description && (
-        <p className="text-[0.95rem] text-text-mid leading-relaxed max-w-[55ch] mb-6">
-          {event.description}
-        </p>
-      )}
+      {/* Content */}
+      <div className="min-w-0">
+        <span className="inline-block text-[0.6rem] tracking-widest uppercase font-medium px-3 py-1 border border-accent/30 text-accent mb-4">
+          {countdownText}
+        </span>
 
-      {event.link && (
-        <a
-          href={event.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mb-6 text-[0.85rem] text-text-mid underline hover:text-text transition-colors"
-        >
-          More info →
-        </a>
-      )}
+        <h2 className="font-display text-[clamp(1.3rem,3.5vw,2rem)] font-bold tracking-tight leading-tight mb-2 line-clamp-2">
+          {event.title}
+        </h2>
 
-      <div className="flex flex-wrap gap-2.5">
-        <button
-          onClick={() => downloadIcs(event)}
-          className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 transition-colors cursor-pointer"
-        >
-          <FaCalendarPlus size={11} />
-          Add to calendar
-        </button>
-        <a
-          href={maps}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 transition-colors"
-        >
-          <FaDirections size={11} />
-          Get directions
-        </a>
+        <div className="flex flex-wrap gap-x-5 gap-y-1 text-[0.85rem] text-text-muted mb-4">
+          <a
+            href={maps}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-text transition-colors min-w-0"
+          >
+            <FaMapMarkerAlt size={12} className="text-text-subtle flex-shrink-0" />
+            <span className="truncate">{event.location}</span>
+          </a>
+          {timeStr && (
+            <span className="inline-flex items-center gap-1.5 flex-shrink-0">
+              <FaClock size={12} className="text-text-subtle" />
+              {timeStr}
+            </span>
+          )}
+          {isMultiDay && (
+            <span className="text-text-subtle truncate">
+              {formatFullDate(start)} – {formatFullDate(end)}
+            </span>
+          )}
+        </div>
+
+        {event.description && (
+          <p className="text-[0.95rem] text-text-mid leading-relaxed max-w-[55ch] mb-5 line-clamp-4">
+            {event.description}
+          </p>
+        )}
+
+        {event.link && (
+          <a
+            href={event.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center mb-5 text-[0.85rem] text-text-mid underline hover:text-text transition-colors min-h-[44px]"
+          >
+            More info →
+          </a>
+        )}
+
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            onClick={() => downloadIcs(event)}
+            className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 min-h-[44px] transition-colors cursor-pointer"
+          >
+            <FaCalendarPlus size={11} />
+            Add to calendar
+          </button>
+          <a
+            href={maps}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-[0.72rem] tracking-wide uppercase font-medium text-text-muted hover:text-text border border-line hover:border-line-strong px-4 py-2 min-h-[44px] transition-colors"
+          >
+            <FaDirections size={11} />
+            Get directions
+          </a>
+        </div>
       </div>
     </div>
   );

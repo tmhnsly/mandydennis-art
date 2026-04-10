@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaMapMarkerAlt, FaInstagram, FaEnvelope } from "react-icons/fa";
+import { FaArrowRight, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
+import EventCard from "../components/EventCard";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -161,7 +162,7 @@ export default function HomePage() {
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            {/* Row 1: line + status */}
+            {/* Row 1: line + status + social icons */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
@@ -185,35 +186,23 @@ export default function HomePage() {
                   {settings.tagline || "Pet portraiture, wildlife, seascapes & still life — predominantly in soft pastels and watercolours."}
                 </p>
 
-                <div className="flex sm:inline-flex gap-2.5 flex-col sm:flex-row">
-                  <Link to="/gallery" className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity">
+                <div className="flex gap-2.5">
+                  <Link to="/gallery" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 bg-text text-bg text-[0.8rem] font-medium tracking-wide uppercase border border-text hover:opacity-85 transition-opacity flex-1 sm:flex-initial">
                     View Gallery
                   </Link>
-                  <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors">
+                  <Link to="/commissions" className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 text-[0.8rem] font-medium tracking-wide uppercase bg-surface/80 border border-text/15 text-text hover:bg-surface transition-colors flex-1 sm:flex-initial">
                     Get in Touch
                   </Link>
                 </div>
-
-                {/* Social icons — below buttons on mobile */}
-                <div className="flex items-center gap-1.5 mt-4 sm:hidden">
-                  <Link to="/commissions" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
-                    <FaEnvelope size={12} />
-                  </Link>
-                  {settings.instagram_url && (
-                    <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-9 min-h-9 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
-                      <FaInstagram size={13} />
-                    </a>
-                  )}
-                </div>
               </div>
 
-              {/* Social icons — column on sm+, hidden on mobile (shown in top bar instead) */}
-              <div className="hidden sm:flex flex-row items-center gap-1.5 flex-shrink-0">
-                <Link to="/commissions" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
+              {/* Social icons — right side on all sizes */}
+              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <Link to="/commissions" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
                   <FaEnvelope size={14} />
                 </Link>
                 {settings.instagram_url && (
-                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-10 min-h-10 flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
+                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
                     <FaInstagram size={15} />
                   </a>
                 )}
@@ -306,37 +295,9 @@ export default function HomePage() {
             <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Upcoming Events" />
               <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[var(--width-narrow)]`}>
-                {upcomingEvents.map((event) => {
-                  const [y, m, d] = event.startDate.split("-").map(Number);
-                  const date = new Date(Date.UTC(y, m - 1, d));
-                  const day = date.getUTCDate();
-                  const month = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-
-                  return (
-                    <div key={event.slug} className="border border-line p-5 flex items-center gap-5">
-                      <div className="text-center flex-shrink-0 w-12">
-                        <div className="font-display font-bold text-xl leading-none">{day}</div>
-                        <div className="text-[0.55rem] tracking-widest uppercase text-text-subtle font-medium mt-0.5">{month}</div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-display font-semibold text-[0.9rem] tracking-tight">{event.title}</div>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-[0.78rem] text-text-muted mt-0.5 hover:text-text transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <FaMapMarkerAlt size={10} className="text-text-subtle flex-shrink-0" />
-                          {event.location}
-                        </a>
-                      </div>
-                      <span className="text-[0.55rem] tracking-widest uppercase text-accent font-medium px-2.5 py-1 border border-accent/30 flex-shrink-0">
-                        Upcoming
-                      </span>
-                    </div>
-                  );
-                })}
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.slug} event={event} isPast={false} compact />
+                ))}
                 <div className="pt-4">
                   <Link to="/events" className="inline-flex items-center gap-2 text-[0.78rem] font-medium tracking-wide uppercase text-text-muted hover:text-text transition-colors min-h-11">
                     All events <FaArrowRight size={12} />

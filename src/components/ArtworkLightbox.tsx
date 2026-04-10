@@ -21,10 +21,13 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   const canNav = items.length > 1;
   const scrollRef = useRef<HTMLDivElement>(null);
   const isScrolling = useRef(false);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [loadedUrls, setLoadedUrls] = useState(new Set<string>());
 
-  // Track loaded images for spinner
+  // Swipe-down-to-close state
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchRef = useRef<{ x: number; y: number; locked: "vertical" | "horizontal" | null }>({ x: 0, y: 0, locked: null });
+
   const onImageLoad = useCallback((url: string) => {
     setLoadedUrls((prev) => {
       if (prev.has(url)) return prev;
@@ -34,7 +37,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     });
   }, []);
 
-  // Scroll to the correct slide when index changes (from buttons/keyboard)
+  // Scroll to the correct slide when index changes
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !isOpen) return;
@@ -44,7 +47,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     }
   }, [index, isOpen]);
 
-  // Scroll to initial position when opening (instant, no animation)
+  // Scroll to initial position when opening
   useEffect(() => {
     if (!isOpen) return;
     const el = scrollRef.current;
@@ -87,14 +90,12 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
 
   const goPrev = useCallback(() => {
     if (!canNav) return;
-    const prev = index === 0 ? items.length - 1 : index - 1;
-    onChange(prev);
+    onChange(index === 0 ? items.length - 1 : index - 1);
   }, [index, items.length, canNav, onChange]);
 
   const goNext = useCallback(() => {
     if (!canNav) return;
-    const next = index === items.length - 1 ? 0 : index + 1;
-    onChange(next);
+    onChange(index === items.length - 1 ? 0 : index + 1);
   }, [index, items.length, canNav, onChange]);
 
   // Keyboard
@@ -113,20 +114,43 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
     };
   }, [isOpen, onClose, goPrev, goNext]);
 
-  // Swipe down to close — only triggers on vertical swipe, not horizontal scroll
+  // Interactive swipe-down-to-close — image follows finger, fades out
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    touchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, locked: null };
   };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStart.current) return;
-    const dx = Math.abs(e.changedTouches[0].clientX - touchStart.current.x);
-    const dy = e.changedTouches[0].clientY - touchStart.current.y;
-    // Must be clearly vertical (down > 80px, ratio 3:1 vertical to horizontal)
-    if (dy > 80 && dy > dx * 3) onClose();
-    touchStart.current = null;
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const t = touchRef.current;
+    const dx = e.touches[0].clientX - t.x;
+    const dy = e.touches[0].clientY - t.y;
+
+    // Lock direction after 10px of movement
+    if (!t.locked) {
+      if (Math.abs(dy) > 10 || Math.abs(dx) > 10) {
+        t.locked = Math.abs(dy) > Math.abs(dx) ? "vertical" : "horizontal";
+      }
+      return;
+    }
+
+    if (t.locked === "vertical" && dy > 0) {
+      setIsDragging(true);
+      setDragY(dy);
+    }
+  };
+  const handleTouchEnd = () => {
+    if (isDragging) {
+      if (dragY > 120) {
+        onClose();
+      }
+      setDragY(0);
+      setIsDragging(false);
+    }
+    touchRef.current = { x: 0, y: 0, locked: null };
   };
 
-  const btnClass = "w-11 h-11 rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
+  const dragOpacity = isDragging ? Math.max(0.2, 1 - dragY / 400) : 1;
+  const dragTransform = isDragging ? `translateY(${dragY}px) scale(${Math.max(0.9, 1 - dragY / 1200)})` : "";
+
+  const btnClass = "min-w-[44px] min-h-[44px] rounded-full backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors";
 
   return (
     <AnimatePresence>
@@ -135,12 +159,14 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
           key="lightbox"
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0 } }}
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
           role="dialog"
           aria-label="Image viewer"
           aria-modal="true"
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+          style={{ opacity: dragOpacity }}
           onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           {/* Close */}
@@ -152,10 +178,11 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             <FaTimes size={13} className="text-white/70" />
           </button>
 
-          {/* Native scroll-snap carousel */}
+          {/* Scroll-snap carousel */}
           <div
             ref={scrollRef}
             className="flex-1 flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
+            style={isDragging ? { transform: dragTransform, transition: "none" } : { transform: "", transition: "transform 0.25s ease-out" }}
           >
             {items.map((item) => {
               const url = fullUrl(item.image);
@@ -165,7 +192,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
                   key={item.slug}
                   className="flex-[0_0_100%] min-w-0 snap-center flex items-center justify-center p-3 sm:p-6 relative"
                 >
-                  {/* Loading spinner */}
                   {!isLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
@@ -185,11 +211,11 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
             })}
           </div>
 
-          {/* Bottom bar — tags left-aligned, nav right-aligned */}
+          {/* Bottom bar — tags grow upward from bottom, nav pinned right */}
           <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
             <div className="max-w-[var(--width-content)] mx-auto flex items-end justify-between gap-3 px-4 py-4">
               {tags.length > 0 ? (
-                <div className="flex gap-1.5 flex-wrap items-end flex-1 pointer-events-auto">
+                <div className="flex gap-1.5 flex-wrap-reverse content-end flex-1 pointer-events-auto">
                   {tags.map((tag) => (
                     <button
                       key={tag}
