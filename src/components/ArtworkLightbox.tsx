@@ -151,7 +151,6 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    const t = touchRef.current;
     const dy = dragging.current ? (() => {
       const carousel = carouselRef.current;
       if (!carousel) return 0;
