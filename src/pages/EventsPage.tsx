@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getEvents, getInitialEvents } from "../lib/content";
-import CtaBanner from "../components/CtaBanner";
+import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
 import EventCard from "../components/EventCard";
@@ -70,7 +70,7 @@ export default function EventsPage() {
       <DrawLine />
 
       <CtaBanner
-        heading="Want to get in touch?"
+        heading={<>Want to <CtaAccent>get in touch?</CtaAccent></>}
         text="Have a question about an event, or interested in commissioning a piece?"
         buttonLabel="Get in Touch"
         buttonTo="/commissions"

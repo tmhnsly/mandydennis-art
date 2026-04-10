@@ -2,8 +2,13 @@ import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { useInView } from "../hooks/useAnimateIn";
 
+/** Serif italic accent for CTA headings */
+export function CtaAccent({ children }: { children: React.ReactNode }) {
+  return <span className="font-serif italic font-normal text-cta-text/70">{children}</span>;
+}
+
 interface Props {
-  heading: string;
+  heading: React.ReactNode;
   text: string;
   buttonLabel: string;
   buttonTo: string;

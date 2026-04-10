@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { getArtwork, getInitialArtwork } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useAnimateIn } from "../hooks/useAnimateIn";
-import CtaBanner from "../components/CtaBanner";
+import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
 import TagFilter from "../components/gallery/TagFilter";
 import MasonryGrid from "../components/MasonryGrid";
@@ -204,7 +204,7 @@ export default function GalleryPage() {
       <DrawLine />
 
       <CtaBanner
-        heading="Like what you see?"
+        heading={<>Like <CtaAccent>what you see?</CtaAccent></>}
         text="Commission your own portrait or get in touch to discuss an idea."
         buttonLabel="Get in Touch"
         buttonTo="/commissions"

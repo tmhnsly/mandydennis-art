@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaMapMarkerAlt, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
-import CtaBanner from "../components/CtaBanner";
+import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
@@ -307,7 +307,7 @@ export default function HomePage() {
       )}
 
       <CtaBanner
-        heading="Ready to commission?"
+        heading={<>Ready to <CtaAccent>commission?</CtaAccent></>}
         text="Get a unique piece of art created just for you. Pastels, watercolours, pet portraits and more."
         buttonLabel="Get in Touch"
         buttonTo="/commissions"
