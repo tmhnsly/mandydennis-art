@@ -72,7 +72,7 @@ export default function EventCard({ event, isPast, compact }: Props) {
           )}
         </div>
 
-        {!compact && event.description && (
+        {event.description && (
           <p className="text-[0.85rem] text-text-mid leading-relaxed line-clamp-3">
             {event.description}
           </p>
