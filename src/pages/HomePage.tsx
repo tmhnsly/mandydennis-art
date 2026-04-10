@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaMapMarkerAlt, FaInstagram, FaEnvelope } from "react-icons/fa";
+import { FaArrowRight, FaMapMarkerAlt, FaInstagram, FaEnvelope, FaPaintBrush } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
@@ -132,8 +132,9 @@ export default function HomePage() {
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
-            {/* Row 1: line + status label + pulse */}
+            {/* Row 1: icon + line + status label + pulse */}
             <div className="flex items-center gap-3 mb-6">
+              <FaPaintBrush size={14} className="text-accent flex-shrink-0" />
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
                 <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Available for work</span>
