@@ -128,8 +128,10 @@ export default function HomePage() {
           item.image ? (
             <div
               key={item.slug}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                i === safeIndex ? (heroReady ? "opacity-100" : "opacity-0") : "opacity-0 pointer-events-none"
+              className={`absolute inset-0 transition-opacity ease-in-out ${
+                i === safeIndex
+                  ? (heroReady ? "opacity-100 duration-700" : "opacity-0 duration-700")
+                  : "opacity-0 duration-1000 pointer-events-none"
               }`}
               aria-hidden={i !== safeIndex}
             >
@@ -143,7 +145,11 @@ export default function HomePage() {
                   alt=""
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
-                  onLoad={i === 0 ? () => setHeroReady(true) : undefined}
+                  onLoad={i === 0 ? () => {
+                    // Defer by one frame so the browser paints opacity-0 first,
+                    // ensuring the CSS transition actually fires
+                    requestAnimationFrame(() => setHeroReady(true));
+                  } : undefined}
                   className="w-full h-full object-cover object-center"
                 />
               </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { FaQuoteLeft, FaArrowRight } from "react-icons/fa";
 import { getAbout, getTestimonials, getInitialTestimonials } from "../lib/content";
@@ -17,12 +17,16 @@ export default function AboutPage() {
   const { ref: testimonialsRef, isInView: testimonialsInView } = useInView(0.1);
   const { ref: ctaRef, isInView: ctaInView } = useInView(0.1);
 
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+
   useEffect(() => { document.title = "About — Mandy Dennis Art"; }, []);
 
   useEffect(() => {
     getAbout().then(setAbout);
     getTestimonials().then(setTestimonials);
   }, []);
+
+  const onPhotoLoad = useCallback(() => setPhotoLoaded(true), []);
 
   return (
     <>
@@ -33,11 +37,14 @@ export default function AboutPage() {
 
           <div ref={bodyRef} className={`anim-fade-up ${isInView ? "in-view" : ""} grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[clamp(2rem,5vw,3.5rem)] items-start`}>
             {about.photo ? (
-              <img
-                src={urlFor(about.photo).width(800).auto("format").quality(85).url()}
-                alt="Mandy Dennis"
-                className="w-full aspect-[3/4] object-cover border border-line"
-              />
+              <div className="w-full aspect-[3/4] bg-surface border border-line overflow-hidden">
+                <img
+                  src={urlFor(about.photo).width(800).auto("format").quality(85).url()}
+                  alt="Mandy Dennis"
+                  onLoad={onPhotoLoad}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ease-out ${photoLoaded ? "opacity-100" : "opacity-0"}`}
+                />
+              </div>
             ) : (
               <div className="w-full aspect-[3/4] bg-text/[0.03] border border-line flex items-center justify-center text-text-subtle text-xs tracking-widest uppercase">
                 Photo
