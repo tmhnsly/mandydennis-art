@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { FaQuoteLeft, FaArrowRight } from "react-icons/fa";
-import { getAbout, getTestimonials, getInitialTestimonials } from "../lib/content";
+import { getAbout, getTestimonials, getInitialTestimonials, hasFreshCache } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { urlFor } from "../lib/sanity";
 import { useAnimateIn, useInView } from "../hooks/useAnimateIn";
@@ -19,17 +19,16 @@ export default function AboutPage() {
 
   const [photoLoaded, setPhotoLoaded] = useState(false);
 
-  useEffect(() => { document.title = "About — Mandy Dennis Art"; }, []);
-
   useEffect(() => {
     getAbout().then(setAbout);
-    getTestimonials().then(setTestimonials);
+    if (!hasFreshCache("testimonials")) getTestimonials().then(setTestimonials);
   }, []);
 
   const onPhotoLoad = useCallback(() => setPhotoLoaded(true), []);
 
   return (
     <>
+      <title>About — Mandy Dennis Art</title>
       {/* Bio section */}
       <div>
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">

@@ -143,6 +143,11 @@ function getCached<T>(key: string): T | null {
   return null;
 }
 
+export function hasFreshCache(key: string): boolean {
+  const entry = cache.get(key);
+  return !!entry && Date.now() - entry.ts < CACHE_TTL;
+}
+
 function setCache(key: string, data: unknown) {
   cache.set(key, { data, ts: Date.now() });
 }

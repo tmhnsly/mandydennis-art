@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getArtwork, getInitialArtwork } from "../lib/content";
+import { getArtwork, getInitialArtwork, hasFreshCache } from "../lib/content";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import { scrollToTop } from "../components/PageTransition";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
@@ -47,8 +47,10 @@ export default function GalleryPage() {
   );
   const [featuredOnly, setFeaturedOnly] = useState(false);
 
-  useEffect(() => { document.title = "Gallery — Mandy Dennis Art"; }, []);
-  useEffect(() => { getArtwork().then(setAllArtwork); }, []);
+  useEffect(() => {
+    if (hasFreshCache("artwork")) return;
+    getArtwork().then(setAllArtwork);
+  }, []);
 
   // Apply tag from URL when it changes
   useEffect(() => {
@@ -136,6 +138,7 @@ export default function GalleryPage() {
 
   return (
     <>
+      <title>Gallery — Mandy Dennis Art</title>
       <div>
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Gallery" />

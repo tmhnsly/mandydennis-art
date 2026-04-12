@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getSettings } from "../lib/content";
+import { getSettings, hasFreshCache } from "../lib/content";
 import type { SiteSettings } from "../types";
 
 // This runs after prefetchAll, so getCached("settings") has real data
@@ -11,6 +11,7 @@ export function SiteSettingsProvider({ children }: { children: React.ReactNode }
   const [settings, setSettings] = useState<SiteSettings>(getInitialSettings);
 
   useEffect(() => {
+    if (hasFreshCache("settings")) return;
     getSettings().then(setSettings);
   }, []);
 

@@ -1,14 +1,10 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import DrawLine from "../components/DrawLine";
 
 export default function NotFoundPage() {
-  useEffect(() => {
-    document.title = "Not Found — Mandy Dennis Art";
-  }, []);
-
   return (
     <>
+      <title>Not Found — Mandy Dennis Art</title>
       <div>
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <h1 className="font-display text-3xl font-bold tracking-tight mb-4">

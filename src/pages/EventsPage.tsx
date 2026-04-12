@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { FaClock, FaMapMarkerAlt, FaCalendarPlus, FaDirections } from "react-icons/fa";
-import { getEvents, getInitialEvents } from "../lib/content";
+import { getEvents, getInitialEvents, hasFreshCache } from "../lib/content";
 import { parseDate, formatDay, formatMonth, formatFullDate, formatTimeRange, mapsUrl, downloadIcs, countdown } from "../lib/events";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import SectionHeader from "../components/SectionHeader";
@@ -13,15 +13,9 @@ export default function EventsPage() {
   // Skip entrance animation — content is above the fold on navigation
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { document.title = "Events — Mandy Dennis Art"; }, []);
   useEffect(() => {
-    getEvents().then((next) => {
-      setAllEvents((prev) =>
-        prev.length === next.length && prev.every((p, i) => p.slug === next[i]?.slug)
-          ? prev
-          : next
-      );
-    });
+    if (hasFreshCache("events")) return;
+    getEvents().then(setAllEvents);
   }, []);
 
   const now = new Date();
@@ -70,6 +64,7 @@ export default function EventsPage() {
 
   return (
     <>
+      <title>Events — Mandy Dennis Art</title>
       <div>
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Events" />

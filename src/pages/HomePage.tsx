@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaInstagram, FaEnvelope } from "react-icons/fa";
-import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl } from "../lib/content";
+import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import EventCard from "../components/EventCard";
@@ -39,8 +39,6 @@ export default function HomePage() {
   const { ref: eventsRef, isInView: eventsInView } = useInView(0.1);
 
   lightboxOpen.current = lightboxIndex >= 0;
-
-  useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
   // Parallax — avoids getBoundingClientRect() which forces synchronous layout
   // reflow in Chrome on every scroll frame (the main perf killer).
@@ -81,22 +79,12 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    getArtwork().then((all) => {
-      const newFeatured = all.filter((a) => a.featured);
-      // Only update if data actually changed (avoids re-render with same cache data)
-      setFeatured((prev) =>
-        prev.length === newFeatured.length && prev.every((p, i) => p.slug === newFeatured[i]?.slug)
-          ? prev
-          : newFeatured
-      );
-    });
-    getEvents().then((newEvents) => {
-      setEvents((prev) =>
-        prev.length === newEvents.length && prev.every((p, i) => p.slug === newEvents[i]?.slug)
-          ? prev
-          : newEvents
-      );
-    });
+    if (!hasFreshCache("artwork")) {
+      getArtwork().then((all) => setFeatured(all.filter((a) => a.featured)));
+    }
+    if (!hasFreshCache("events")) {
+      getEvents().then(setEvents);
+    }
   }, []);
 
   // Cycle hero — pauses when lightbox is open
@@ -133,6 +121,7 @@ export default function HomePage() {
 
   return (
     <>
+      <title>Mandy Dennis Art</title>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
         {/* Hero images — only render active + previous (for crossfade).

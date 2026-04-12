@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCommissions, getInitialCommissions } from "../lib/content";
+import { getCommissions, getInitialCommissions, hasFreshCache } from "../lib/content";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useAnimateIn } from "../hooks/useAnimateIn";
 import SectionHeader from "../components/SectionHeader";
@@ -13,11 +13,14 @@ export default function CommissionsPage() {
   const [commissions, setCommissions] = useState<CommissionCategory[]>(getInitialCommissions);
   const { ref: bodyRef, isInView } = useAnimateIn();
 
-  useEffect(() => { document.title = "Commissions — Mandy Dennis Art"; }, []);
-  useEffect(() => { getCommissions().then(setCommissions); }, []);
+  useEffect(() => {
+    if (hasFreshCache("commissions")) return;
+    getCommissions().then(setCommissions);
+  }, []);
 
   return (
     <>
+      <title>Commissions — Mandy Dennis Art</title>
       <div>
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
           <SectionHeader title="Commissions" />
