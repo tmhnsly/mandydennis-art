@@ -33,6 +33,7 @@ export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const parallaxImgs = useRef<HTMLElement[]>([]);
   const prevHeroIndex = useRef(0);
+  const [instantSwitch, setInstantSwitch] = useState(false);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
@@ -133,16 +134,16 @@ export default function HomePage() {
           return (
             <div
               key={item.slug}
-              className={`absolute inset-0 transition-opacity ease-in-out ${
+              className={`absolute inset-0 ${instantSwitch ? "" : "transition-opacity duration-700 ease-in-out will-change-[opacity]"} ${
                 isActive
-                  ? (heroReady ? "opacity-100 duration-700" : "opacity-0 duration-700")
-                  : "opacity-0 duration-1000 pointer-events-none"
+                  ? (heroReady ? "opacity-100" : "opacity-0")
+                  : "opacity-0 pointer-events-none"
               }`}
               aria-hidden={!isActive}
             >
               <div
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className={`absolute inset-0 ${isActive ? "will-change-transform" : ""}`}
+                className="absolute inset-0 will-change-transform"
                 style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
               >
                 <img
@@ -163,7 +164,7 @@ export default function HomePage() {
         })}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
-          <div className="hero-stagger max-w-xl bg-bg/80 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+          <div className="hero-stagger max-w-xl bg-bg/60 backdrop-blur-md border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             {/* Row 1: line + status + social icons */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
@@ -229,7 +230,12 @@ export default function HomePage() {
               {featured.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => { prevHeroIndex.current = safeIndex; setHeroIndex(i); }}
+                  onClick={() => {
+                    prevHeroIndex.current = safeIndex;
+                    setInstantSwitch(true);
+                    setHeroIndex(i);
+                    requestAnimationFrame(() => requestAnimationFrame(() => setInstantSwitch(false)));
+                  }}
                   className={`rounded-full transition-all duration-300 cursor-pointer ${
                     i === safeIndex
                       ? "w-8 h-2.5 bg-text/50 shadow-sm"
