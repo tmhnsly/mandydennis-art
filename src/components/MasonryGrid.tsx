@@ -79,6 +79,7 @@ export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
                 className="block w-full relative overflow-hidden cursor-pointer group text-left bg-surface"
                 style={{
                   aspectRatio: ratio,
+                  contain: "content",
                   ...(shouldAnimate ? {
                     animation: `gridFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${Math.min(index * 0.03, 0.3)}s both`,
                   } : undefined),

@@ -81,7 +81,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   scrollbar-gutter: stable;
 }
 
@@ -143,13 +142,15 @@ body {
 }
 
 /* ---- Animations ---- */
-/* translate3d forces GPU compositing in Safari */
+/* translate3d forces GPU compositing in Safari.
+   No will-change on initial state — Chrome auto-promotes elements to the
+   compositor when a transition actually fires, so pre-declaring will-change
+   just wastes GPU memory on layers that aren't animating yet. */
 
 /* Fade up — sections, content blocks */
 .anim-fade-up {
   opacity: 0;
   transform: translate3d(0, 16px, 0);
-  will-change: opacity, transform;
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -162,7 +163,6 @@ body {
 .anim-rule {
   transform: scaleX(0) translate3d(0, 0, 0);
   transform-origin: left;
-  will-change: transform;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-rule.in-view {
@@ -173,7 +173,6 @@ body {
 .anim-word {
   display: inline-block;
   transform: translate3d(0, 110%, 0);
-  will-change: transform;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .anim-word.in-view {
@@ -184,7 +183,6 @@ body {
 .hero-stagger > * {
   opacity: 0;
   transform: translate3d(0, 16px, 0);
-  will-change: opacity, transform;
   animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .hero-stagger > *:nth-child(1) { animation-delay: 0.05s; }
@@ -205,6 +203,12 @@ body {
 @keyframes gridFadeIn {
   from { opacity: 0; transform: translate3d(0, 8px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ---- Chrome perf: skip rendering off-screen sections ---- */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }
 
 /* Hide scrollbar but keep scroll functionality */
@@ -228,14 +232,6 @@ body {
 @keyframes dropdown-out {
   from { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
   to { opacity: 0; transform: scale(0.95) translate3d(0, -4px, 0); }
-}
-
-/* Safari GPU compositing hints for glassmorphism elements */
-.backdrop-blur-md,
-.backdrop-blur-xl,
-.backdrop-blur-sm {
-  -webkit-backdrop-filter: var(--tw-backdrop-blur);
-  transform: translate3d(0, 0, 0);
 }
 
 /* Pulse ring for status dot */

@@ -39,7 +39,7 @@ export default function CtaBanner({ heading, text, buttonLabel, buttonTo, second
           {secondaryLabel && secondaryTo && (
             <Link
               to={secondaryTo}
-              className="inline-flex items-center gap-2 min-h-11 px-6 py-3 text-cta-text text-[0.8rem] font-medium tracking-wide uppercase backdrop-blur-sm bg-cta-text/5 border border-cta-btn-border hover:bg-cta-text/10 transition-colors"
+              className="inline-flex items-center gap-2 min-h-11 px-6 py-3 text-cta-text text-[0.8rem] font-medium tracking-wide uppercase bg-cta-text/5 border border-cta-btn-border hover:bg-cta-text/10 transition-colors"
             >
               {secondaryLabel}
             </Link>

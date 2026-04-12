@@ -32,6 +32,7 @@ export default function HomePage() {
   });
   const heroRef = useRef<HTMLDivElement>(null);
   const parallaxImgs = useRef<HTMLElement[]>([]);
+  const prevHeroIndex = useRef(0);
   const lightboxOpen = useRef(false);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
@@ -41,19 +42,23 @@ export default function HomePage() {
 
   useEffect(() => { document.title = "Mandy Dennis Art"; }, []);
 
-  // Parallax — uses CSS custom property to avoid Chrome layout thrashing
-  // Writing a CSS variable is cheaper than rewriting the full transform string
+  // Parallax — avoids getBoundingClientRect() which forces synchronous layout
+  // reflow in Chrome on every scroll frame (the main perf killer).
+  // window.scrollY is free and hero height is cached on resize.
   useEffect(() => {
     let rafId = 0;
+    let heroHeight = heroRef.current?.offsetHeight ?? 0;
+
+    const cacheHeight = () => {
+      heroHeight = heroRef.current?.offsetHeight ?? 0;
+    };
 
     const update = () => {
-      const el = heroRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.bottom > 0) {
-        const y = -rect.top * 0.10;
+      const scrollY = window.scrollY;
+      if (scrollY < heroHeight) {
+        const y = scrollY * 0.10;
         for (const img of parallaxImgs.current) {
-          if (img) img.style.setProperty("--parallax-y", `${y}px`);
+          if (img) img.style.transform = `scale(1.12) translate3d(0, ${y}px, 0)`;
         }
       }
     };
@@ -63,11 +68,14 @@ export default function HomePage() {
       rafId = requestAnimationFrame(update);
     };
 
+    cacheHeight();
     update();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", cacheHeight);
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", cacheHeight);
       cancelAnimationFrame(rafId);
     };
   }, []);
@@ -94,7 +102,10 @@ export default function HomePage() {
   // Cycle hero — pauses when lightbox is open
   const cycleHero = useCallback(() => {
     if (featured.length <= 1 || lightboxOpen.current) return;
-    setHeroIndex((i) => (i + 1) % featured.length);
+    setHeroIndex((prev) => {
+      prevHeroIndex.current = prev;
+      return (prev + 1) % featured.length;
+    });
   }, [featured.length]);
 
   useEffect(() => {
@@ -124,22 +135,26 @@ export default function HomePage() {
     <>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Hero images — all rendered, only active is visible via opacity */}
-        {featured.map((item, i) => (
-          item.image ? (
+        {/* Hero images — only render active + previous (for crossfade).
+            Mounting all images at opacity:0 wastes compositor layers in Chrome. */}
+        {featured.map((item, i) => {
+          const isActive = i === safeIndex;
+          const isPrev = i === prevHeroIndex.current;
+          if (!item.image || (!isActive && !isPrev)) return null;
+          return (
             <div
               key={item.slug}
               className={`absolute inset-0 transition-opacity ease-in-out ${
-                i === safeIndex
+                isActive
                   ? (heroReady ? "opacity-100 duration-700" : "opacity-0 duration-700")
                   : "opacity-0 duration-1000 pointer-events-none"
               }`}
-              aria-hidden={i !== safeIndex}
+              aria-hidden={!isActive}
             >
               <div
                 ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className="absolute inset-0 will-change-transform"
-                style={{ transform: "scale(1.12) translate3d(0, var(--parallax-y, 0px), 0)" }}
+                className={`absolute inset-0 ${isActive ? "will-change-transform" : ""}`}
+                style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
               >
                 <img
                   src={heroUrl(item.image)}
@@ -147,8 +162,6 @@ export default function HomePage() {
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   onLoad={i === 0 ? () => {
-                    // Defer by one frame so the browser paints opacity-0 first,
-                    // ensuring the CSS transition actually fires
                     requestAnimationFrame(() => setHeroReady(true));
                   } : undefined}
                   className="w-full h-full object-cover object-center"
@@ -157,17 +170,17 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
             </div>
-          ) : null
-        ))}
+          );
+        })}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
-          <div className="hero-stagger max-w-xl backdrop-blur-[var(--blur-glass)] bg-bg/50 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
+          <div className="hero-stagger max-w-xl bg-bg/80 border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
             {/* Row 1: line + status + social icons */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex-1 h-px bg-text/10" />
               <span className="flex items-center gap-2.5">
                 <span className="text-[0.6rem] tracking-widest uppercase text-text-subtle font-medium">Available for work</span>
-                <span className="relative flex h-3 w-3">
+                <span className="relative flex h-3 w-3 isolate">
                   <span className="absolute h-full w-full rounded-full bg-emerald-400/50 animate-ping" />
                   <span className="relative rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
@@ -198,11 +211,11 @@ export default function HomePage() {
 
               {/* Social icons — right side on all sizes */}
               <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                <Link to="/commissions" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
+                <Link to="/commissions" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Get in touch">
                   <FaEnvelope size={14} />
                 </Link>
                 {settings.instagram_url && (
-                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full backdrop-blur-sm bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
+                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-text/[0.04] border border-text/[0.06] text-text-muted hover:text-text hover:bg-text/[0.08] transition-colors" aria-label="Instagram">
                     <FaInstagram size={15} />
                   </a>
                 )}
@@ -227,8 +240,8 @@ export default function HomePage() {
               {featured.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setHeroIndex(i)}
-                  className={`rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
+                  onClick={() => { prevHeroIndex.current = safeIndex; setHeroIndex(i); }}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${
                     i === safeIndex
                       ? "w-8 h-2.5 bg-text/50 shadow-sm"
                       : "w-2.5 h-2.5 bg-text/15 hover:bg-text/25"
@@ -243,7 +256,7 @@ export default function HomePage() {
       <DrawLine />
 
       {/* Intro strip */}
-      <div ref={introRef}>
+      <div ref={introRef} className="cv-auto">
         <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[clamp(2rem,4vw,3rem)]">
           <div className={`anim-fade-up ${introInView ? "in-view" : ""} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
             <p className="text-text-mid text-[1rem] leading-relaxed max-w-lg">
@@ -260,7 +273,7 @@ export default function HomePage() {
       {/* Featured Work — always shows ALL featured items */}
       {featured.length > 0 && (
         <>
-          <div ref={featuredRef}>
+          <div ref={featuredRef} className="cv-auto">
             <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Featured Work" />
               <div className={`anim-fade-up ${featuredInView ? "in-view" : ""}`}>
@@ -291,7 +304,7 @@ export default function HomePage() {
       {/* Upcoming events teaser */}
       {upcomingEvents.length > 0 && (
         <>
-          <div ref={eventsRef}>
+          <div ref={eventsRef} className="cv-auto">
             <div className="max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-section)]">
               <SectionHeader title="Upcoming Events" />
               <div className={`anim-fade-up ${eventsInView ? "in-view" : ""} space-y-3 max-w-[var(--width-narrow)]`}>

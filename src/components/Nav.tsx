@@ -85,7 +85,7 @@ function MobileNav() {
 
 export default function Nav() {
   return (
-    <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 bg-bg/95">
       <div className="max-w-[var(--width-content)] mx-auto flex items-center justify-between px-[var(--pad-page)] py-2">
         <NavLink
           to="/"
