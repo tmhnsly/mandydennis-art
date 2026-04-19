@@ -11,8 +11,8 @@ Portfolio website for artist Mandy Dennis. Showcases artwork, takes commission e
 - **Icons:** lucide-react
 - **Lightbox:** yet-another-react-lightbox
 - **CMS:** Sanity (headless CMS -- content + image hosting in one service)
-- **Hosting:** Netlify (free tier, auto-deploys from GitHub)
-- **Forms:** Netlify Forms (commission enquiry form)
+- **Hosting:** Vercel (auto-deploys from GitHub; live at mandydennis.art, www → apex redirect via vercel.json)
+- **Forms:** None (commission enquiry uses a `mailto:` link — opens the user's email client prefilled)
 - **Repo:** github.com/tmhnsly/mandydennis-art
 
 ## Key Architecture Decisions
@@ -22,6 +22,7 @@ Portfolio website for artist Mandy Dennis. Showcases artwork, takes commission e
 - **Dummy fallback data:** When `VITE_SANITY_PROJECT_ID` is empty, the site renders with placeholder content so the layout can be previewed without Sanity.
 - **SiteSettings context:** Global settings (currency, tagline, etc.) fetched once via React context, not per-page.
 - **Currency is configurable:** Stored as `currency_symbol` in Sanity site settings, rendered from there. Currently GBP (£).
+- **Contact form is `mailto:` only:** no backend, no third-party form service. Opens the user's mail client addressed to `settings.contact_email` (currently `mandy@mandydennis.art`).
 - **No Cloudinary, no Netlify Identity, no Git Gateway:** Sanity replaces all of these.
 
 ## Project Structure
@@ -43,7 +44,7 @@ src/
     Footer.tsx                -- Copyright + optional Facebook link
     FeaturedGrid.tsx          -- Homepage featured artwork grid
     CommissionCard.tsx        -- Single commission category pricing table
-    CommissionForm.tsx        -- Netlify Forms enquiry form
+    CommissionForm.tsx        -- Mailto-based commission enquiry form
     EventCard.tsx             -- Single event card
     gallery/
       GalleryGrid.tsx         -- CSS columns masonry grid

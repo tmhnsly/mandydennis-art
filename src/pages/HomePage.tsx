@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaInstagram, FaEnvelope } from "react-icons/fa";
-import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache } from "../lib/content";
+import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache, imageDimensions } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 import ArtworkLightbox from "../components/ArtworkLightbox";
 import EventCard from "../components/EventCard";
@@ -149,7 +149,10 @@ export default function HomePage() {
                 <img
                   src={heroUrl(item.image)}
                   alt=""
+                  width={imageDimensions(item.image)?.width}
+                  height={imageDimensions(item.image)?.height}
                   loading={i === 0 ? "eager" : "lazy"}
+                  decoding={i === 0 ? "sync" : "async"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   onLoad={i === 0 ? () => {
                     requestAnimationFrame(() => setHeroReady(true));

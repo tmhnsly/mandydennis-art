@@ -22,7 +22,7 @@ export default function CommissionForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const to = settings.contact_email || "mandy@example.com";
+    const to = settings.contact_email || "mandy@mandydennis.art";
     const subject = `Commission enquiry from ${name}`;
     const body = `From: ${name}\nEmail: ${email}\n\n${message}`;
     window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

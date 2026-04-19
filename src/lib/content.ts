@@ -100,7 +100,7 @@ const DUMMY_COMMISSIONS: CommissionCategory[] = [
 
 const DUMMY_SETTINGS: SiteSettings = {
   tagline: "Original artwork & commissions",
-  contact_email: "mandy@example.com",
+  contact_email: "mandy@mandydennis.art",
   facebook_url: "",
   instagram_url: "",
   currency_symbol: "£",

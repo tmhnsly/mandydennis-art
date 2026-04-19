@@ -6,8 +6,8 @@ Portfolio website for artist Mandy Dennis -- showcasing artwork, commission pric
 
 - **Frontend:** React 19, Vite, TypeScript, Tailwind CSS v4
 - **CMS:** Sanity (content + image hosting)
-- **Hosting:** Netlify
-- **Forms:** Netlify Forms
+- **Hosting:** Vercel (live at mandydennis.art)
+- **Forms:** None — commission enquiry uses a `mailto:` link
 
 ## Quick Start
 

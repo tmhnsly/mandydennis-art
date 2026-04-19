@@ -88,8 +88,11 @@ export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
                 <img
                   src={thumbnailUrl(item.image)}
                   alt={item.title}
+                  width={dims?.width}
+                  height={dims?.height}
                   className={`w-full h-auto block transition-opacity duration-300 ease-out ${isLoaded ? "opacity-100" : "opacity-0"}`}
                   loading="lazy"
+                  decoding="async"
                   onLoad={() => onImageLoad(item.slug)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,31,24,0.8)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-4">

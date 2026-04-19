@@ -42,7 +42,7 @@ Complete visual redesign of the Mandy Dennis Art portfolio. Construction-line ae
 ### Commissions (/commissions)
 - Pricing cards with dotted row dividers, structured header/body/addons/notes
 - Interactive enquiry form: toggles for size + addons giving rough estimate
-- Netlify Forms submission
+- Mailto-based enquiry (opens visitor's mail client pre-filled to `mandy@mandydennis.art`)
 
 ### Events (/events)
 - Event cards with large date display (day + month), location, description

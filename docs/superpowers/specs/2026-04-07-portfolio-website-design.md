@@ -1,5 +1,7 @@
 # Mandy Dennis Art -- Portfolio Website Design
 
+> **Update 2026-04-19**: hosting switched from Netlify to **Vercel** (apex `mandydennis.art`, www → apex redirect). The commission form was simplified to a `mailto:` link rather than a hosted form service — zero backend, opens the visitor's mail client pre-filled. The rest of this spec stands.
+
 ## Overview
 
 A portfolio website for artist Mandy Dennis to showcase her artwork, take commission enquiries, and promote upcoming events. The site must be dead-simple for a non-technical user (phone-only, no code) to manage day-to-day content.
@@ -19,8 +21,8 @@ A portfolio website for artist Mandy Dennis to showcase her artwork, take commis
 | Framework   | React 19 + Vite + TypeScript | Fast builds, modern tooling                            |
 | Styling     | Tailwind CSS v4           | Rapid UI development, responsive out of the box          |
 | CMS         | Sanity (free tier)        | Single service for content + images, great mobile UX     |
-| Hosting     | Netlify (free tier)       | Auto-deploy, free SSL, easy custom domain                |
-| Forms       | Netlify Forms (free)      | 100 submissions/month, no backend needed                 |
+| Hosting     | Vercel (free tier)        | Auto-deploy from GitHub, free SSL, easy custom domain    |
+| Forms       | `mailto:` link            | Zero backend; opens visitor's mail client pre-filled     |
 
 ### Why Sanity (not Decap CMS + Cloudinary)
 

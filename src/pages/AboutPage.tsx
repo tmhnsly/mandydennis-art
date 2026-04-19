@@ -40,6 +40,8 @@ export default function AboutPage() {
                 <img
                   src={urlFor(about.photo).width(800).auto("format").quality(85).url()}
                   alt="Mandy Dennis"
+                  loading="lazy"
+                  decoding="async"
                   onLoad={onPhotoLoad}
                   className={`w-full h-full object-cover transition-opacity duration-500 ease-out ${photoLoaded ? "opacity-100" : "opacity-0"}`}
                 />
