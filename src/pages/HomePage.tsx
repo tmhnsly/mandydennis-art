@@ -122,7 +122,7 @@ export default function HomePage() {
 
   return (
     <>
-      <title>Mandy Dennis Art</title>
+      <title>Mandy Dennis Art — Pastel Pet Portraits &amp; Wildlife Art, UK</title>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
         {/* Hero images — only render active + previous (for crossfade).
