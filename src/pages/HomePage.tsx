@@ -31,10 +31,10 @@ export default function HomePage() {
     return img.complete;
   });
   const heroRef = useRef<HTMLDivElement>(null);
-  const parallaxImgs = useRef<HTMLElement[]>([]);
-  const prevHeroIndex = useRef(0);
-  const [instantSwitch, setInstantSwitch] = useState(false);
+  const parallaxImg = useRef<HTMLDivElement>(null);
+  const heroIndexRef = useRef(0);
   const lightboxOpen = useRef(false);
+  useEffect(() => { heroIndexRef.current = heroIndex; }, [heroIndex]);
   const { ref: featuredRef, isInView: featuredInView } = useInView(0.1);
   const { ref: introRef, isInView: introInView } = useInView(0.1);
   const { ref: eventsRef, isInView: eventsInView } = useInView(0.1);
@@ -56,9 +56,8 @@ export default function HomePage() {
       const scrollY = window.scrollY;
       if (scrollY < heroHeight) {
         const y = scrollY * 0.10;
-        for (const img of parallaxImgs.current) {
-          if (img) img.style.transform = `scale(1.12) translate3d(0, ${y}px, 0)`;
-        }
+        const el = parallaxImg.current;
+        if (el) el.style.transform = `scale(1.12) translate3d(0, ${y}px, 0)`;
       }
     };
 
@@ -88,14 +87,25 @@ export default function HomePage() {
     }
   }, []);
 
-  // Cycle hero — pauses when lightbox is open
+  // Single hero image, swap src on cycle. Next image is preloaded into
+  // the browser cache before swapping so the new src renders immediately.
+  // No layered crossfade — keeps initial paint and runtime cost minimal.
+  const swapToHero = useCallback((next: number) => {
+    if (lightboxOpen.current) return;
+    if (next === heroIndexRef.current) return;
+    const item = featured[next];
+    if (!item?.image) return;
+    const img = new Image();
+    img.src = heroUrl(item.image);
+    const swap = () => setHeroIndex(next);
+    if (img.complete) swap();
+    else img.addEventListener("load", swap, { once: true });
+  }, [featured]);
+
   const cycleHero = useCallback(() => {
-    if (featured.length <= 1 || lightboxOpen.current) return;
-    setHeroIndex((prev) => {
-      prevHeroIndex.current = prev;
-      return (prev + 1) % featured.length;
-    });
-  }, [featured.length]);
+    if (featured.length <= 1) return;
+    swapToHero((heroIndexRef.current + 1) % featured.length);
+  }, [featured.length, swapToHero]);
 
   useEffect(() => {
     if (featured.length <= 1) return;
@@ -105,6 +115,7 @@ export default function HomePage() {
 
   // Hero cycles through featured images
   const safeIndex = featured.length > 0 ? heroIndex % featured.length : 0;
+  const activeItem = featured[safeIndex];
   // If no featured items have images, reveal hero immediately
   const hasHeroImages = featured.some((f) => f.image);
   useEffect(() => { if (!hasHeroImages) setHeroReady(true); }, [hasHeroImages]);
@@ -125,46 +136,34 @@ export default function HomePage() {
       <title>Mandy Dennis Art — Pastel Pet Portraits &amp; Wildlife Art, UK</title>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Hero images — all featured images mounted so crossfade has both
-            layers present. Mounting only active+prev caused new image to
-            render straight at opacity:1 with no transition (jump, not fade). */}
-        {featured.map((item, i) => {
-          if (!item.image) return null;
-          const isActive = i === safeIndex;
-          return (
+        {/* Single hero image — src swaps on cycle. One element, one
+            compositor layer, no per-slide layered crossfade. */}
+        {activeItem?.image && (
+          <div
+            className={`absolute inset-0 transition-opacity duration-500 ease-out ${heroReady ? "opacity-100" : "opacity-0"}`}
+            aria-hidden="true"
+          >
             <div
-              key={item.slug}
-              className={`absolute inset-0 ${instantSwitch ? "" : "transition-opacity duration-700 ease-in-out"} ${
-                isActive
-                  ? (heroReady ? "opacity-100" : "opacity-0")
-                  : "opacity-0 pointer-events-none"
-              }`}
-              aria-hidden={!isActive}
+              ref={parallaxImg}
+              className="absolute inset-0 will-change-transform"
+              style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
             >
-              <div
-                ref={(el) => { if (el) parallaxImgs.current[i] = el; }}
-                className="absolute inset-0 will-change-transform"
-                style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
-              >
-                <img
-                  src={heroUrl(item.image)}
-                  alt=""
-                  width={imageDimensions(item.image)?.width}
-                  height={imageDimensions(item.image)?.height}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  decoding={i === 0 ? "sync" : "async"}
-                  fetchPriority={i === 0 ? "high" : undefined}
-                  onLoad={i === 0 ? () => {
-                    requestAnimationFrame(() => setHeroReady(true));
-                  } : undefined}
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
+              <img
+                src={heroUrl(activeItem.image)}
+                alt=""
+                width={imageDimensions(activeItem.image)?.width}
+                height={imageDimensions(activeItem.image)?.height}
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+                onLoad={() => setHeroReady(true)}
+                className="w-full h-full object-cover object-center"
+              />
             </div>
-          );
-        })}
+            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
+          </div>
+        )}
 
         <div className="relative max-w-[var(--width-content)] mx-auto px-[var(--pad-page)] py-[var(--pad-hero)]">
           <div className="hero-stagger max-w-xl bg-bg/60 backdrop-blur-md border border-line rounded-lg p-[clamp(1.5rem,4vw,2.5rem)]">
@@ -233,12 +232,7 @@ export default function HomePage() {
               {featured.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => {
-                    prevHeroIndex.current = safeIndex;
-                    setInstantSwitch(true);
-                    setHeroIndex(i);
-                    requestAnimationFrame(() => requestAnimationFrame(() => setInstantSwitch(false)));
-                  }}
+                  onClick={() => swapToHero(i)}
                   className={`rounded-full transition-all duration-300 cursor-pointer ${
                     i === safeIndex
                       ? "w-8 h-2.5 bg-text/50 shadow-sm"
