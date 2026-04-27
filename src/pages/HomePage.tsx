@@ -1,9 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache, imageDimensions } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
-import ArtworkLightbox from "../components/ArtworkLightbox";
+const ArtworkLightbox = lazy(() => import("../components/ArtworkLightbox"));
+if (typeof window !== "undefined") {
+  window.addEventListener("load", () => { import("../components/ArtworkLightbox"); }, { once: true });
+}
 import EventCard from "../components/EventCard";
 import { useSiteSettings } from "../context/SiteSettings";
 import { useInView } from "../hooks/useAnimateIn";
@@ -135,16 +138,18 @@ export default function HomePage() {
   const hasHeroImages = featured.some((f) => f.image);
   useEffect(() => { if (!hasHeroImages) setHeroReady(true); }, [hasHeroImages]);
   // Upcoming events
-  const now = new Date();
-  const toUTC = (d: string | null) => {
-    if (!d) return 0;
-    const [y, m, dd] = d.split("-").map(Number);
-    return Date.UTC(y, m - 1, dd);
-  };
-  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const upcomingEvents = events
-    .filter((e) => e.startDate && toUTC(e.endDate ?? e.startDate) >= todayUTC)
-    .slice(0, 2);
+  const upcomingEvents = useMemo(() => {
+    const toUTC = (d: string | null) => {
+      if (!d) return 0;
+      const [y, m, dd] = d.split("-").map(Number);
+      return Date.UTC(y, m - 1, dd);
+    };
+    const now = new Date();
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return events
+      .filter((e) => e.startDate && toUTC(e.endDate ?? e.startDate) >= todayUTC)
+      .slice(0, 2);
+  }, [events]);
 
   return (
     <>
@@ -321,12 +326,16 @@ export default function HomePage() {
           </div>
           <DrawLine />
 
-          <ArtworkLightbox
-            items={featured}
-            index={lightboxIndex}
-            onClose={() => setLightboxIndex(-1)}
-            onChange={setLightboxIndex}
-          />
+          {lightboxIndex >= 0 && (
+            <Suspense fallback={null}>
+              <ArtworkLightbox
+                items={featured}
+                index={lightboxIndex}
+                onClose={() => setLightboxIndex(-1)}
+                onChange={setLightboxIndex}
+              />
+            </Suspense>
+          )}
         </>
       )}
 

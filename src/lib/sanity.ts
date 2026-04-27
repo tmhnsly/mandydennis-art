@@ -12,6 +12,7 @@ export const client = isConfigured
       dataset: import.meta.env.VITE_SANITY_DATASET || "production",
       useCdn: true,
       apiVersion: "2024-01-01",
+      stega: false,
     })
   : null;
 

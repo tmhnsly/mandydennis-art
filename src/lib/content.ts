@@ -159,17 +159,70 @@ export function getInitialCommissions(): CommissionCategory[] { return getCached
 export function getInitialTestimonials(): Testimonial[] { return getCached("testimonials") ?? DUMMY_TESTIMONIALS; }
 export function getInitialSettings(): SiteSettings { return getCached("settings") ?? DUMMY_SETTINGS; }
 
-// Pre-fetch everything — called once before React mounts.
-// Populates the cache so getInitial*() has real data on first render.
+// Pre-fetch everything — called once after React mounts to warm the
+// cache so subsequent navigation has real data immediately. One combined
+// GROQ query (single round-trip) instead of six parallel CDN fetches.
 export async function prefetchAll(): Promise<void> {
-  await Promise.all([
-    getArtwork(),
-    getEvents(),
-    getCommissions(),
-    getSettings(),
-    getAbout(),
-    getTestimonials(),
-  ]);
+  if (!isConfigured || !client) return;
+  try {
+    const result = await withTimeout(client.fetch(`{
+      "artwork": *[_type == "artwork"] | order(date desc) {
+        "slug": slug.current, title, image, description, medium, subject, featured, date
+      },
+      "events": *[_type == "event"] | order(coalesce(startDate, date) asc) {
+        "slug": slug.current, title, "startDate": coalesce(startDate, date),
+        endDate, startTime, endTime, location, description, link
+      },
+      "commissions": *[_type == "commissionCategory"] | order(title asc) {
+        "slug": slug.current, title, options, addons, included, notes
+      },
+      "settings": *[_type == "siteSettings"][0] {
+        tagline, contact_email, facebook_url, instagram_url, currency_symbol
+      },
+      "about": *[_type == "about"][0] { bio, photo },
+      "testimonials": *[_type == "testimonial"] { name, quote, commission }
+    }`), 3000) as {
+      artwork?: Artwork[];
+      events?: ArtEvent[];
+      commissions?: CommissionCategory[];
+      settings?: SiteSettings | null;
+      about?: AboutPage | null;
+      testimonials?: Testimonial[];
+    };
+    setCache("artwork", normalizeArtwork(result.artwork ?? []));
+    setCache("events", normalizeEvents(result.events ?? []));
+    setCache("commissions", result.commissions && result.commissions.length > 0 ? result.commissions : DUMMY_COMMISSIONS);
+    setCache("settings", result.settings ?? DUMMY_SETTINGS);
+    setCache("about", result.about ?? DUMMY_ABOUT);
+    setCache("testimonials", result.testimonials && result.testimonials.length > 0 ? result.testimonials : DUMMY_TESTIMONIALS);
+  } catch {
+    // Per-page useEffect fetchers will retry individually.
+  }
+}
+
+// Shared normalisation — used by both prefetchAll and the per-resource fetchers.
+const ANIMAL_TAGS = ["pets", "animals", "dogs", "cats", "horses", "birds", "wildlife"];
+
+function normalizeArtwork(results: Artwork[]): Artwork[] {
+  if (!results || results.length === 0) return DUMMY_ARTWORK;
+  const mapped = results.map((item) => ({
+    ...item,
+    description: item.description ?? "",
+    medium: item.medium ?? [],
+    subject: item.subject ?? [],
+    featured: item.featured ?? false,
+  }));
+  return mapped.sort((a, b) => {
+    const aAnimal = a.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
+    const bAnimal = b.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
+    if (aAnimal !== bAnimal) return aAnimal - bAnimal;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+}
+
+function normalizeEvents(results: ArtEvent[]): ArtEvent[] {
+  if (!results || results.length === 0) return DUMMY_EVENTS;
+  return results.filter((e) => e.startDate);
 }
 
 // Async fetchers — also called in useEffect to refresh stale cache.
@@ -195,22 +248,7 @@ export function getArtwork(): Promise<Artwork[]> {
         "slug": slug.current, title, image, description, medium, subject, featured, date
       }
     `), 3000);
-    if (!results || results.length === 0) return DUMMY_ARTWORK;
-    const ANIMAL_TAGS = ["pets", "animals", "dogs", "cats", "horses", "birds", "wildlife"];
-    const mapped = results.map((item: Artwork) => ({
-      ...item,
-      description: item.description ?? "",
-      medium: item.medium ?? [],
-      subject: item.subject ?? [],
-      featured: item.featured ?? false,
-    }));
-    // Sort: animal-tagged artwork first, then by date
-    return mapped.sort((a: Artwork, b: Artwork) => {
-      const aAnimal = a.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
-      const bAnimal = b.subject.some((s: string) => ANIMAL_TAGS.includes(s)) ? 0 : 1;
-      if (aAnimal !== bAnimal) return aAnimal - bAnimal;
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+    return normalizeArtwork(results);
   }, DUMMY_ARTWORK);
 }
 
@@ -224,8 +262,7 @@ export function getEvents(): Promise<ArtEvent[]> {
         endDate, startTime, endTime, location, description, link
       }
     `), 3000);
-    if (!results || results.length === 0) return DUMMY_EVENTS;
-    return results.filter((e: ArtEvent) => e.startDate);
+    return normalizeEvents(results);
   }, DUMMY_EVENTS);
 }
 
