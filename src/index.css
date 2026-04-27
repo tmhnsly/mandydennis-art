@@ -241,3 +241,13 @@ body {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+/* Hero crossfade — applied to the active layer; previous layer sits
+   underneath at opacity 1 so there is no blank frame during swap. */
+@keyframes heroFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.hero-fade-in {
+  animation: heroFade 500ms ease-out forwards;
+}
+

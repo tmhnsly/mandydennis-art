@@ -30,8 +30,9 @@ export default function HomePage() {
     img.src = heroUrl(first.image);
     return img.complete;
   });
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const parallaxImg = useRef<HTMLDivElement>(null);
+  const parallaxImgs = useRef<(HTMLDivElement | null)[]>([]);
   const heroIndexRef = useRef(0);
   const lightboxOpen = useRef(false);
   useEffect(() => { heroIndexRef.current = heroIndex; }, [heroIndex]);
@@ -56,8 +57,10 @@ export default function HomePage() {
       const scrollY = window.scrollY;
       if (scrollY < heroHeight) {
         const y = scrollY * 0.10;
-        const el = parallaxImg.current;
-        if (el) el.style.transform = `scale(1.12) translate3d(0, ${y}px, 0)`;
+        const t = `scale(1.12) translate3d(0, ${y}px, 0)`;
+        for (const el of parallaxImgs.current) {
+          if (el) el.style.transform = t;
+        }
       }
     };
 
@@ -87,9 +90,9 @@ export default function HomePage() {
     }
   }, []);
 
-  // Single hero image, swap src on cycle. Next image is preloaded into
-  // the browser cache before swapping so the new src renders immediately.
-  // No layered crossfade — keeps initial paint and runtime cost minimal.
+  // Two-layer crossfade. Preload next, then mount new layer above the old.
+  // Old layer stays painted at opacity 1 underneath while new fades in —
+  // no blank frame, no src-swap flash.
   const swapToHero = useCallback((next: number) => {
     if (lightboxOpen.current) return;
     if (next === heroIndexRef.current) return;
@@ -97,7 +100,10 @@ export default function HomePage() {
     if (!item?.image) return;
     const img = new Image();
     img.src = heroUrl(item.image);
-    const swap = () => setHeroIndex(next);
+    const swap = () => {
+      setPrevIndex(heroIndexRef.current);
+      setHeroIndex(next);
+    };
     if (img.complete) swap();
     else img.addEventListener("load", swap, { once: true });
   }, [featured]);
@@ -116,6 +122,15 @@ export default function HomePage() {
   // Hero cycles through featured images
   const safeIndex = featured.length > 0 ? heroIndex % featured.length : 0;
   const activeItem = featured[safeIndex];
+  const prevItem = prevIndex != null && prevIndex !== safeIndex && featured.length > 0
+    ? featured[prevIndex % featured.length]
+    : null;
+  // Drop the previous layer once the new one has finished fading in.
+  useEffect(() => {
+    if (prevIndex == null) return;
+    const t = setTimeout(() => setPrevIndex(null), 600);
+    return () => clearTimeout(t);
+  }, [prevIndex]);
   // If no featured items have images, reveal hero immediately
   const hasHeroImages = featured.some((f) => f.image);
   useEffect(() => { if (!hasHeroImages) setHeroReady(true); }, [hasHeroImages]);
@@ -136,15 +151,37 @@ export default function HomePage() {
       <title>Mandy Dennis Art — Pastel Pet Portraits &amp; Wildlife Art, UK</title>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Single hero image — src swaps on cycle. One element, one
-            compositor layer, no per-slide layered crossfade. */}
+        {/* Two-layer crossfade: previous image stays painted underneath
+            while the new image fades in on top. No src swap, no blank
+            frame between transitions. */}
+        {prevItem?.image && (
+          <div className="absolute inset-0 opacity-100" aria-hidden="true">
+            <div
+              ref={(el) => { parallaxImgs.current[0] = el; }}
+              className="absolute inset-0"
+              style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
+            >
+              <img
+                src={heroUrl(prevItem.image)}
+                alt=""
+                width={imageDimensions(prevItem.image)?.width}
+                height={imageDimensions(prevItem.image)?.height}
+                decoding="async"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-bg/70 via-bg/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent" />
+          </div>
+        )}
         {activeItem?.image && (
           <div
-            className={`absolute inset-0 transition-opacity duration-500 ease-out ${heroReady ? "opacity-100" : "opacity-0"}`}
+            key={`hero-${safeIndex}`}
+            className={`absolute inset-0 ${heroReady ? "hero-fade-in" : "opacity-0"}`}
             aria-hidden="true"
           >
             <div
-              ref={parallaxImg}
+              ref={(el) => { parallaxImgs.current[1] = el; }}
               className="absolute inset-0 will-change-transform"
               style={{ transform: "scale(1.12) translate3d(0, 0px, 0)" }}
             >
