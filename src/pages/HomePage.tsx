@@ -125,16 +125,16 @@ export default function HomePage() {
       <title>Mandy Dennis Art — Pastel Pet Portraits &amp; Wildlife Art, UK</title>
       {/* Hero — background cycles through featured, text overlaid */}
       <div ref={heroRef} className="relative overflow-hidden bg-surface">
-        {/* Hero images — only render active + previous (for crossfade).
-            Mounting all images at opacity:0 wastes compositor layers in Chrome. */}
+        {/* Hero images — all featured images mounted so crossfade has both
+            layers present. Mounting only active+prev caused new image to
+            render straight at opacity:1 with no transition (jump, not fade). */}
         {featured.map((item, i) => {
+          if (!item.image) return null;
           const isActive = i === safeIndex;
-          const isPrev = i === prevHeroIndex.current;
-          if (!item.image || (!isActive && !isPrev)) return null;
           return (
             <div
               key={item.slug}
-              className={`absolute inset-0 ${instantSwitch ? "" : "transition-opacity duration-700 ease-in-out will-change-[opacity]"} ${
+              className={`absolute inset-0 ${instantSwitch ? "" : "transition-opacity duration-700 ease-in-out"} ${
                 isActive
                   ? (heroReady ? "opacity-100" : "opacity-0")
                   : "opacity-0 pointer-events-none"
