@@ -13,10 +13,9 @@ function hideLoader() {
   loader.addEventListener("transitionend", () => loader.remove(), { once: true });
 }
 
-// Mount React immediately with dummy/cached data. Pages hydrate from
-// Sanity via useEffect (no pop-in for text — only late-arriving images
-// fade in on top). Blocking on document.fonts.ready + prefetchAll cost
-// 1-2s of spinner on cold cache, especially in Chrome.
+// Mount React immediately with dummy/cached data so the rendered DOM
+// triggers font requests via its font-family rules. Sanity hydrates in
+// the background (the old block on prefetchAll cost 1-2s of spinner).
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
 createRoot(root).render(
@@ -32,7 +31,12 @@ createRoot(root).render(
 // Warm the cache in the background so navigation feels instant.
 prefetchAll();
 
-// Hide loader after React paints its first frame.
-requestAnimationFrame(() => {
-  requestAnimationFrame(hideLoader);
+// Keep the loader on top of the mounted-but-fallback-fonts page until
+// fonts are ready, then fade. Hides FOUT without blocking React mount.
+// Safety timeout: never hold the loader longer than 2s, even if a font
+// stalls.
+const fontsReady = document.fonts?.ready ?? Promise.resolve();
+const fontTimeout = new Promise<void>((r) => setTimeout(r, 2000));
+Promise.race([fontsReady, fontTimeout]).then(() => {
+  requestAnimationFrame(() => requestAnimationFrame(hideLoader));
 });
