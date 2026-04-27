@@ -13,26 +13,26 @@ function hideLoader() {
   loader.addEventListener("transitionend", () => loader.remove(), { once: true });
 }
 
-// Wait for BOTH fonts and Sanity data before mounting React.
-// The loader stays visible until everything is ready — no pop-in.
-Promise.all([
-  document.fonts.ready,
-  prefetchAll(),
-]).then(() => {
-  const root = document.getElementById("root");
-  if (!root) throw new Error("Root element not found");
-  createRoot(root).render(
-    <StrictMode>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <SiteSettingsProvider>
-          <App />
-        </SiteSettingsProvider>
-      </BrowserRouter>
-    </StrictMode>
-  );
+// Mount React immediately with dummy/cached data. Pages hydrate from
+// Sanity via useEffect (no pop-in for text — only late-arriving images
+// fade in on top). Blocking on document.fonts.ready + prefetchAll cost
+// 1-2s of spinner on cold cache, especially in Chrome.
+const root = document.getElementById("root");
+if (!root) throw new Error("Root element not found");
+createRoot(root).render(
+  <StrictMode>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <SiteSettingsProvider>
+        <App />
+      </SiteSettingsProvider>
+    </BrowserRouter>
+  </StrictMode>
+);
 
-  // Hide loader after React has painted the first frame
-  requestAnimationFrame(() => {
-    requestAnimationFrame(hideLoader);
-  });
+// Warm the cache in the background so navigation feels instant.
+prefetchAll();
+
+// Hide loader after React paints its first frame.
+requestAnimationFrame(() => {
+  requestAnimationFrame(hideLoader);
 });
