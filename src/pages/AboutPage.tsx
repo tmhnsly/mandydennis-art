@@ -39,7 +39,7 @@ export default function AboutPage() {
               <div className="w-full aspect-[3/4] bg-surface border border-line overflow-hidden">
                 <img
                   src={urlFor(about.photo).width(800).auto("format").quality(85).url()}
-                  alt="Mandy Dennis"
+                  alt={about.photo?.alt ?? "Mandy Dennis"}
                   loading="lazy"
                   decoding="async"
                   onLoad={onPhotoLoad}

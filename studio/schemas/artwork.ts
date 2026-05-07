@@ -18,7 +18,7 @@ export default defineType({
       title: "URL Slug",
       type: "slug",
       options: { source: "title", maxLength: 96 },
-      description: "Click Generate to create automatically from the title",
+      description: "Tap the 'Generate' button to create this automatically from the title.",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -26,7 +26,15 @@ export default defineType({
       title: "Photo",
       type: "image",
       options: { hotspot: true },
-      description: "Upload a photo of the artwork",
+      description: "Upload a photo of the artwork. Tap the image once uploaded to set the focus point — that's the part that stays visible when the photo is cropped.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Description for screen readers",
+          type: "string",
+          description: "Optional but kind. A short description for people who can't see the image, e.g. 'Pastel portrait of a black labrador'.",
+        }),
+      ],
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -86,13 +94,21 @@ export default defineType({
       name: "featured",
       title: "Show on Homepage",
       type: "boolean",
-      description: "Turn this on to feature this piece on the homepage",
+      description: "Turn this on to show this piece in the featured row at the top of the homepage.",
       initialValue: false,
+    }),
+    defineField({
+      name: "featuredOrder",
+      title: "Featured order",
+      type: "number",
+      description: "Optional. Lower numbers show first on the homepage's featured row (e.g. 1 shows before 2). Leave blank to fall back to newest-first.",
+      hidden: ({ parent }) => !parent?.featured,
     }),
     defineField({
       name: "date",
       title: "Date Added",
       type: "date",
+      description: "When was this piece made? Auto-fills to today; tap to change if needed.",
       initialValue: () => new Date().toISOString().split("T")[0],
       validation: (rule) => rule.required(),
     }),

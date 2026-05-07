@@ -1,7 +1,8 @@
 import type { SanityImageSource } from "@sanity/image-url";
 
-// Sanity image reference object
-export type SanityImage = SanityImageSource | null;
+// Sanity image reference object — intersected with the optional alt
+// sub-field defined in the studio schema (artwork.image, about.photo).
+export type SanityImage = (SanityImageSource & { alt?: string }) | null;
 
 export interface Artwork {
   slug: string;
@@ -11,6 +12,7 @@ export interface Artwork {
   medium: string[];
   subject: string[];
   featured: boolean;
+  featuredOrder?: number;
   date: string;
 }
 

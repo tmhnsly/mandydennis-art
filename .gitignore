@@ -28,3 +28,6 @@ dist-ssr
 *.sw?
 .superpowers/
 studio/.yarn/
+
+# Private — Mandy's printable guide (not for the public repo)
+docs/sanity-guide/

@@ -87,7 +87,7 @@ export default function MasonryGrid({ items, onSelect, emptyMessage }: Props) {
               >
                 <img
                   src={thumbnailUrl(item.image)}
-                  alt={item.title}
+                  alt={item.image?.alt ?? item.title}
                   width={dims?.width}
                   height={dims?.height}
                   className={`w-full h-auto block transition-opacity duration-300 ease-out ${isLoaded ? "opacity-100" : "opacity-0"}`}

@@ -49,7 +49,7 @@ export default defineType({
               name: "price",
               title: "Price (£)",
               type: "number",
-              description: "Just the number, e.g. 80",
+              description: "Enter only the number, e.g. 80. The £ symbol is added automatically on the website.",
               validation: (rule) => rule.required().min(0),
             }),
           ],
@@ -68,7 +68,7 @@ export default defineType({
       name: "addons",
       title: "Extras / Add-ons",
       type: "array",
-      description: "Things the customer can add on top, like extra pets or a specific background.",
+      description: "Optional. Things customers can add on top (e.g. extra pets, a specific background). Leave the whole section blank if not needed.",
       of: [
         {
           type: "object",
@@ -85,7 +85,7 @@ export default defineType({
               name: "price",
               title: "Extra cost (£)",
               type: "number",
-              description: "Just the number, e.g. 50",
+              description: "Enter only the number, e.g. 50. The £ symbol is added automatically.",
               validation: (rule) => rule.required().min(0),
             }),
           ],
@@ -104,14 +104,14 @@ export default defineType({
       title: "What's included in the price?",
       type: "text",
       rows: 2,
-      description: "e.g. 'A5–A3 includes a basic frame and mount. Add extra for a specific frame.'",
+      description: "Optional. What comes with the price (e.g. 'A5–A3 includes a basic frame and mount. Add extra for a specific frame.').",
     }),
     defineField({
       name: "notes",
       title: "Anything else to mention?",
       type: "text",
       rows: 2,
-      description: "e.g. 'Postage & packaging available if required'",
+      description: "Optional. Anything else customers should know (e.g. 'Postage & packaging available on request').",
     }),
   ],
   preview: {

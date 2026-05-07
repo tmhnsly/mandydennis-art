@@ -230,7 +230,7 @@ export default function ArtworkLightbox({ items, index, onClose, onChange, onTag
               )}
               <img
                 src={url}
-                alt={item.title}
+                alt={item.image?.alt ?? item.title}
                 loading="eager"
                 decoding="async"
                 onLoad={() => onImageLoad(url)}

@@ -38,13 +38,13 @@ export default defineType({
       name: "startTime",
       title: "Start Time (optional)",
       type: "string",
-      description: "e.g. '10:00am', '2pm'",
+      description: "e.g. '10:00am' or '2pm'. Leave blank if there's no specific start time.",
     }),
     defineField({
       name: "endTime",
       title: "End Time (optional)",
       type: "string",
-      description: "e.g. '4:00pm', '8pm'",
+      description: "e.g. '4:00pm' or '8pm'. Leave blank for open-ended events.",
     }),
     defineField({
       name: "location",
@@ -65,7 +65,7 @@ export default defineType({
       name: "link",
       title: "Link (optional)",
       type: "url",
-      description: "Link to more info, e.g. a Facebook event",
+      description: "Optional. Full URL starting with https:// — e.g. a Facebook event page or a venue's website.",
     }),
   ],
   orderings: [

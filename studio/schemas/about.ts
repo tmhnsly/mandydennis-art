@@ -19,7 +19,15 @@ export default defineType({
       title: "Photo of Me",
       type: "image",
       options: { hotspot: true },
-      description: "A photo of yourself to show on the About page",
+      description: "A photo of yourself to show on the About page. Tap the image once uploaded to set the focus point.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Description for screen readers",
+          type: "string",
+          description: "Optional but kind. Short description for people who can't see the image, e.g. 'Mandy at her studio easel'.",
+        }),
+      ],
     }),
   ],
   preview: {

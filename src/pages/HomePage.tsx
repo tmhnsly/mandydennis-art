@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaInstagram, FaEnvelope } from "react-icons/fa";
-import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache, imageDimensions } from "../lib/content";
+import { getArtwork, getInitialArtwork, getEvents, getInitialEvents, heroUrl, hasFreshCache, imageDimensions, sortFeatured } from "../lib/content";
 import CtaBanner, { CtaAccent } from "../components/CtaBanner";
 const ArtworkLightbox = lazy(() => import("../components/ArtworkLightbox"));
 if (typeof window !== "undefined") {
@@ -21,13 +21,12 @@ const CYCLE_MS = 5000;
 export default function HomePage() {
   const settings = useSiteSettings();
   const initial = getInitialArtwork();
-  const [featured, setFeatured] = useState<Artwork[]>(() => initial.filter((a) => a.featured));
+  const [featured, setFeatured] = useState<Artwork[]>(() => sortFeatured(initial.filter((a) => a.featured)));
   const [events, setEvents] = useState<ArtEvent[]>(getInitialEvents);
   const [heroIndex, setHeroIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [heroReady, setHeroReady] = useState(() => {
-    // If the first hero image is already in browser cache, show immediately (no fade)
-    const first = initial.filter((a) => a.featured).find((a) => a.image);
+    const first = sortFeatured(initial.filter((a) => a.featured)).find((a) => a.image);
     if (!first) return true;
     const img = new Image();
     img.src = heroUrl(first.image);
@@ -86,7 +85,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!hasFreshCache("artwork")) {
-      getArtwork().then((all) => setFeatured(all.filter((a) => a.featured)));
+      getArtwork().then((all) => setFeatured(sortFeatured(all.filter((a) => a.featured))));
     }
     if (!hasFreshCache("events")) {
       getEvents().then(setEvents);

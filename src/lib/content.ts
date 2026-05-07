@@ -19,6 +19,7 @@ const DUMMY_ARTWORK: Artwork[] = [
     medium: ["pastel"],
     subject: ["animals", "dogs"],
     featured: true,
+    featuredOrder: 1,
     date: "2026-03-15",
   },
   {
@@ -29,6 +30,7 @@ const DUMMY_ARTWORK: Artwork[] = [
     medium: ["watercolour"],
     subject: ["landscape"],
     featured: true,
+    featuredOrder: 2,
     date: "2026-02-20",
   },
   {
@@ -167,7 +169,7 @@ export async function prefetchAll(): Promise<void> {
   try {
     const result = await withTimeout(client.fetch(`{
       "artwork": *[_type == "artwork"] | order(date desc) {
-        "slug": slug.current, title, image, description, medium, subject, featured, date
+        "slug": slug.current, title, image, description, medium, subject, featured, featuredOrder, date
       },
       "events": *[_type == "event"] | order(coalesce(startDate, date) asc) {
         "slug": slug.current, title, "startDate": coalesce(startDate, date),
@@ -198,6 +200,17 @@ export async function prefetchAll(): Promise<void> {
   } catch {
     // Per-page useEffect fetchers will retry individually.
   }
+}
+
+// Sort featured artworks: explicit featuredOrder asc (lower = earlier),
+// undefined falls to the bottom, then most recent first.
+export function sortFeatured(items: Artwork[]): Artwork[] {
+  return [...items].sort((a, b) => {
+    const ao = a.featuredOrder ?? Infinity;
+    const bo = b.featuredOrder ?? Infinity;
+    if (ao !== bo) return ao - bo;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
 }
 
 // Shared normalisation — used by both prefetchAll and the per-resource fetchers.
@@ -245,7 +258,7 @@ export function getArtwork(): Promise<Artwork[]> {
   return fetchAndCache("artwork", async () => {
     const results = await withTimeout(c.fetch(`
       *[_type == "artwork"] | order(date desc) {
-        "slug": slug.current, title, image, description, medium, subject, featured, date
+        "slug": slug.current, title, image, description, medium, subject, featured, featuredOrder, date
       }
     `), 3000);
     return normalizeArtwork(results);
